@@ -1,0 +1,83 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: Pretendard;
+  font-weight: 400;
+  src:
+    local('Pretendard Regular'),
+    url('./assets/fonts/Pretendard-Regular.woff') format('woff'),
+    url('./assets/fonts/Pretendard-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Pretendard;
+  font-weight: 500;
+  src:
+    local('Pretendard Medium'),
+    url('./assets/fonts/Pretendard-Medium.woff') format('woff'),
+    url('./assets/fonts/Pretendard-Medium.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Pretendard;
+  font-weight: 600;
+  src:
+    local('Pretendard SemiBold'),
+    url('./assets/fonts/Pretendard-SemiBold.woff') format('woff'),
+    url('./assets/fonts/Pretendard-SemiBold.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Pretendard;
+  font-weight: 700;
+  src:
+    local('Pretendard Bold'),
+    url('./assets/fonts/Pretendard-Bold.woff') format('woff'),
+    url('./assets/fonts/Pretendard-Bold.woff2') format('woff2');
+  font-display: swap;
+}
+
+@theme {
+  /* Font */
+  --font-pretendard: 'Pretendard', sans-serif;
+
+  /* Color */
+
+  /* Main */
+  --color-main: #f36b0a;
+  --color-sub: #ffead7;
+  --color-bg: #f8f9fa;
+
+  /* Orange */
+  --color-orange-50: #fff9f4;
+  --color--orange-100: #fff5ec;
+  --color--orange-200: #ffead7;
+  --color--orange-300: #ffdbbb;
+  --color--orange-400: #ffc48f;
+  --color--orange-500: #ffa45b;
+  --color--orange-600: #fb811c;
+  --color--orange-700: #f36b0a;
+  --color--orange-800: ##e95408;
+  --color--orange-900: ##d64206;
+
+  /* GrayScale */
+  --color-gray-50: #f8f9fa;
+  --color-gray-100: #f1f3f5;
+  --color-gray-200: #e9ecef;
+  --color-gray-300: #dee2e6;
+  --color-gray-400: #ced4da;
+  --color-gray-500: #adb5bd;
+  --color-gray-600: #868e96;
+  --color-gray-700: #5c636a;
+  --color-gray-800: #343a40;
+  --color-gray-900: #202124;
+  --color-gray-1000: #121314;
+
+  /* Etc */
+  --color-error: #f04438;
+  --color-success: #22b85a;
+  --color-warning: #f5c518;
+}
