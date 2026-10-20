@@ -2,11 +2,11 @@
 
 ## ✨프로젝트 소개
 
->
+> 학생 관심사 기반 교내 행사 정보를 제공 및 참여 연결 서비스
 
 - 기간 : 2026.09.28 ~ 2026.11.16
 - 인원 : Frontend 2명
-- 목적 :
+- 목적 : 대학생 행사 및 활동 정보를 손쉽게 파악하고 실제 참여를 준비하는 과정에서 겪는 어려움을 해결
 - 주요 기능
   - 회원가입 및 로그인
   - 교내 행사 안내 및 시각화
@@ -67,7 +67,7 @@
 ## 📁폴더 구조
 
 ```
-📦redo-front
+📦front
  ┣ 📂.github
  ┃ ┣ 📂ISSUE_TEMPLATE
  ┃ ┣ 📂workflows
@@ -105,7 +105,7 @@
 ## ▶️실행 방법
 
 ```bash
-git clone 'https://github.com/REDO-Team/Front.git'
+git clone 'https://github.com/Hangarae-catholic/FE.git'
 
 pnpm install
 
