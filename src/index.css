@@ -81,3 +81,11 @@
   --color-success: #22b85a;
   --color-warning: #f5c518;
 }
+
+.custom-pagination .swiper-pagination-bullet {
+  @apply w-1.5 h-1.5 bg-gray-400 rounded-full opacity-100 transition-all;
+}
+
+.custom-pagination .swiper-pagination-bullet-active {
+  @apply bg-[#fb811c] opacity-100 w-5 h-1.5;
+}
