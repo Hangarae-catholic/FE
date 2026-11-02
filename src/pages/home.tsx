@@ -3,8 +3,9 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
-import EventCard from '../components/Home/EventCard';
+import EventCard from '../components/HomePage/EventCard';
 import ExEvent from '/src/assets/images/event_ex.png';
+import MiniMap from '../components/HomePage/MiniMap';
 
 const mock = [
   { image: ExEvent, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '콘서트홀' },
@@ -34,11 +35,16 @@ export default function Home() {
         <div className='custom-pagination w-full max-w-120 flex justify-center gap-1.5 mt-3'></div>
       </div>
 
+      {/* 지도 영역 */}
       <div className='mt-4'>
         <h2 className='font-pretendard font-semibold text-lg text-gray-800 leading-7'>교내 행사 미니맵</h2>
         <div className='flex justify-between items-center'>
           <p className='font-pretendard font-normal text-sm text-gray-700 leading-5'>오늘 우리 학교, 어디가 핫할까?</p>
           <span className='font-pretendard font-normal text-sm text-orange-600 leading-5'>3개 진행중</span>
+        </div>
+
+        <div className='mt-3'>
+          <MiniMap />
         </div>
       </div>
     </>
