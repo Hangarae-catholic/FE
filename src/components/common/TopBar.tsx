@@ -10,7 +10,7 @@ export default function TopBar({ title, rightIcon, rightBtnName }: TopBarProps) 
   const RightIcon = rightIcon;
 
   return (
-    <div className='fixed top-0 z-50 flex w-full h-11 left-1/2 -translate-x-1/2 max-w-120 items-center justify-center bg-bg py-2.5 px-5'>
+    <div className='fixed top-0 z-30 flex w-full h-11 left-1/2 -translate-x-1/2 max-w-120 items-center justify-center bg-bg py-2.5 px-5'>
       <button type='button' className='fixed left-5'>
         <LeftArrow className='w-8 h-8 text-gray-700' />
       </button>

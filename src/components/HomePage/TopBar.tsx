@@ -6,7 +6,7 @@ export default function TopBar() {
   // const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
 
   return (
-    <div className='fixed top-0 z-50 flex w-full left-1/2 -translate-x-1/2 max-w-120 items-center justify-between bg-bg py-2.5 px-5'>
+    <div className='fixed top-0 z-30 flex w-full left-1/2 -translate-x-1/2 max-w-120 items-center justify-between bg-bg py-2.5 px-5'>
       <div className='flex items-center gap-1'>
         <img src={Logo} alt='logo' />
         <img src={TextLogo} alt='Hangarae' className='h-6 w-18' />
