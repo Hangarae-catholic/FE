@@ -10,7 +10,7 @@ export default function NavBar() {
   return (
     <>
       {/* 본문 비활성화 처리 */}
-      {isOpenModal && <div className='fixed inset-x-0 top-0 bottom-22 z-40 bg-gray-800/25' onClick={() => setIsOpenModal(false)} aria-hidden='true' />}
+      {isOpenModal && <div className='fixed inset-x-0 top-0 bottom-22 z-40 bg-gray-800/25 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsOpenModal(false)} aria-hidden='true' />}
 
       <nav aria-label='하단 내비게이션' className='fixed bottom-0 left-0 right-0 mx-auto z-50 w-full max-w-120 h-22 bg-white'>
         <ul className='flex items-center justify-around h-full'>
