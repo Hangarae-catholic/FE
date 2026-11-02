@@ -1,6 +1,6 @@
 import { matchPath, Outlet } from 'react-router-dom';
-import TopBar from '../components/HomePage/TopBar';
 import NavBar from '../components/common/NavBar';
+import TopBar from '../components/HomePage/TopBar';
 
 function MainLayout() {
   const isHome = !!matchPath({ path: '/home' }, location.pathname);
