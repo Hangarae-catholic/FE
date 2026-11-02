@@ -1,5 +1,5 @@
 import { matchPath, Outlet } from 'react-router-dom';
-import TopBar from '../components/Home/TopBar';
+import TopBar from '../components/HomePage/TopBar';
 import NavBar from '../components/common/NavBar';
 
 function MainLayout() {
