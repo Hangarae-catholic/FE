@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider, type RouteObject } from 'react-rou
 import MainLayout from './layouts/main-layout';
 import LandingPage from './pages/landing-page';
 import Home from './pages/home';
+import AddEventPage from './pages/add-event-page';
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -16,6 +17,10 @@ export default function App() {
         {
           path: 'home',
           element: <Home />,
+        },
+        {
+          path: 'add-event',
+          element: <AddEventPage />,
         },
       ],
     },
