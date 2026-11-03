@@ -1,11 +1,11 @@
 import { matchPath, Outlet } from 'react-router-dom';
 import NavBar from '../components/common/NavBar';
-import TopBar from '../components/common/TopBar';
+// import TopBar from '../components/common/TopBar';
 import HomeTopBar from '../components/HomePage/TopBar';
 
 function MainLayout() {
   const isHome = !!matchPath({ path: '/home' }, location.pathname);
-  const isAddEventPage = !!matchPath({ path: '/add-event' }, location.pathname);
+  // const isAddEventPage = !!matchPath({ path: '/add-event' }, location.pathname);
 
   const showNavBar = isHome;
 
@@ -14,7 +14,7 @@ function MainLayout() {
       <div className='flex mx-auto min-h-screen w-full max-w-120 bg-bg'>
         <div className={`mx-auto flex w-full max-w-120 flex-col px-5 h-full`}>
           {isHome && <HomeTopBar />}
-          {isAddEventPage && <TopBar title='행사 등록' />}
+          {/* {isAddEventPage && <TopBar title='행사 등록' />} */}
           <main className='mt-15 flex flex-1 flex-col'>
             <Outlet />
           </main>
