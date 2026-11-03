@@ -2,11 +2,13 @@ interface ModalProps {
   title: string;
   content?: string;
   leftBtn?: string;
+  cancel?: () => void;
   rightBtn: string;
   rightBtnColor?: 'ORANGE' | 'RED';
+  onClick: () => void;
 }
 
-export default function Modal({ title, content, leftBtn, rightBtn, rightBtnColor = 'ORANGE' }: ModalProps) {
+export default function Modal({ title, content, leftBtn, cancel, rightBtn, rightBtnColor = 'ORANGE', onClick }: ModalProps) {
   return (
     <div role='dialog' aria-modal='true' className='fixed inset-0 flex items-center justify-center bg-gray-700/23 z-50 w-full max-w-120 left-1/2 -translate-x-1/2'>
       <div className='bg-white p-5 w-full max-w-80 rounded-[20px] flex flex-col gap-4'>
@@ -16,11 +18,11 @@ export default function Modal({ title, content, leftBtn, rightBtn, rightBtnColor
         </div>
         <div className='flex justify-center items-center gap-4'>
           {leftBtn && (
-            <button type='button' className='w-full font-pretendard font-medium text-base text-gray-800 p-2.5 rounded-xl bg-gray-200'>
+            <button type='button' className='w-full font-pretendard font-medium text-base text-gray-800 p-2.5 rounded-xl bg-gray-200' onClick={cancel}>
               {leftBtn}
             </button>
           )}
-          <button type='button' className={`w-full font-pretendard font-medium text-base text-white p-2.5 rounded-xl ${rightBtnColor === 'ORANGE' ? 'bg-main' : 'bg-error'}`}>
+          <button type='button' className={`w-full font-pretendard font-medium text-base text-white p-2.5 rounded-xl ${rightBtnColor === 'ORANGE' ? 'bg-main' : 'bg-error'}`} onClick={onClick}>
             {rightBtn}
           </button>
         </div>
