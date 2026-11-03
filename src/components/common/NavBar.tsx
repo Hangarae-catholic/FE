@@ -1,16 +1,22 @@
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { NAV_ITEMS } from '../../constants/NAV_ITEMS';
 import { useState } from 'react';
 import RightArrow from '/src/assets/icons/arrow_right.svg?react';
 
 export default function NavBar() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const handleClickAddEvent = () => {
+    navigate('/add-event');
+    setIsOpenModal(false);
+  };
 
   return (
     <>
       {/* 본문 비활성화 처리 */}
-      {isOpenModal && <div className='fixed inset-x-0 top-0 bottom-22 z-40 bg-gray-800/25 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsOpenModal(false)} aria-hidden='true' />}
+      {isOpenModal && <div className='fixed inset-x-0 top-0 bottom-22 z-30 bg-gray-800/25 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsOpenModal(false)} aria-hidden='true' />}
 
       <nav aria-label='하단 내비게이션' className='fixed bottom-0 left-0 right-0 mx-auto z-30 w-full max-w-120 h-22 bg-white'>
         <ul className='flex items-center justify-around h-full'>
@@ -22,7 +28,7 @@ export default function NavBar() {
                   {/* 모달 */}
                   {isOpenModal && (
                     <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-3 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
-                      <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200'>
+                      <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200' onClick={handleClickAddEvent}>
                         <span className='font-pretendard font-normal text-sm text-gray-800'>행사 추가</span>
                         <RightArrow className='w-2.5 h-2.5 text-gray-700' />
                       </button>
