@@ -9,11 +9,12 @@ import ArrowDown from '/src/assets/icons/arrow_down.svg?react';
 type DateButtonProps = {
   value?: string;
   onClick?: () => void;
+  isDateSelected?: boolean;
 };
 
-const DateButton = forwardRef<HTMLButtonElement, DateButtonProps>(({ value, onClick }, ref) => (
+const DateButton = forwardRef<HTMLButtonElement, DateButtonProps>(({ value, onClick, isDateSelected = false }, ref) => (
   <button ref={ref} type='button' onClick={onClick} aria-label='행사 날짜 선택' className='flex items-center gap-0.5'>
-    <span className='font-pretendard font-medium text-sm text-gray-500 underline'>{value}</span>
+    <span className={`font-pretendard font-medium text-sm underline ${isDateSelected ? 'text-main' : 'text-gray-500'}`}>{value}</span>
     <ArrowDown className='w-6 h-6 text-gray-700' />
   </button>
 ));
@@ -23,9 +24,10 @@ DateButton.displayName = 'DateButton';
 type DateDropdownProps = {
   value: Date | null;
   onChange: (date: Date | null) => void;
+  isDateSelected: boolean;
 };
 
-export default function DateDropdown({ value, onChange }: DateDropdownProps) {
+export default function DateDropdown({ value, onChange, isDateSelected }: DateDropdownProps) {
   return (
     <>
       <DatePicker
@@ -33,7 +35,7 @@ export default function DateDropdown({ value, onChange }: DateDropdownProps) {
         onChange={onChange}
         locale={ko}
         dateFormat='yyyy.MM.dd'
-        customInput={<DateButton />}
+        customInput={<DateButton isDateSelected={isDateSelected} />}
         popperClassName='!z-50'
         popperPlacement='bottom'
         showPopperArrow={false}
