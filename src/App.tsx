@@ -3,6 +3,7 @@ import MainLayout from './layouts/main-layout';
 import LandingPage from './pages/landing-page';
 import Home from './pages/home';
 import AddEventPage from './pages/add-event-page';
+import TeamMatchingPage from './pages/team-matching';
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -21,6 +22,10 @@ export default function App() {
         {
           path: 'add-event',
           element: <AddEventPage />,
+        },
+        {
+          path: 'team-match',
+          element: <TeamMatchingPage />,
         },
       ],
     },
