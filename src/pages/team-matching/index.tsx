@@ -13,6 +13,7 @@ import Capybara from '/src/assets/images/capy_face_surprise.svg?react';
 
 const mock = [
   {
+    id: 1,
     image: ExTeamMatching,
     title: '컴퓨터공학부 학술제',
     content: '학술제 같이 나가실 분 구해요! 성실히 참ㅇㄹㅇ여하실 분으로 구해봅니다. 프로젝트 경험 있으신 분 환영합니다!',
@@ -25,6 +26,7 @@ const mock = [
     currentMember: 2,
   },
   {
+    id: 2,
     image: ExTeamMatching,
     title: '미디어콘텐츠학과 학술제',
     content: '학술제 같이 나가실 분 구해요! 성실히 참ㅇㄹㅇ여하실 분으로 구해봅니다. 프로젝트 경험 있으신 분 환영합니다!',
@@ -37,6 +39,7 @@ const mock = [
     currentMember: 6,
   },
   {
+    id: 3,
     image: ExTeamMatching,
     title: '코딩테스트 스터디',
     content: '학술제 같이 나가실 분 구해요! 성실히 참ㅇㄹㅇ여하실 분으로 구해봅니다. 프로젝트 경험 있으신 분 환영합니다!',
@@ -57,9 +60,9 @@ export default function TeamMatchingPage() {
 
   return (
     <>
+      {/* 본문 비활성화 처리 */}
       {isMoreModalOpen && <div className='fixed inset-x-0 top-0 bottom-22 z-30 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
       <div className='fixed z-20 flex flex-col w-full left-1/2 -translate-x-1/2 max-w-120 bg-bg px-5'>
-        {/* 본문 비활성화 처리 */}
         {/* 상단 문구 */}
         <div className='flex flex-col gap-0.5 relative'>
           <div className='flex justify-between items-center'>
@@ -70,14 +73,14 @@ export default function TeamMatchingPage() {
             {/* 더보기 모달 */}
             {isMoreModalOpen &&
               createPortal(
-                <div className='fixed z-50 top-10 right-[calc((100vw-480px)/2+20px)] flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
+                <div className='absolute z-50 top-10 right-0 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
                   <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200'>
-                    <span>내 게시물</span>
+                    <span className='font-pretendard font-normal text-sm text-gray-800'>내 게시물</span>
                     <RightArrow className='w-2.5 h-2.5' />
                   </button>
 
                   <button type='button' className='flex items-center justify-between py-2'>
-                    <span>최근 본</span>
+                    <span className='font-pretendard font-normal text-sm text-g'>최근 본</span>
                     <RightArrow className='w-2.5 h-2.5' />
                   </button>
                 </div>,
@@ -128,7 +131,7 @@ export default function TeamMatchingPage() {
 
               return matchCategory && matchKeyword;
             })
-            .map((m) => <TeamCard key={m.title} image={m.image} title={m.title} content={m.content} date={m.date} writerName={m.writerName} writerMajor={m.writerMajor} writerGrage={m.writerGrage} category={m.category} limitMember={m.limitMember} currentMember={m.currentMember} />)
+            .map((m) => <TeamCard key={m.title} image={m.image} title={m.title} content={m.content} date={m.date} writerName={m.writerName} writerMajor={m.writerMajor} writerGrage={m.writerGrage} category={m.category} limitMember={m.limitMember} currentMember={m.currentMember} id={m.id} />)
         ) : (
           <div className='flex flex-col items-center justify-center py-25 gap-3.5'>
             <Capybara className='w-25' />

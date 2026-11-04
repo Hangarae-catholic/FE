@@ -4,6 +4,7 @@ import LandingPage from './pages/landing-page';
 import Home from './pages/home';
 import AddEventPage from './pages/add-event-page';
 import TeamMatchingPage from './pages/team-matching';
+import TeamMatchDetailPage from './pages/team-matching/detail-page';
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -26,6 +27,10 @@ export default function App() {
         {
           path: 'team-match',
           element: <TeamMatchingPage />,
+        },
+        {
+          path: 'team-match/:postId',
+          element: <TeamMatchDetailPage />,
         },
       ],
     },
