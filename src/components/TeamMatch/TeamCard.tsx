@@ -2,8 +2,10 @@ import Calendar from '/src/assets/icons/calendar.svg?react';
 import Writer from '/src/assets/icons/writer.svg?react';
 import Member from '/src/assets/icons/member.svg?react';
 import RightArrow from '/src/assets/icons/arrow_right.svg?react';
+import { useNavigate } from 'react-router-dom';
 
 interface TeamCardProps {
+  id: number;
   image: string;
   title: string;
   content: string;
@@ -16,7 +18,9 @@ interface TeamCardProps {
   category: string;
 }
 
-export default function TeamCard({ image, title, content, date, writerName, writerMajor, writerGrage, limitMember, currentMember, category }: TeamCardProps) {
+export default function TeamCard({ id, image, title, content, date, writerName, writerMajor, writerGrage, limitMember, currentMember, category }: TeamCardProps) {
+  const navigate = useNavigate();
+
   return (
     <div className={`flex flex-col gap-3 px-5 py-3.5 rounded-[20px] ${limitMember === currentMember ? 'bg-gray-200' : 'bg-white'}`}>
       <div className='flex gap-2 items-center'>
@@ -47,7 +51,13 @@ export default function TeamCard({ image, title, content, date, writerName, writ
         </div>
       </div>
 
-      <button type='button' className={`w-full flex items-center justify-between rounded-xl px-1 py-0.5 ${limitMember === currentMember ? 'bg-gray-300' : 'bg-orange-100'}`}>
+      <button
+        type='button'
+        className={`w-full flex items-center justify-between rounded-xl px-1 py-0.5 ${limitMember === currentMember ? 'bg-gray-300' : 'bg-orange-100'}`}
+        onClick={() => {
+          navigate(`/team-match/${id}`);
+        }}
+      >
         <div className='flex gap-0.5 items-center'>
           <Member className={`w-5 h-5 ${limitMember === currentMember ? 'text-gray-600' : 'text-orange-500'}`} />
           <span className={`font-pretendard font-normal text-[13px] ${limitMember === currentMember ? 'text-gray-600' : 'text-main'}`}>
