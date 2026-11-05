@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import More from '/src/assets/icons/more.svg?react';
 import RightArrow from '/src/assets/icons/arrow_right.svg?react';
 import Search from '/src/assets/icons/search.svg?react';
@@ -63,11 +63,26 @@ export default function TeamMatchingPage() {
   const options = ['최신 순', '오래된 순'];
   const [sorted, setSorted] = useState(options[0]);
 
+  useEffect(() => {
+    if (!isMoreModalOpen) return;
+
+    // 기존 스크롤 상태 저장
+    const prevOverflow = document.body.style.overflow;
+
+    // 배경 스크롤 비활성화
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      // 모달이 닫히면 기존 상태로 복구
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isMoreModalOpen]);
+
   return (
     <>
       {/* 본문 비활성화 처리 */}
-      {isMoreModalOpen && <div className='fixed inset-x-0 top-0 bottom-22 z-30 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
-      <div className='fixed z-20 flex flex-col w-full left-1/2 -translate-x-1/2 max-w-120 bg-bg px-5'>
+      {isMoreModalOpen && <div className='h-full fixed inset-x-0 top-0 bottom-22 z-30 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
+      <div className='pt-1 top-0 fixed z-20 flex flex-col w-full left-1/2 -translate-x-1/2 max-w-120 bg-bg px-5'>
         {/* 상단 문구 */}
         <div className='flex flex-col gap-0.5 relative'>
           <div className='flex justify-between items-center'>
@@ -78,7 +93,7 @@ export default function TeamMatchingPage() {
             {/* 더보기 모달 */}
             {isMoreModalOpen &&
               createPortal(
-                <div className='absolute z-50 top-10 right-0 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
+                <div className='absolute z-50 top-10 right-5 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
                   <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200'>
                     <span className='font-pretendard font-normal text-sm text-gray-800'>내 게시물</span>
                     <RightArrow className='w-2.5 h-2.5' />
