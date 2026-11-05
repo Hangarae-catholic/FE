@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import TopBar from '../../components/common/TopBar';
 import More from '/src/assets/icons/more.svg?react';
-import RightArrow from '/src/assets/icons/arrow_right.svg?react';
 import Calendar from '/src/assets/icons/calendar_event.svg?react';
 import Member from '/src/assets/icons/member.svg?react';
 import Modal from '../../components/common/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ExTeamMatching from '/src/assets/images/ex_team-matching.png';
 import KakaoTalk from '/src/assets/icons/kakao.svg?react';
 import Instagram from '/src/assets/icons/instagram.svg?react';
@@ -42,6 +41,7 @@ const mock = [
 
 export default function TeamMatchDetailPage() {
   const navigate = useNavigate();
+  const { postId } = useParams();
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -76,22 +76,8 @@ export default function TeamMatchDetailPage() {
       {/* 본문 비활성화 처리 */}
       {isMoreModalOpen && <div className='h-full fixed inset-x-0 top-0 bottom-22 z-40 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
       {/* 상단바 */}
-      <div className='relative'>
-        {user === mock[0].writerName ? <TopBar title='팀 매칭 상세' rightIcon={More} rightOnClick={() => setIsMoreModalOpen(true)} /> : <TopBar title='팀 매칭 상세' />}
-
-        {isMoreModalOpen && (
-          <div className='absolute z-50 -top-5 right-2 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
-            <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200'>
-              <span className='font-pretendard font-normal text-sm text-gray-800'>글 수정하기</span>
-              <RightArrow className='w-2.5 h-2.5' />
-            </button>
-
-            <button type='button' className='flex items-center justify-between py-2' onClick={() => setIsDeleteModalOpen(true)}>
-              <span className='font-pretendard font-normal text-sm text-gray-800'>글 삭제하기</span>
-              <RightArrow className='w-2.5 h-2.5' />
-            </button>
-          </div>
-        )}
+      <div>
+        {user === mock[0].writerName ? <TopBar title='팀 매칭 상세' rightIcon={More} rightOnClick={() => setIsMoreModalOpen((prev) => !prev)} isMoreModalOpen={isMoreModalOpen} modalBtn1='글 수정하기' modalBtn2='글 삭제하기' onClickModalBtn1={() => navigate(`/team-match/edit/${postId}`)} onClickModalBtn2={() => setIsDeleteModalOpen(true)} /> : <TopBar title='팀 매칭 상세' />}
 
         {isDeleteModalOpen && <Modal title='팀 모집글을 삭제할까요?' content='삭제한 모집글은 복구할 수 없어요.' leftBtn='취소' cancel={handleCancel} rightBtn='삭제하기' rightBtnColor='RED' onClick={handleDelete} />}
       </div>
