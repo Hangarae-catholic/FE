@@ -153,3 +153,11 @@
 .react-datepicker__navigation-icon::before {
   border-color: #6b7280 !important;
 }
+
+/* Chrome, Safari, Edge, Opera */
+/* input type number button delete */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
