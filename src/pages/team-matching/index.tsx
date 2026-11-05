@@ -118,7 +118,7 @@ export default function TeamMatchingPage() {
         <div className='mb-3 flex justify-end'>
           <Dropdown
             baseClassName='CustomDropdown'
-            className='w-23 px-2 py-1 rounded-sm border border-gray-300 bg-white relative'
+            className='w-fit px-2 py-1 rounded-sm border border-gray-300 bg-white relative'
             options={options}
             value={sorted}
             onChange={(option) => setSorted(option.value.toString())}
