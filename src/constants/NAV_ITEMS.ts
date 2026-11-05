@@ -19,7 +19,7 @@ export const NAV_ITEMS = [
     icon: Plus,
   },
   {
-    path: '/matching',
+    path: '/team-match',
     label: '팀매칭',
     icon: Matching,
   },

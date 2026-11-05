@@ -41,6 +41,7 @@ export default function AddEventPage() {
   const [isOpenSubmitModal, setIsOpenSubmitModal] = useState(false);
   const [isOpenBackModal, setIsOpenBackModal] = useState(false);
 
+  // 타임 피커 영역 감지
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
       if (startTimePickerRef.current && !startTimePickerRef.current.contains(event.target as Node)) {
@@ -112,7 +113,7 @@ export default function AddEventPage() {
             </div>
           )}
           {selectedImages.length < 3 && (
-            <label className='w-25 h-25 flex justify-center items-center bg-gray-200'>
+            <label className='w-25 h-25 flex justify-center items-center bg-gray-200 ml-1.5'>
               <Camera className='w-6 h-6 text-gray-600' />
               <input type='file' accept='image/*' multiple className='hidden' onChange={handleImageChange} />
             </label>
@@ -153,11 +154,11 @@ export default function AddEventPage() {
         </label>
         {/* 시작일시 */}
         <div className='w-full bg-white border border-gray-300 rounded-xl px-2.5 py-4 flex items-center gap-3'>
-          <div className='flex gap-1.5 items-center'>
+          <div className='flex gap-1.5 items-center leading-none'>
             <EventCalender className='w-6 h-6 text-gray-600' />
             <span className='font-pretendard font-normal text-[13px] text-gray-600'>시작일시</span>
           </div>
-          <div className='flex items-baseline gap-2'>
+          <div className='flex items-center gap-2 leading-none'>
             {/* 날짜 선택 */}
             <DateDropdown
               value={startEventDate}
@@ -191,11 +192,11 @@ export default function AddEventPage() {
         </div>
         {/* 종료일시 */}
         <div className='w-full bg-white border border-gray-300 rounded-xl px-2.5 py-4 flex items-center gap-3'>
-          <div className='flex gap-1.5 items-center'>
+          <div className='flex gap-1.5 items-center leading-none'>
             <EventCalender className='w-6 h-6 text-gray-600' />
             <span className='font-pretendard font-normal text-[13px] text-gray-600'>종료일시</span>
           </div>
-          <div className='flex items-baseline gap-2'>
+          <div className='flex items-center gap-2 leading-none'>
             {/* 날짜 선택 */}
             <DateDropdown
               value={endEventDate}
@@ -258,7 +259,7 @@ export default function AddEventPage() {
       </button>
 
       {/* 뒤로가기 모달 */}
-      {isOpenBackModal && <Modal title='행사 등록을 그만둘까요?' content='지금 나가면 작성 중인 내용이 저장되지 않고 사라져요.' leftBtn='계속 작성' cancel={() => setIsOpenBackModal(false)} rightBtn='나가기' onClick={() => navigate('/home')} />}
+      {isOpenBackModal && <Modal title='행사 등록을 그만둘까요?' content='지금 나가면 작성 중인 내용이 저장되지 않고 사라져요.' leftBtn='계속 작성' cancel={() => setIsOpenBackModal(false)} rightBtn='나가기' onClick={() => navigate(-1)} />}
 
       {/* 완료 모달 */}
       {isOpenSubmitModal && <Modal title='행사를 등록하시겠어요?' content='등록한 행사 정보는 관리자의 승인 후 사용자들에게 공개돼요. 허위 또는 부적절한 내용은 관리자에 의해 수정되거나 삭제될 수 있어요.' leftBtn='취소' cancel={() => setIsOpenSubmitModal(false)} rightBtn='등록하기' onClick={handleSubmit} />}

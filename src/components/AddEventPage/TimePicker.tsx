@@ -96,7 +96,7 @@ function WheelColumn({ label, value, max, onChange }: WheelColumnProps) {
   };
 
   return (
-    <div className='flex w-20 flex-col items-center font-pretendard'>
+    <div className='flex w-[clamp(3.5rem,20vw,5rem)] flex-col items-center font-pretendard'>
       <button type='button' onClick={() => changeBy(1)} aria-label={`${label} 증가`} className='p-1'>
         <ArrowUp className='w-6 h-6' />
       </button>
@@ -143,7 +143,7 @@ export default function StartTimePicker({ value, onChange }: StartTimePickerProp
   };
 
   return (
-    <div className='flex w-full items-center justify-center gap-4'>
+    <div className='flex w-full min-w-0 items-center justify-center gap-[clamp(0.5rem,3vw,1rem)]'>
       <WheelColumn label='시' value={hour} max={23} onChange={updateHour} />
 
       <span className='text-2xl font-normal text-gray-900'>:</span>
