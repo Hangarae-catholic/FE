@@ -1,9 +1,10 @@
-import { matchPath, Outlet } from 'react-router-dom';
+import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import NavBar from '../components/common/NavBar';
 // import TopBar from '../components/common/TopBar';
 import HomeTopBar from '../components/HomePage/TopBar';
 
 function MainLayout() {
+  const location = useLocation();
   const isHome = !!matchPath({ path: '/home' }, location.pathname);
   const isTeamMatchingIndexPage = !!matchPath({ path: '/team-match' }, location.pathname);
   const isTeamMatchingDetailPage = !!matchPath({ path: '/team-match/:postId' }, location.pathname);
