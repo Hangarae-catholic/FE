@@ -81,28 +81,31 @@ export default function TeamMatchingPage() {
   return (
     <>
       {/* 본문 비활성화 처리 */}
-      {isMoreModalOpen && <div className='h-full fixed inset-x-0 top-0 bottom-22 z-30 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
+      {isMoreModalOpen && <div className='fixed inset-x-0 top-0 bottom-22 z-30 mx-auto w-full max-w-120 bg-gray-700/23' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
       <div className='pt-1 top-0 fixed z-20 flex flex-col w-full left-1/2 -translate-x-1/2 max-w-120 bg-bg px-5'>
         {/* 상단 문구 */}
-        <div className='flex flex-col gap-0.5 relative'>
-          <div className='flex justify-between items-center'>
-            <h1 className='font-pretendard font-bold text-xl text-gray-800 leading-7.5'>함께할 팀원을 찾아볼까요?</h1>
-            <button type='button' onClick={() => setIsMoreModalOpen(true)} className=''>
-              <More className='w-6 h-6 text-gray-700' />
+        <div className='relative flex flex-col gap-0.5'>
+          <div className='flex items-center justify-between'>
+            <h1 className='font-pretendard text-xl font-bold leading-7.5 text-gray-800'>함께할 팀원을 찾아볼까요?</h1>
+
+            <button type='button' onClick={() => setIsMoreModalOpen(true)}>
+              <More className='h-6 w-6 text-gray-700' />
             </button>
             {/* 더보기 모달 */}
             {isMoreModalOpen &&
               createPortal(
-                <div className='absolute z-50 top-10 right-5 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
-                  <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200'>
-                    <span className='font-pretendard font-normal text-sm text-gray-800'>내 게시물</span>
-                    <RightArrow className='w-2.5 h-2.5' />
-                  </button>
+                <div className='fixed inset-x-0 top-0 z-50 mx-auto w-full max-w-120'>
+                  <div className='absolute right-5 top-10 flex w-34 flex-col rounded-xl bg-[#fcfbfb] px-3'>
+                    <button type='button' className='flex items-center justify-between border-b border-gray-200 py-2'>
+                      <span className='font-pretendard text-sm font-normal text-gray-800'>내 게시물</span>
+                      <RightArrow className='h-2.5 w-2.5' />
+                    </button>
 
-                  <button type='button' className='flex items-center justify-between py-2'>
-                    <span className='font-pretendard font-normal text-sm text-g'>최근 본</span>
-                    <RightArrow className='w-2.5 h-2.5' />
-                  </button>
+                    <button type='button' className='flex items-center justify-between py-2'>
+                      <span className='font-pretendard text-sm font-normal text-gray-800'>최근 본</span>
+                      <RightArrow className='h-2.5 w-2.5' />
+                    </button>
+                  </div>
                 </div>,
                 document.body,
               )}
