@@ -8,8 +8,10 @@ import ExTeamMatching from '/src/assets/images/ex_team-matching.png';
 import { createPortal } from 'react-dom';
 import X from '/src/assets/icons/x.svg?react';
 import Capybara from '/src/assets/images/capy_face_surprise.svg?react';
+import ArrowDown from '/src/assets/icons/arrow_down.svg?react';
+import Dropdown from 'react-dropdown';
 
-// 무한스크롤
+// 무한스크롤?
 
 const mock = [
   {
@@ -57,6 +59,9 @@ export default function TeamMatchingPage() {
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
   const [selected, setSelected] = useState<string>('전체');
   const [searchKeyword, setSearchKeyword] = useState('');
+
+  const options = ['최신 순', '오래된 순'];
+  const [sorted, setSorted] = useState(options[0]);
 
   return (
     <>
@@ -108,10 +113,27 @@ export default function TeamMatchingPage() {
 
         {/* 카테고리 필터 */}
         <CategoryGroup selected={selected} setSelected={setSelected} />
+
+        {/* 정렬 드롭다운 */}
+        <div className='mb-3 flex justify-end'>
+          <Dropdown
+            baseClassName='CustomDropdown'
+            className='w-23 px-2 py-1 rounded-sm border border-gray-300 bg-white relative'
+            options={options}
+            value={sorted}
+            onChange={(option) => setSorted(option.value.toString())}
+            controlClassName='flex items-center w-full flex justify-between'
+            placeholderClassName='font-pretendard font-normal text-[13px] text-gray-800 select-none'
+            menuClassName='absolute left-0 top-full w-full z-50 overflow-y-auto rounded-sm border border-gray-300 bg-white'
+            optionClassName='font-pretendard font-normal text-[13px] text-gray-800 py-1 px-2 border-t border-gray-300 select-none'
+            arrowClosed={<ArrowDown className='w-6 h-6 text-gray-600' />}
+            arrowOpen={<ArrowDown className='w-6 h-6 text-gray-600 rotate-180' />}
+          />
+        </div>
       </div>
 
       {/* 팀매칭 카드 */}
-      <div className='mt-46 flex flex-col gap-4'>
+      <div className='mt-55 flex flex-col gap-4'>
         {mock.filter((m) => {
           const matchCategory = selected === '전체' || selected === m.category;
 
