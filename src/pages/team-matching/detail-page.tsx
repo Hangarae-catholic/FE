@@ -5,7 +5,7 @@ import RightArrow from '/src/assets/icons/arrow_right.svg?react';
 import Calendar from '/src/assets/icons/calendar_event.svg?react';
 import Member from '/src/assets/icons/member.svg?react';
 import Modal from '../../components/common/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ExTeamMatching from '/src/assets/images/ex_team-matching.png';
 import KakaoTalk from '/src/assets/icons/kakao.svg?react';
 import Instagram from '/src/assets/icons/instagram.svg?react';
@@ -42,6 +42,7 @@ const mock = [
 
 export default function TeamMatchDetailPage() {
   const navigate = useNavigate();
+  const { postId } = useParams();
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -81,7 +82,7 @@ export default function TeamMatchDetailPage() {
 
         {isMoreModalOpen && (
           <div className='absolute z-50 -top-5 right-2 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
-            <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200'>
+            <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200' onClick={() => navigate(`/team-match/edit/${postId}`)}>
               <span className='font-pretendard font-normal text-sm text-gray-800'>글 수정하기</span>
               <RightArrow className='w-2.5 h-2.5' />
             </button>

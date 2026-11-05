@@ -6,6 +6,7 @@ import AddEventPage from './pages/add-event-page';
 import TeamMatchingPage from './pages/team-matching';
 import TeamMatchDetailPage from './pages/team-matching/detail-page';
 import TeamCreatePage from './pages/team-matching/create-page';
+import TeamMatchPostEditPage from './pages/team-matching/post-edit-page';
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -36,6 +37,10 @@ export default function App() {
         {
           path: 'team-match/create',
           element: <TeamCreatePage />,
+        },
+        {
+          path: 'team-match/edit/:postId',
+          element: <TeamMatchPostEditPage />,
         },
       ],
     },

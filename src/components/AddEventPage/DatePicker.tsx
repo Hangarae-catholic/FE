@@ -12,11 +12,12 @@ type DateButtonProps = {
   onClick?: () => void;
   isDateSelected?: boolean;
   showArrow?: boolean;
+  isEdit?: boolean;
 };
 
-const DateButton = forwardRef<HTMLButtonElement, DateButtonProps>(({ value, onClick, isDateSelected = false, showArrow = true }, ref) => (
+const DateButton = forwardRef<HTMLButtonElement, DateButtonProps>(({ value, onClick, isDateSelected = false, showArrow = true, isEdit = false }, ref) => (
   <button ref={ref} type='button' onClick={onClick} aria-label='행사 날짜 선택' className='flex items-center gap-0.5'>
-    <span className={`font-pretendard font-medium text-sm underline ${isDateSelected ? 'text-main' : 'text-gray-500'} max-[375px]:text-xs`}>{value}</span>
+    <span className={`font-pretendard font-medium text-sm underline ${isDateSelected ? 'text-main' : 'text-gray-500'} max-[375px]:text-xs ${isEdit ? 'text-main' : 'text-gray-500'}`}>{value}</span>
     {showArrow && <ArrowDown className='w-6 h-6 text-gray-700' />}
   </button>
 ));
@@ -29,9 +30,10 @@ type DateDropdownProps = {
   isDateSelected: boolean;
   showArrow?: boolean;
   showCustomInput?: boolean;
+  isEdit?: boolean;
 };
 
-export default function DateDropdown({ value, onChange, isDateSelected, showArrow, showCustomInput = true }: DateDropdownProps) {
+export default function DateDropdown({ value, onChange, isDateSelected, showArrow, showCustomInput = true, isEdit }: DateDropdownProps) {
   return (
     <>
       {showCustomInput ? (
@@ -40,7 +42,7 @@ export default function DateDropdown({ value, onChange, isDateSelected, showArro
           onChange={onChange}
           locale={ko}
           dateFormat='yyyy.MM.dd'
-          customInput={<DateButton isDateSelected={isDateSelected} showArrow={showArrow} />}
+          customInput={<DateButton isDateSelected={isDateSelected} showArrow={showArrow} isEdit={isEdit} />}
           popperClassName='!z-50'
           popperPlacement='bottom-start'
           showPopperArrow={false}

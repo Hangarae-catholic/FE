@@ -7,9 +7,11 @@ interface TopBarProps {
   rightBtnName?: string;
   leftOnClick?: () => void;
   rightOnClick?: () => void;
+  btnTextColor?: string;
+  btnBgColor?: string;
 }
 
-export default function TopBar({ title, rightIcon, rightBtnName, leftOnClick, rightOnClick }: TopBarProps) {
+export default function TopBar({ title, rightIcon, rightBtnName, leftOnClick, rightOnClick, btnTextColor, btnBgColor }: TopBarProps) {
   const RightIcon = rightIcon;
   const navigate = useNavigate();
 
@@ -23,6 +25,19 @@ export default function TopBar({ title, rightIcon, rightBtnName, leftOnClick, ri
         <button type='button' className={`fixed right-5 flex items-center gap-0.5 ${rightBtnName && 'bg-gray-100 rounded-xl py-0.5 px-1.5'}`} onClick={rightOnClick}>
           <RightIcon className='w-6 h-6 text-gray-700' />
           {rightBtnName && <span className='font-pretendard font-normal text-sm text-gray-800'>{rightBtnName}</span>}
+        </button>
+      )}
+      {!RightIcon && rightBtnName && (
+        <button
+          type='button'
+          className={`fixed right-5 flex items-center gap-0.5 font-pretendard font-normal text-base rounded-2xl px-3 py-0.5`}
+          style={{
+            color: btnTextColor,
+            backgroundColor: btnBgColor,
+          }}
+          onClick={rightOnClick}
+        >
+          {rightBtnName}
         </button>
       )}
     </div>
