@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TopBar from '../../components/common/TopBar';
 import More from '/src/assets/icons/more.svg?react';
 import RightArrow from '/src/assets/icons/arrow_right.svg?react';
@@ -45,6 +45,21 @@ export default function TeamMatchDetailPage() {
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (!isMoreModalOpen) return;
+
+    // 기존 스크롤 상태 저장
+    const prevOverflow = document.body.style.overflow;
+
+    // 배경 스크롤 비활성화
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      // 모달이 닫히면 기존 상태로 복구
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isMoreModalOpen]);
+
   const handleDelete = () => {
     // 삭제 후 알림
     alert('삭제되었습니다.');
@@ -59,13 +74,13 @@ export default function TeamMatchDetailPage() {
   return (
     <>
       {/* 본문 비활성화 처리 */}
-      {isMoreModalOpen && <div className='fixed inset-x-0 top-0 bottom-22 z-40 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
+      {isMoreModalOpen && <div className='h-full fixed inset-x-0 top-0 bottom-22 z-40 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
       {/* 상단바 */}
       <div className='relative'>
         {user === mock[0].writerName ? <TopBar title='팀 매칭 상세' rightIcon={More} rightOnClick={() => setIsMoreModalOpen(true)} /> : <TopBar title='팀 매칭 상세' />}
 
         {isMoreModalOpen && (
-          <div className='absolute z-50 top-10 right-0 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
+          <div className='absolute z-50 -top-5 right-2 flex flex-col w-34 px-3 rounded-xl bg-[#fcfbfb]'>
             <button type='button' className='flex items-center justify-between py-2 border-b border-gray-200'>
               <span className='font-pretendard font-normal text-sm text-gray-800'>글 수정하기</span>
               <RightArrow className='w-2.5 h-2.5' />
