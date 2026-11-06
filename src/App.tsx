@@ -19,6 +19,10 @@ import ProfileSetupPage from "./pages/profile/profile-setup-page";
 import ProfileInfoPage from "./pages/profile/profile-info-page";
 import ProfileCompletePage from "./pages/profile/profile-complete-page";
 import BottomSheetTestPage from "./pages/bottom-sheet-test-page";
+import MyPage from "./pages/my/my-page";
+import ManageAccountPage from "./pages/my/manage-account-page";
+import DeleteAccountPage from "./pages/my/delete-account-page";
+import ProfileEditPage from "./pages/my/profile-edit-page";
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -78,6 +82,22 @@ export default function App() {
         {
           path: "profile/complete",
           element: <ProfileCompletePage />,
+        },
+        {
+          path: "my",
+          element: <MyPage />,
+        },
+        {
+          path: "my/manage",
+          element: <ManageAccountPage />,
+        },
+        {
+          path: "my/delete",
+          element: <DeleteAccountPage />,
+        },
+        {
+          path: "my/edit",
+          element: <ProfileEditPage />,
         },
         {
           path: "test",

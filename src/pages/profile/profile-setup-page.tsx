@@ -1,42 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { CHARACTERS, type CharacterType } from "../../constants/CHARACTER";
 
 import TopBar from "../../components/common/TopBar";
 import BottomButton from "../../components/common/BottomButton";
 import ProgressBar from "../../components/common/ProgressBar";
-import matchCapy from "../../assets/images/capy_match_hand.svg";
-import thumbsupCapy from "../../assets/images/capy_thumbs_up.svg";
-import vCapy from "../../assets/images/capy_v.svg";
-import greetingCapy from "../../assets/images/capy_greeting.svg";
-import cheerupCapy from "../../assets/images/capy_cheer_up.svg";
-import thinkingCapy from "../../assets/images/capy_thinking.svg";
 import check from "../../assets/icons/check.svg";
 
-const characterImages = [
-  matchCapy,
-  thumbsupCapy,
-  vCapy,
-  greetingCapy,
-  cheerupCapy,
-  thinkingCapy,
-];
-
-const characterColors = [
-  "#FF665B",
-  "#FFA85B",
-  "#FFD95B",
-  "#5BCA06",
-  "#5B9DFF",
-  "#F677C3",
-];
+const characterEntries = Object.entries(CHARACTERS) as [
+  CharacterType,
+  (typeof CHARACTERS)[CharacterType],
+][];
 
 const ProfileSetupPage = () => {
   const navigate = useNavigate();
 
   const [nickname, setNickname] = useState("");
-  const [selectedCharacter, setSelectedCharacter] = useState<number | null>(
-    null,
-  );
+  const [selectedCharacter, setSelectedCharacter] =
+    useState<CharacterType | null>(null);
 
   const isValid = nickname.trim().length > 0 && selectedCharacter !== null;
 
@@ -173,17 +154,17 @@ const ProfileSetupPage = () => {
           </p>
 
           <div className="grid grid-cols-4 gap-x-3 gap-y-4 mt-6">
-            {characterImages.map((character, index) => {
-              const isSelected = selectedCharacter === index;
+            {characterEntries.map(([type, character]) => {
+              const isSelected = selectedCharacter === type;
               const isDimmed = selectedCharacter !== null && !isSelected;
 
               return (
                 <button
-                  key={index}
+                  key={type}
                   type="button"
-                  aria-label={`캐릭터 ${index + 1} 선택`}
+                  aria-label={`캐릭터 ${type} 선택`}
                   aria-pressed={isSelected}
-                  onClick={() => setSelectedCharacter(index)}
+                  onClick={() => setSelectedCharacter(type)}
                   className="
           relative
           w-full aspect-square
@@ -201,11 +182,11 @@ const ProfileSetupPage = () => {
             ${isDimmed ? "opacity-40" : "opacity-100"}
           `}
                     style={{
-                      backgroundColor: characterColors[index],
+                      backgroundColor: character.color,
                     }}
                   >
                     <img
-                      src={character}
+                      src={character.image}
                       alt=""
                       className="
               w-[65%] h-[65%]
