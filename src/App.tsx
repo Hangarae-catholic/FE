@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider, type RouteObject } from 'react-router-dom';
 import MainLayout from './layouts/main-layout';
 import LandingPage from './pages/auth/landing-page';
-import Home from './pages/home-page';
+import HomePage from './pages/home-page';
 import AddEventPage from './pages/add-event-page';
 import TeamMatchingPage from './pages/team-matching';
 import TeamMatchDetailPage from './pages/team-matching/detail-page';
@@ -29,7 +29,7 @@ export default function App() {
         { index: true, element: <LandingPage /> },
         {
           path: 'home',
-          element: <Home />,
+          element: <HomePage />,
         },
         {
           path: 'add-event',

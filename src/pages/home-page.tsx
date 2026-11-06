@@ -19,7 +19,7 @@ const mock = [
 
 const mockInterests = ['IT•소프트웨어', 'AI•데이터', 'AI•데이터', '취업•창업•대외활동'];
 
-export default function Home() {
+export default function HomePage() {
   const navigate = useNavigate();
 
   return (
