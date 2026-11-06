@@ -50,6 +50,7 @@
   --color-main: #f36b0a;
   --color-sub: #ffead7;
   --color-bg: #f6f5fa;
+  --background-image-main-gradient: linear-gradient(#f36b0a, #ed6300, #f36b0a);
 
   /* Orange */
   --color-orange-50: #fff9f4;
@@ -84,11 +85,11 @@
 
 /* 스와이퍼 커스텀 */
 .custom-pagination .swiper-pagination-bullet {
-  @apply w-1.5 h-1.5 bg-gray-400 rounded-full opacity-100 transition-all;
+  @apply w-1.5 h-1.5 bg-[#ffdbbb] rounded-full opacity-100 transition-all;
 }
 
 .custom-pagination .swiper-pagination-bullet-active {
-  @apply bg-[#fb811c] opacity-100 w-5 h-1.5;
+  @apply bg-white opacity-100 w-5 h-1.5;
 }
 
 /* 데이트피커 커스텀 */
