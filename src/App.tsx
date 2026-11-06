@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider, type RouteObject } from 'react-router-dom';
 import MainLayout from './layouts/main-layout';
 import LandingPage from './pages/auth/landing-page';
-import Home from './pages/home-page';
+import HomePage from './pages/home-page';
 import AddEventPage from './pages/add-event-page';
 import TeamMatchingPage from './pages/team-matching';
 import TeamMatchDetailPage from './pages/team-matching/detail-page';
@@ -19,6 +19,7 @@ import MyPage from './pages/my/my-page';
 import ManageAccountPage from './pages/my/manage-account-page';
 import DeleteAccountPage from './pages/my/delete-account-page';
 import ProfileEditPage from './pages/my/profile-edit-page';
+import EventDetailPage from './pages/event-detail-page';
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -29,7 +30,7 @@ export default function App() {
         { index: true, element: <LandingPage /> },
         {
           path: 'home',
-          element: <Home />,
+          element: <HomePage />,
         },
         {
           path: 'add-event',
@@ -98,6 +99,10 @@ export default function App() {
         {
           path: 'test',
           element: <BottomSheetTestPage />,
+        },
+        {
+          path: '/event-detail/:postId',
+          element: <EventDetailPage />,
         },
       ],
     },

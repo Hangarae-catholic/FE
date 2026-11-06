@@ -13,13 +13,13 @@ import ProfileCard from '../components/HomePage/ProfileCard';
 import { useNavigate } from 'react-router-dom';
 
 const mock = [
-  { image: ExEvent, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '콘서트홀' },
-  { title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '콘서트홀' },
+  { id: 1, image: ExEvent, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '콘서트홀' },
+  { id: 2, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '콘서트홀' },
 ];
 
 const mockInterests = ['IT•소프트웨어', 'AI•데이터', 'AI•데이터', '취업•창업•대외활동'];
 
-export default function Home() {
+export default function HomePage() {
   const navigate = useNavigate();
 
   return (
@@ -40,16 +40,15 @@ export default function Home() {
 
       {/* 카드 스와이퍼 */}
       <div className='-mt-14.5'>
-        <Swiper loop={true} pagination={{ el: '.custom-pagination', type: 'bullets', clickable: true }} spaceBetween={10} modules={[Pagination, Autoplay]}>
-          {/* autoplay={{ delay: 5000 }} */}
+        <Swiper loop={true} pagination={{ el: '.custom-pagination', type: 'bullets', clickable: true }} spaceBetween={10} autoplay={{ delay: 5000 }} modules={[Pagination, Autoplay]}>
           <>
             <SwiperSlide>
               <ProfileCard interests={mockInterests} />
             </SwiperSlide>
-            {mock.map((m) => {
+            {mock.map((m, idx) => {
               return (
-                <SwiperSlide>
-                  <EventCard image={m.image} title={m.title} date={m.date} location={m.location} />
+                <SwiperSlide key={idx}>
+                  <EventCard image={m.image} title={m.title} date={m.date} location={m.location} id={m.id} />
                 </SwiperSlide>
               );
             })}

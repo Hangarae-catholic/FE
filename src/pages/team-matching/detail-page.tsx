@@ -9,6 +9,10 @@ import ExTeamMatching from '/src/assets/images/ex_team-matching.png';
 import KakaoTalk from '/src/assets/icons/kakao.svg?react';
 import Instagram from '/src/assets/icons/instagram.svg?react';
 import Mail from '/src/assets/icons/mail.svg?react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import Picture from '/src/assets/icons/picture.svg?react';
 
 const user = '정다민';
 
@@ -24,7 +28,7 @@ const mock = [
     term: '2026.11.04. ~ 2026.11.29.',
     limitMember: 4,
     currentMember: 2,
-    image: ExTeamMatching,
+    image: [ExTeamMatching, ExTeamMatching],
     contact: [
       {
         kakao: 'https://open.kakao.com/o/dfdfdffdfdfdfdfdf',
@@ -44,6 +48,7 @@ export default function TeamMatchDetailPage() {
   const { postId } = useParams();
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(1);
 
   useEffect(() => {
     if (!isMoreModalOpen) return;
@@ -83,19 +88,42 @@ export default function TeamMatchDetailPage() {
       </div>
 
       {/* 본문 내용 */}
-      <img src={mock[0].image} alt='이미지' className='w-full max-h-37.5 object-fill rounded-t-xl' />
+      {/* 이미지 */}
+      {mock[0].image && mock[0].image.length > 0 ? (
+        <div className='relative'>
+          <Swiper loop={true} spaceBetween={10} slidesPerView={1} className='w-full' onSlideChange={(swiper) => setCurrentSlide(swiper.realIndex + 1)}>
+            {mock[0].image.map((img, idx) => (
+              <SwiperSlide key={idx}>
+                <img src={img} alt={`${mock[0].title} 모집글의 이미지 ${idx + 1}`} className='w-full h-37.5 object-fill rounded-t-xl' />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+          <div className='absolute bottom-2 right-2 z-10 bg-gray-600/80 px-2.5 py-1.5 rounded-full flex items-center'>
+            <span className='font-pretendard font-medium text-xs text-white'>
+              {currentSlide} / {mock[0].image.length}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className='w-full h-37.5 rounded-t-xl flex justify-center items-center bg-gray-400'>
+          <Picture className='w-9 h-9 text-gray-600' />
+        </div>
+      )}
 
+      {/* 태그 */}
       <div className='px-5'>
         <div className='flex gap-1.5 items-center justify-between mt-5'>
           <span className='font-pretendard font-normal text-[13px] bg-white text-gray-800 py-1 px-3 rounded-3xl border border-orange-300'>{mock[0].category}</span>
           <span className={`font-pretendard font-normal text-[13px] py-1 px-3 rounded-3xl ${mock[0].limitMember === mock[0].currentMember ? 'text-gray-600 bg-gray-300' : 'bg-[#DAF6DF] text-[#0D8D3D]'}`}>{mock[0].limitMember === mock[0].currentMember ? '모집완료' : '모집중'}</span>
         </div>
 
+        {/* 제목 */}
         <div className='mt-3'>
           <h1 className='font-pretendard font-semibold text-lg text-gray-800 leading-7'>{mock[0].title}</h1>
           <p className='font-pretendard font-normal text-sm text-gray-700 leading-5.5 line-clamp-2'>{mock[0].content}</p>
         </div>
 
+        {/* 작성자 정보 */}
         <div>
           <div className='flex gap-2 items-center mt-4.5'>
             <img src={mock[0].writerProfile} alt={`${mock[0].writerName}의 프로필`} className='w-10.5 h-10.5 rounded-full object-fill' />
@@ -107,6 +135,7 @@ export default function TeamMatchDetailPage() {
             </div>
           </div>
 
+          {/* 모집 기간 */}
           <div className='mt-4.5 flex flex-col gap-4'>
             <div className='flex gap-3 items-center'>
               <Calendar className='w-6.5 h-6.5 text-gray-600' />
@@ -115,6 +144,8 @@ export default function TeamMatchDetailPage() {
                 <span className='font-pretendard font-medium text-base text-gray-800'>{mock[0].term}</span>
               </div>
             </div>
+
+            {/* 모집 인원 */}
             <div className='flex gap-3 items-center pb-4.5 border-b border-gray-300'>
               <Member className='w-6.5 h-6.5 text-gray-600' />
               <div className='flex flex-col'>
@@ -128,9 +159,11 @@ export default function TeamMatchDetailPage() {
         </div>
       </div>
 
+      {/* 연락수단 */}
       <div className='mt-4.5 flex flex-col gap-2 px-5'>
         <span className='font-pretendard font-medium text-sm text-gray-800'>연락수단</span>
         <p className='font-pretendard font-normal text-[13px] text-gray-700'>관심 있는 팀인가요? 팀장에게 직접 연락해 참여 의사를 전해 보세요</p>
+
         {mock[0].contact[0].kakao && (
           <div className='flex gap-2 px-3.5 py-2.5 bg-white rounded-xl border border-gray-300'>
             <KakaoTalk className='w-6 h-6' />
@@ -139,6 +172,7 @@ export default function TeamMatchDetailPage() {
             </a>
           </div>
         )}
+
         {mock[0].contact[1].instagram && (
           <div className='flex gap-2 px-3.5 py-2.5 bg-white rounded-xl border border-gray-300'>
             <Instagram className='w-6 h-6' />
@@ -147,6 +181,7 @@ export default function TeamMatchDetailPage() {
             </a>
           </div>
         )}
+
         {mock[0].contact[2].etc && (
           <div className='flex gap-2 px-3.5 py-2.5 bg-white rounded-xl border border-gray-300'>
             <Mail className='w-6 h-6' />
@@ -157,6 +192,7 @@ export default function TeamMatchDetailPage() {
         )}
       </div>
 
+      {/* 활동 소개 */}
       <div className='mt-4 px-5 flex flex-col gap-2'>
         <span className='font-pretendard font-medium text-sm text-gray-800'>활동 소개</span>
         <p className='font-pretendard font-normal text-sm text-gray-700'>{mock[0].content}</p>
