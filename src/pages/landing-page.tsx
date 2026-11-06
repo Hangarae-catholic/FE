@@ -16,8 +16,13 @@ import logoText from "../assets/icons/logo_text.svg";
 const LandingPage = () => {
   const navigate = useNavigate();
 
+  const K_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
+  const K_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${K_REST_API_KEY}&redirect_uri=${K_REDIRECT_URI}&prompt=login`;
+
   const handleKakaoLogin = () => {
-    // TODO: 카카오 로그인 연동
+    // 추후 카카오 소셜 로그인 연동 및 수정 예정
+    window.location.href = kakaoURL;
   };
 
   const handleGoogleLogin = () => {
@@ -169,7 +174,7 @@ const LandingPage = () => {
 
         <button
           type="button"
-          onClick={() => navigate("/signup")}
+          onClick={() => navigate("/tou")}
           className="
             mt-[20px]
             font-pretendard
