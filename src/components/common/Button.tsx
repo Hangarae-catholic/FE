@@ -37,7 +37,7 @@ const Button = ({
       disabled={disabled}
       className={`
         flex items-center justify-center
-        w-full h-[60px]
+        w-full h-[52px]
         rounded-[12px]
         font-pretendard font-semibold text-[16px]
         transition-all duration-150

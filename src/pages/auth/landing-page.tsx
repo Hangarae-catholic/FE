@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import AuthButton from "../components/AuthButton";
+import AuthButton from "../../components/AuthButton";
 
-import kakaoIcon from "../assets/icons/icon_kakao.svg";
-import googleIcon from "../assets/icons/icon_google.svg";
-import emailIcon from "../assets/icons/icon_email.svg";
-import handshakeCapy from "../assets/images/capy_handshake.svg";
-import jumpCapy from "../assets/images/capy_jump.svg";
-import landingBackground from "../assets/images/landing_background.svg";
-import starIcon from "../assets/icons/icon_star.svg";
-import sunIcon from "../assets/icons/icon_sun.svg";
-import logoText from "../assets/icons/logo_text.svg";
+import kakaoIcon from "../../assets/icons/icon_kakao.svg";
+import googleIcon from "../../assets/images/google.png";
+import emailIcon from "../../assets/icons/icon_email.svg";
+import handshakeCapy from "../../assets/images/capy_handshake.svg";
+import jumpCapy from "../../assets/images/capy_jump.svg";
+import landingBackground from "../../assets/images/landing_background.svg";
+import starIcon from "../../assets/icons/icon_star.svg";
+import sunIcon from "../../assets/icons/icon_sun.svg";
+import logoText from "../../assets/icons/logo_text.svg";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -40,12 +40,14 @@ const LandingPage = () => {
   return (
     <div
       className="
-        relative flex flex-1 flex-col
-        w-full
-        overflow-hidden
-        bg-[#F7F8FA]
-        font-[PretendardVariable]
-      "
+      relative flex flex-1 flex-col
+      w-[calc(100%+40px)]
+      -mx-5 -mt-15
+      min-h-dvh
+      overflow-hidden
+      bg-bg
+      font-pretendard
+    "
     >
       <img
         src={landingBackground}
@@ -70,14 +72,13 @@ const LandingPage = () => {
         <p
           className="
             mb-[10px]
-            font-pretendard
             font-bold
-            text-[#5C636A]
-            text-[clamp(15px,4.7vw,27px)]
+            text-[#FB811C]
+            text-[clamp(15px,4.7vw,25px)]
             whitespace-nowrap
           "
         >
-          찾고, 만나고, 함께하는 학교생활
+          학교생활을 잇는 우리만의 방법
         </p>
 
         <img

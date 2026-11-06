@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "../components/Button";
-import backIcon from "../assets/icons/icon_back.svg";
-import visibleIcon from "../assets/icons/icon_visible.svg";
-import invisibleIcon from "../assets/icons/icon_invisible.svg";
+import Button from "../../components/common/Button";
+import TopBar from "../../components/common/TopBar";
+import visibleIcon from "../../assets/icons/icon_visible.svg";
+import invisibleIcon from "../../assets/icons/icon_invisible.svg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -38,28 +38,9 @@ const LoginPage = () => {
         font-pretendard
       "
     >
-      <header className="px-5 pt-5">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          aria-label="뒤로가기"
-          className="
-            flex items-center justify-center
-            w-6 h-6
-            text-gray-700
-            cursor-pointer
-          "
-        >
-          <img
-            src={backIcon}
-            alt=""
-            aria-hidden="true"
-            className="w-full h-full object-contain"
-          />
-        </button>
-      </header>
+      <TopBar />
 
-      <section className="flex flex-col px-5 pt-[45px]">
+      <section className="flex flex-col pt-[45px]">
         <div>
           <h1
             className="
@@ -108,7 +89,6 @@ const LoginPage = () => {
               text-[16px]
               placeholder:text-[#ADB5BD]
               outline-none
-              focus:ring-2 focus:ring-main/30
             "
           />
 
@@ -131,7 +111,6 @@ const LoginPage = () => {
       text-[#343A40] text-[16px]
       placeholder:text-[#ADB5BD]
       outline-none
-      focus:ring-2 focus:ring-main/30
     "
             />
 
@@ -187,7 +166,7 @@ const LoginPage = () => {
           <button
             type="button"
             onClick={() => navigate("/find-id")}
-            className="cursor-pointer hover:underline"
+            className="cursor-pointer"
           >
             아이디 찾기
           </button>
@@ -197,7 +176,7 @@ const LoginPage = () => {
           <button
             type="button"
             onClick={() => navigate("/find-password")}
-            className="cursor-pointer hover:underline"
+            className="cursor-pointer"
           >
             비밀번호 찾기
           </button>
@@ -211,6 +190,7 @@ const LoginPage = () => {
               text-main underline
               underline-offset-4
               cursor-pointer
+              font-normal
             "
           >
             회원가입

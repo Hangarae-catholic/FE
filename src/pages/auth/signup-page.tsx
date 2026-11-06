@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "../components/Button";
-import backIcon from "../assets/icons/icon_back.svg";
+import Button from "../../components/common/Button";
+import TopBar from "../../components/common/TopBar";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -82,6 +82,7 @@ const SignupPage = () => {
     if (!canSignup) return;
 
     // TODO: 회원가입 API 연동
+    navigate("/welcome", { replace: true });
   };
 
   const inputStyle = `
@@ -93,38 +94,19 @@ const SignupPage = () => {
     text-gray-900 text-[16px]
     placeholder:text-[#ADB5BD]
     outline-none
-    focus:ring-2 focus:ring-main/30
   `;
 
   return (
     <main
       className="
-        flex flex-1 flex-col
-        w-full min-h-dvh
-        bg-bg font-pretendard
-      "
+  flex flex-1 flex-col
+  w-full min-h-0
+  bg-bg font-pretendard
+"
     >
-      <header className="px-5 pt-5">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          aria-label="뒤로가기"
-          className="
-            flex items-center justify-center
-            w-6 h-6
-            cursor-pointer
-          "
-        >
-          <img
-            src={backIcon}
-            alt=""
-            aria-hidden="true"
-            className="w-full h-full object-contain"
-          />
-        </button>
-      </header>
+      <TopBar />
 
-      <section className="flex flex-col px-5 pt-[45px]">
+      <section className="flex flex-col pt-[45px]">
         <div>
           <h1 className="text-[24px] font-bold text-[#343A40]">회원가입</h1>
 
@@ -172,7 +154,7 @@ const SignupPage = () => {
                   text-[#FB811C] text-[16px]
                   font-semibold
                   cursor-pointer
-                  hover:bg-orange-50
+                  hover:bg-gray-300
                   disabled:opacity-50
                   disabled:cursor-not-allowed
                   transition-colors duration-150
@@ -340,7 +322,7 @@ const SignupPage = () => {
             type="button"
             onClick={() => navigate("/login")}
             className="
-              text-main
+              text-[#FB811C]
               underline underline-offset-4
               cursor-pointer
             "

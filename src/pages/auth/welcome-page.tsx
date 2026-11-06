@@ -1,28 +1,27 @@
 import { useNavigate } from "react-router-dom";
 
-import Button from "../components/Button";
-import welcomeCapy from "../assets/images/capy_welcome.svg";
+import Button from "../../components/common/Button";
+import welcomeCapy from "../../assets/images/capy_welcome.svg";
 
 const WelcomePage = () => {
   const navigate = useNavigate();
 
   const handleStart = () => {
     // TODO: 프로필 설정 페이지 경로에 맞게 수정
-    navigate("/signup/profile");
+    navigate("/profile/setup", { replace: true });
   };
 
   const handleGoHome = () => {
-    navigate("/");
+    navigate("/home");
   };
 
   return (
     <div
       className="
-        flex flex-1 flex-col
-        w-full min-h-dvh
-        bg-bg
-        font-pretendard
-      "
+  flex flex-1 flex-col
+  w-full min-h-0
+  bg-bg font-pretendard
+"
     >
       <div
         className="
@@ -30,7 +29,7 @@ const WelcomePage = () => {
           items-center
           w-full
           px-5
-          pt-[15vh]
+          pt-[10vh]
         "
       >
         <img
@@ -48,13 +47,12 @@ const WelcomePage = () => {
           className="
             flex flex-col
             items-center
-            mt-[32px]
+            mt-[16px]
             text-center
           "
         >
           <h1
             className="
-              font-pretendard
               font-bold
               text-[24px]
               text-[#343A40]
@@ -67,7 +65,6 @@ const WelcomePage = () => {
           <p
             className="
               mt-2
-              font-pretendard
               font-normal
               text-[16px]
               text-[#5C636A]
@@ -86,7 +83,6 @@ const WelcomePage = () => {
           onClick={handleGoHome}
           className="
             mt-[16px]
-            font-pretendard
             font-normal
             text-[14px]
             text-[#5C636A]

@@ -4,17 +4,17 @@ import {
   type RouteObject,
 } from "react-router-dom";
 import MainLayout from "./layouts/main-layout";
-import LandingPage from "./pages/landing-page";
+import LandingPage from "./pages/auth/landing-page";
 import Home from "./pages/home";
 import AddEventPage from "./pages/add-event-page";
 import TeamMatchingPage from "./pages/team-matching";
 import TeamMatchDetailPage from "./pages/team-matching/detail-page";
 import TeamCreatePage from "./pages/team-matching/create-page";
 import TeamMatchPostEditPage from "./pages/team-matching/post-edit-page";
-import LoginPage from "./pages/login-page";
-import ToUPage from "./pages/tou-page";
-import SignupPage from "./pages/signup-page";
-import WelcomePage from "./pages/welcome-page";
+import LoginPage from "./pages/auth/login-page";
+import ToUPage from "./pages/auth/tou-page";
+import SignupPage from "./pages/auth/signup-page";
+import WelcomePage from "./pages/auth/welcome-page";
 
 export default function App() {
   const routes: RouteObject[] = [

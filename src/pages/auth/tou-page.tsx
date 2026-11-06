@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "../components/Button";
+import TopBar from "../../components/common/TopBar";
+import BottomButton from "../../components/common/BottomButton";
 
 interface CheckIconProps {
   checked: boolean;
+  isAll?: boolean;
 }
 
-const CheckIcon = ({ checked }: CheckIconProps) => {
+const CheckIcon = ({ checked, isAll = false }: CheckIconProps) => {
   return (
     <svg
       width="24"
@@ -19,7 +21,7 @@ const CheckIcon = ({ checked }: CheckIconProps) => {
     >
       <path
         d="M4 12L9 17L20 6"
-        stroke={checked ? "#F36B0A" : "#868E96"}
+        stroke={checked ? (isAll ? "#FFFFFF" : "#F36B0A") : "#868E96"}
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -42,7 +44,7 @@ const TermsBox = ({ content }: TermsBoxProps) => {
         border border-[#CED4DA]
         px-5 py-3
         text-[12px]
-        font-pretendard font-normal
+        font-pretendard font-regular
         leading-[1.6]
         text-[#868E96]
         whitespace-pre-line
@@ -127,52 +129,20 @@ HTTPS 기반 암호화 통신
   return (
     <main
       className="
-        flex flex-1 flex-col
-        w-full h-dvh min-h-0
-        bg-bg
-        font-pretendard
-      "
+    relative flex flex-none flex-col
+    w-[calc(100%+40px)]
+    -mx-5 -mt-15
+    h-dvh min-h-0
+    overflow-hidden
+    bg-bg
+    font-pretendard
+  "
     >
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <header className="px-5 pt-5">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            aria-label="뒤로가기"
-            className="
-              flex h-6 w-6
-              items-center justify-center
-              text-gray-700
-              cursor-pointer
-            "
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                d="M15 4L7 12L15 20"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </header>
+      <TopBar />
 
-        <section className="px-5 pt-[45px]">
-          <h1
-            className="
-              text-[24px]
-              font-bold
-              text-[#343A40]
-            "
-          >
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <section className="px-5 pt-[105px]">
+          <h1 className="text-[24px] font-bold text-[#343A40]">
             이용 약관 동의
           </h1>
 
@@ -181,24 +151,25 @@ HTTPS 기반 암호화 통신
             onClick={handleAllAgree}
             aria-pressed={allAgreed}
             className={`
-              flex items-center
-              w-full h-[52px]
-              mt-6 px-4
-              rounded-[12px]
-              cursor-pointer
-              transition-colors duration-150
-              ${allAgreed ? "bg-orange-200" : "bg-[#E9ECEF]"}
-            `}
+    flex items-center
+    w-full h-[52px]
+    mt-6 px-4
+    rounded-[12px]
+    cursor-pointer
+    transition-colors duration-150
+    ${allAgreed ? "bg-main" : "bg-[#E9ECEF]"}
+  `}
           >
-            <CheckIcon checked={allAgreed} />
+            <CheckIcon checked={allAgreed} isAll />
 
             <span
-              className="
-                flex-1 text-center
-                text-[16px]
-                font-medium
-                text-[#343A40]
-              "
+              className={`
+      flex-1 text-center
+      text-[16px]
+      font-medium
+      transition-colors duration-150
+      ${allAgreed ? "text-white" : "text-[#343A40]"}
+    `}
             >
               네, 모두 동의합니다.
             </span>
@@ -217,6 +188,7 @@ HTTPS 기반 암호화 통신
                 flex items-center gap-3
                 mb-3
                 cursor-pointer
+                pl-4
               "
             >
               <CheckIcon checked={agreeTerms} />
@@ -245,6 +217,7 @@ HTTPS 기반 암호화 통신
                 flex items-center gap-3
                 mb-3
                 cursor-pointer
+                pl-4
               "
             >
               <CheckIcon checked={agreePrivacy} />
@@ -266,16 +239,11 @@ HTTPS 기반 암호화 통신
         </section>
       </div>
 
-      <div
-        className="
-          shrink-0
-          w-full bg-bg
-          px-5 pt-4
-          pb-[max(20px,env(safe-area-inset-bottom))]
-        "
-      >
-        <Button text="동의합니다" onClick={handleAgree} disabled={!allAgreed} />
-      </div>
+      <BottomButton
+        text="동의합니다"
+        onClick={handleAgree}
+        disabled={!allAgreed}
+      />
     </main>
   );
 };
