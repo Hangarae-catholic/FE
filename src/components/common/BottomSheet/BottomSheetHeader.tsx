@@ -1,3 +1,4 @@
+import type { RefObject } from "react";
 import x from "../../../assets/icons/x-black.svg";
 
 interface BottomSheetHeaderProps {
@@ -5,6 +6,7 @@ interface BottomSheetHeaderProps {
   description?: string;
   onClose: () => void;
   titleId: string;
+  handleRef: RefObject<HTMLDivElement | null>;
 }
 
 const BottomSheetHeader = ({
@@ -12,24 +14,20 @@ const BottomSheetHeader = ({
   description,
   onClose,
   titleId,
+  handleRef,
 }: BottomSheetHeaderProps) => {
   return (
     <div className="shrink-0 bg-bg">
       <div
+        ref={handleRef}
         className="
-          flex items-center justify-center
-          w-full h-10
-          cursor-grab
-          select-none
-        "
+    flex items-center justify-center
+    w-full h-10
+    cursor-grab active:cursor-grabbing
+    touch-none select-none
+  "
       >
-        <div
-          className="
-            w-10 h-1
-            rounded-full
-            bg-gray-500
-          "
-        />
+        <div className="w-10 h-1 rounded-full bg-gray-500" />
       </div>
 
       <div
@@ -80,13 +78,7 @@ const BottomSheetHeader = ({
             cursor-pointer
           "
         >
-          <img
-            src={x}
-            alt=""
-            className="
-            w-3 h-3
-          "
-          />
+          <img src={x} alt="" aria-hidden="true" className="w-3 h-3" />
         </button>
       </div>
     </div>

@@ -18,6 +18,7 @@ import WelcomePage from "./pages/auth/welcome-page";
 import ProfileSetupPage from "./pages/profile/profile-setup-page";
 import ProfileInfoPage from "./pages/profile/profile-info-page";
 import ProfileCompletePage from "./pages/profile/profile-complete-page";
+import BottomSheetTestPage from "./pages/bottom-sheet-test-page";
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -77,6 +78,10 @@ export default function App() {
         {
           path: "profile/complete",
           element: <ProfileCompletePage />,
+        },
+        {
+          path: "test",
+          element: <BottomSheetTestPage />,
         },
       ],
     },

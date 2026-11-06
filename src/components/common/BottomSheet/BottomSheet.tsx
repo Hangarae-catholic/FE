@@ -26,10 +26,12 @@ interface BottomSheetProps {
 
   children?: ReactNode;
   footer?: ReactNode;
+
+  initialHeight?: number;
 }
 
-const BottomSheet = ({
-  isOpen,
+// 실제로 바텀시트가 열렸을 때만 마운트되는 컴포넌트
+const BottomSheetPanel = ({
   onClose,
   title,
   description,
@@ -43,14 +45,13 @@ const BottomSheet = ({
   columns = 1,
   children,
   footer,
+  initialHeight = 0.5,
 }: BottomSheetProps) => {
   const titleId = useId();
 
-  const { sheet, content } = useBottomSheet();
+  const { sheet, handle, content } = useBottomSheet(initialHeight);
 
   useEffect(() => {
-    if (!isOpen) return;
-
     const previousOverflow = document.body.style.overflow;
 
     document.body.style.overflow = "hidden";
@@ -67,9 +68,7 @@ const BottomSheet = ({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  }, [onClose]);
 
   return (
     <div
@@ -93,23 +92,27 @@ const BottomSheet = ({
         aria-modal="true"
         aria-labelledby={titleId}
         className="
-          fixed
-          left-1/2 -translate-x-1/2
+          fixed left-1/2 -translate-x-1/2
           z-[101]
           flex flex-col
           w-full max-w-120
+          min-h-0
           rounded-t-[32px]
-          bg-bg
-          font-pretendard
+          bg-[#F8F9FA] font-pretendard
           shadow-xl
           overflow-hidden
         "
+        style={{
+          top: `${(1 - initialHeight) * 100}dvh`,
+          height: `${initialHeight * 100}dvh`,
+        }}
       >
         <BottomSheetHeader
           title={title}
           description={description}
           onClose={onClose}
           titleId={titleId}
+          handleRef={handle}
         />
 
         <div
@@ -138,7 +141,6 @@ const BottomSheet = ({
           </BottomSheetContent>
         </div>
 
-        {/* 선택형 버튼이 필요한 경우 */}
         {footer && (
           <div
             className="
@@ -154,6 +156,12 @@ const BottomSheet = ({
       </div>
     </div>
   );
+};
+
+const BottomSheet = (props: BottomSheetProps) => {
+  if (!props.isOpen) return null;
+
+  return <BottomSheetPanel {...props} />;
 };
 
 export default BottomSheet;
