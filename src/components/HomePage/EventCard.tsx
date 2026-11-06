@@ -1,15 +1,19 @@
 import Calendar from '/src/assets/icons/calendar.svg?react';
 import Marker from '/src/assets/icons/marker.svg?react';
 import RightArrow from '/src/assets/icons/arrow_right.svg?react';
+import { useNavigate } from 'react-router-dom';
 
 interface EventCardProps {
+  id: number;
   image?: string;
   title: string;
   date: string;
   location: string;
 }
 
-export default function EventCard({ image, title, date, location }: EventCardProps) {
+export default function EventCard({ image, title, date, location, id }: EventCardProps) {
+  const navigate = useNavigate();
+
   return image ? (
     <div className='w-full bg-white rounded-[18px] flex gap-2.5 p-4'>
       <img src={image} alt={title} className='w-19 h-26.5 object-fill rounded-sm' />
@@ -34,7 +38,7 @@ export default function EventCard({ image, title, date, location }: EventCardPro
             </div>
           </div>
 
-          <button type='button' className='flex justify-between items-center'>
+          <button type='button' className='flex justify-between items-center' onClick={() => navigate(`/event-detail/${id}`)}>
             <span className='font-pretendard font-normal text-sm text-gray-800'>자세히 보기</span>
             <RightArrow className='text-gray-700 w-2.5' />
           </button>
@@ -63,7 +67,7 @@ export default function EventCard({ image, title, date, location }: EventCardPro
             </div>
           </div>
 
-          <button type='button' className='flex justify-between items-center pt-3'>
+          <button type='button' className='flex justify-between items-center pt-3 ' onClick={() => navigate(`/event-detail/${id}`)}>
             <span className='font-pretendard font-normal text-sm text-gray-800'>자세히 보기</span>
             <RightArrow className='text-gray-700 w-2.5' />
           </button>

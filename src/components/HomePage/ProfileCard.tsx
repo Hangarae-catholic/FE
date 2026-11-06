@@ -13,8 +13,8 @@ export default function ProfileCard({ interests }: ProfileCardProps) {
       </div>
       {interests && interests.length > 0 && (
         <div className='flex flex-wrap'>
-          {interests.map((i) => (
-            <ProfileChip name={i} />
+          {interests.map((i, idx) => (
+            <ProfileChip name={i} key={idx} />
           ))}
         </div>
       )}
