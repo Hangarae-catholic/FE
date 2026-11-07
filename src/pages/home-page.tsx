@@ -11,6 +11,8 @@ import MiniMapMarker from '/src/assets/icons/minimap-marker.svg?react';
 import MegaPhone from '/src/assets/icons/mega-phone.svg?react';
 import ProfileCard from '../components/HomePage/ProfileCard';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 const mock = [
   { id: 1, image: ExEvent, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '콘서트홀' },
@@ -22,12 +24,15 @@ const mockInterests = ['IT•소프트웨어', 'AI•데이터', 'AI•데이터
 export default function HomePage() {
   const navigate = useNavigate();
 
+  // 오늘 날짜 포맷팅 'm월 d일 e요일'
+  const today = format(new Date(), 'M월 d일 EEEE', { locale: ko });
+
   return (
     <>
       {/* 상단 내용 */}
       <div className='flex justify-between'>
         <div className='mb-3'>
-          <p className='font-pretendard font-light text-2xl text-white leading-8.5 max-[425px]:text-xl'>10월 14일 수요일</p>
+          <p className='font-pretendard font-light text-2xl text-white leading-8.5 max-[425px]:text-xl'>{today}</p>
           <span className='flex gap-1 items-center font-pretendard font-normal text-2xl text-white leading-8.5 max-[425px]:text-xl'>
             <span className='font-bold'>아이브</span>님
           </span>
@@ -70,7 +75,7 @@ export default function HomePage() {
           <span className='font-pretendard font-normal text-[13px] text-white leading-5'>3개 진행중</span>
         </div>
 
-        <div className='relative w-full h-44 overflow-hidden rounded-[18px]'>
+        <div className='relative w-full h-44 overflow-hidden rounded-[18px]' onClick={() => navigate('/events')}>
           <img src={Map} alt='지도 미리보기' className='w-full h-full object-cover' />
 
           <MiniMapMarker className='absolute w-8.5 h-8.5 top-[30%] left-[50%] z-10' />
