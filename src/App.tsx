@@ -20,6 +20,7 @@ import ManageAccountPage from './pages/my/manage-account-page';
 import DeleteAccountPage from './pages/my/delete-account-page';
 import ProfileEditPage from './pages/my/profile-edit-page';
 import EventDetailPage from './pages/event-detail-page';
+import EventsPage from './pages/events-page';
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -103,6 +104,10 @@ export default function App() {
         {
           path: '/event-detail/:postId',
           element: <EventDetailPage />,
+        },
+        {
+          path: '/events',
+          element: <EventsPage />,
         },
       ],
     },
