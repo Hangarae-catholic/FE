@@ -25,6 +25,7 @@ import DeleteAccountPage from "./pages/my/delete-account-page";
 import ProfileEditPage from "./pages/my/profile-edit-page";
 import EventDetailPage from "./pages/event-detail-page";
 import MyActivityPage from "./pages/my/my-activity-page";
+import CalendarPage from "./pages/calendar-page";
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -104,6 +105,10 @@ export default function App() {
         {
           path: "my/activity",
           element: <MyActivityPage />,
+        },
+        {
+          path: "/calendar",
+          element: <CalendarPage />,
         },
         {
           path: "test",
