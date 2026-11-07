@@ -6,7 +6,7 @@ interface ProfileCardProps {
 
 export default function ProfileCard({ interests }: ProfileCardProps) {
   return (
-    <div className='px-4 py-3 rounded-[18px] bg-gray-50 h-29'>
+    <div className='px-4 py-3 rounded-[18px] bg-gray-50 h-29 break-keep'>
       <div className='flex items-center gap-1.5'>
         <span className='font-pretendard font-semibold text-base text-gray-800'>아이브</span>
         <span className='font-pretendard font-normal text-sm text-gray-700'>미디어기술콘텐츠학부 4학년</span>

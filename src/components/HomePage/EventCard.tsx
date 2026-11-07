@@ -15,7 +15,7 @@ export default function EventCard({ image, title, date, location, id }: EventCar
   const navigate = useNavigate();
 
   return image ? (
-    <div className='w-full bg-white rounded-[18px] flex gap-2.5 p-4'>
+    <div className='w-full bg-white rounded-[18px] flex gap-2.5 p-4 break-keep'>
       <img src={image} alt={title} className='w-19 h-26.5 object-fill rounded-sm' />
 
       <div className='flex flex-col w-full gap-1'>
@@ -46,7 +46,7 @@ export default function EventCard({ image, title, date, location, id }: EventCar
       </div>
     </div>
   ) : (
-    <div className='w-full bg-white rounded-[18px] flex gap-2.5 p-4'>
+    <div className='w-full bg-white rounded-[18px] flex gap-2.5 p-4 break-keep'>
       <div className='flex flex-col w-full gap-1'>
         <h2 className='font-pretendard font-medium text-base'>{title}</h2>
 

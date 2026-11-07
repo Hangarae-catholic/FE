@@ -35,7 +35,13 @@ export default function HomePage() {
             캠퍼스 곳곳의 <span>행사를 만나봐요!</span>
           </p>
         </div>
-        <img src={WinkCapy} alt='카피바라' className='mt-6 h-51 max-[425px]:w-42 w-52 max-[370px]:w-32' />
+        <img
+          src={WinkCapy}
+          alt='카피바라'
+          className='mt-6 w-1/2 h-[clamp(270px,38vh,380px)]
+          shrink-0
+          pointer-events-none'
+        />
       </div>
 
       {/* 카드 스와이퍼 */}
