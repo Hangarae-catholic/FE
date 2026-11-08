@@ -27,9 +27,10 @@ interface EventCardProps {
   setCurrentSlide?: Dispatch<SetStateAction<number>>;
   eventsNum?: number;
   onSlideChange?: (index: number) => void;
+  onClose?: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function EventCard({ id, recommend, unrecommend, image, location, title, date, content, currentSlide, eventsNum, onSlideChange, like, disLike, setLike, setDisLike, liked, disLiked }: EventCardProps) {
+export default function EventCard({ id, recommend, unrecommend, image, location, title, date, content, currentSlide, eventsNum, onSlideChange, like, disLike, setLike, setDisLike, liked, disLiked, onClose }: EventCardProps) {
   const navigate = useNavigate();
 
   // 서버 초기 상태와 변경 상태가 서로 다르면 최종 투표 상태가 반전(XOR)
@@ -62,7 +63,7 @@ export default function EventCard({ id, recommend, unrecommend, image, location,
         <div className='flex flex-col gap-3'>
           <div className='flex items-center justify-between'>
             <span className='font-pretendard font-normal text-[13px] text-orange-600'>콘서트홀</span>
-            <button type='button' className='flex items-center justify-end'>
+            <button type='button' className='flex items-center justify-end' onClick={() => onClose?.(false)}>
               <X className='w-6 h-6 text-gray-700' />
             </button>
           </div>

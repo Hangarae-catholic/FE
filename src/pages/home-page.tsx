@@ -13,16 +13,104 @@ import ProfileCard from '../components/HomePage/ProfileCard';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
 
 const mock = [
-  { id: 1, image: ExEvent, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '콘서트홀' },
-  { id: 2, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '콘서트홀' },
+  { id: 1, image: ExEvent, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '약학관' },
+  { id: 2, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '다솔관' },
 ];
 
 const mockInterests = ['IT•소프트웨어', 'AI•데이터', 'AI•데이터', '취업•창업•대외활동'];
 
 export default function HomePage() {
   const navigate = useNavigate();
+
+  // 행사 장소 중복 제거
+  const eventLocations = useMemo(() => [...new Set(mock.map((event) => event.location))], []);
+
+  // 좌표 데이터가 존재하는 장소만 추출
+  const markers = useMemo(() => buildingCoordinates.filter((location) => eventLocations.includes(location.name)), [eventLocations]);
+
+  // 마커 중 하나를 랜덤으로 선택
+  const [focusLocation] = useState(() => {
+    if (markers.length === 0) return null;
+
+    return markers[Math.floor(Math.random() * markers.length)];
+  });
+
+  // 지도 프레임과 지도 레이어 참조
+  const frameRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  // 지도 이동 위치
+  const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
+
+  // 선택된 마커가 프레임 내부에 오도록 지도 이동
+  useEffect(() => {
+    const frame = frameRef.current;
+    const map = mapRef.current;
+
+    if (!frame || !map || !focusLocation) return;
+
+    const updateMapPosition = () => {
+      const frameWidth = frame.clientWidth;
+      const frameHeight = frame.clientHeight;
+
+      const mapWidth = map.clientWidth;
+      const mapHeight = map.clientHeight;
+
+      // 확대된 지도 레이어의 기본 위치
+      const baseLeft = (frameWidth - mapWidth) / 2;
+      const baseTop = (frameHeight - mapHeight) / 2;
+
+      // 마커의 지도 레이어 내부 좌표
+      const markerX = (focusLocation.x / 100) * mapWidth;
+      const markerY = (focusLocation.y / 100) * mapHeight;
+
+      const padding = 21;
+
+      let x = 0;
+      let y = 0;
+
+      // 마커가 프레임 왼쪽 또는 오른쪽을 벗어나는 경우에만 이동
+      const markerScreenX = baseLeft + markerX;
+
+      if (markerScreenX < padding) {
+        x = padding - markerScreenX;
+      } else if (markerScreenX > frameWidth - padding) {
+        x = frameWidth - padding - markerScreenX;
+      }
+
+      // 마커가 프레임 위쪽 또는 아래쪽을 벗어나는 경우에만 이동
+      const markerScreenY = baseTop + markerY;
+
+      if (markerScreenY < padding) {
+        y = padding - markerScreenY;
+      } else if (markerScreenY > frameHeight - padding) {
+        y = frameHeight - padding - markerScreenY;
+      }
+
+      // 지도 이미지가 프레임 밖으로 벗어나지 않도록 이동 범위 제한
+      const minX = frameWidth - mapWidth - baseLeft;
+      const maxX = -baseLeft;
+
+      const minY = frameHeight - mapHeight - baseTop;
+      const maxY = -baseTop;
+
+      x = Math.max(minX, Math.min(maxX, x));
+      y = Math.max(minY, Math.min(maxY, y));
+
+      setMapOffset({ x, y });
+    };
+
+    updateMapPosition();
+
+    const observer = new ResizeObserver(updateMapPosition);
+    observer.observe(frame);
+
+    return () => observer.disconnect();
+  }, [focusLocation]);
 
   // 오늘 날짜 포맷팅 'm월 d일 e요일'
   const today = format(new Date(), 'M월 d일 EEEE', { locale: ko });
@@ -72,14 +160,36 @@ export default function HomePage() {
       <div className='mt-4'>
         <div className='flex justify-between items-center'>
           <span className='font-pretendard font-normal text-base text-white leading-6'>교내 행사 미니맵</span>
-          <span className='font-pretendard font-normal text-[13px] text-white leading-5'>3개 진행중</span>
+
+          <span className='font-pretendard font-normal text-[13px] text-white leading-5'>{mock.length}개 진행중</span>
         </div>
 
-        <div className='relative w-full h-44 overflow-hidden rounded-[18px]' onClick={() => navigate('/events')}>
-          <img src={Map} alt='지도 미리보기' className='w-full h-full object-cover' />
+        {/* 지도 프레임 */}
+        <div ref={frameRef} className='relative w-full h-44 overflow-hidden rounded-[18px]' onClick={() => navigate('/events')}>
+          <div
+            ref={mapRef}
+            className='absolute w-[140%] h-auto aspect-square'
+            style={{
+              left: `calc(50% + ${mapOffset.x}px)`,
+              top: `calc(50% + ${mapOffset.y}px)`,
+              transform: 'translate(-50%, -50%)',
+              transition: 'left 0.5s ease, top 0.5s ease',
+            }}
+          >
+            <img src={Map} alt='지도 미리보기' className='w-full h-full object-fill' />
 
-          <MiniMapMarker className='absolute w-8.5 h-8.5 top-[30%] left-[50%] z-10' />
-          <MiniMapMarker className='absolute w-8.5 h-8.5 top-[50%] left-[20%] z-10' />
+            {markers.map((marker) => (
+              <MiniMapMarker
+                key={marker.name}
+                className='absolute w-8.5 h-8.5 z-10'
+                style={{
+                  left: `${marker.x}%`,
+                  top: `${marker.y}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
