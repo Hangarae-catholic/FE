@@ -31,30 +31,42 @@ type DateDropdownProps = {
   value: Date | null | [Date | null, Date | null];
   onChange: (date: Date | null | [Date | null, Date | null]) => void;
   isDateSelected: boolean;
+  isRange?: boolean;
   showArrow?: boolean;
   showCustomInput?: boolean;
 };
 
-export default function DateDropdown({ value, onChange }: DateDropdownProps) {
+export default function DateDropdown({ value, onChange, isRange = false }: DateDropdownProps) {
   const rangeValue = Array.isArray(value) ? value : [value, null];
 
   const [startDate, endDate] = rangeValue;
 
-  const formatDate = (date: Date) => format(date, 'M/d (E)', { locale: ko });
+  const formatDate = (date: Date) => format(date, isRange ? 'M/d' : 'M/d (E)', { locale: ko });
 
-  const displayValue = startDate ? (endDate ? `${formatDate(startDate)} ~ ${formatDate(endDate)}` : formatDate(startDate)) : `${formatDate(new Date())} ~ ${formatDate(new Date())}`;
+  const displayValue = isRange ? (startDate ? `${formatDate(startDate)} ~ ${formatDate(endDate ?? startDate)}` : `${formatDate(new Date())} ~ ${formatDate(new Date())}`) : formatDate(startDate ?? new Date());
+
+  // 오늘 날짜 포함 일주일 계산
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const lastDate = new Date(today);
+  lastDate.setDate(today.getDate() + 6);
 
   return (
     <DatePicker
       wrapperClassName='w-full'
       calendarClassName='custom-range-calendar'
       selected={startDate}
-      onChange={(dates: [Date | null, Date | null]) => {
-        onChange(dates);
+      onChange={(date: Date | null | [Date | null, Date | null]) => {
+        if (isRange) {
+          onChange(date as [Date | null, Date | null]);
+        } else {
+          onChange(date as Date | null);
+        }
       }}
       startDate={startDate}
       endDate={endDate}
-      selectsRange
+      selectsRange={isRange ? true : undefined}
       locale={ko}
       dateFormat='yyyy.MM.dd'
       customInput={<DateButton displayValue={displayValue} />}
@@ -71,6 +83,12 @@ export default function DateDropdown({ value, onChange }: DateDropdownProps) {
       showPopperArrow={false}
       shouldCloseOnSelect
       isClearable={false}
+      filterDate={(date) => {
+        const targetDate = new Date(date);
+        targetDate.setHours(0, 0, 0, 0);
+
+        return targetDate >= today && targetDate <= lastDate;
+      }}
       renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
         <div className='flex items-center justify-between px-3 pb-3 pt-1'>
           <button type='button' onClick={decreaseMonth} aria-label='이전 달' className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-100'>

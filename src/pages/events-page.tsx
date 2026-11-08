@@ -13,6 +13,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import EventListCard from '../components/AddEventPage/EventCard';
 
 interface Event {
   id: number;
@@ -64,7 +65,7 @@ const mock: Event[] = [
 
 export default function EventsPage() {
   const [isMap, setIsMap] = useState(true);
-  const [selectedListDate, setSelectedListDate] = useState<[Date | null, Date | null]>([null, null]);
+  const [selectedListDate, setSelectedListDate] = useState<[Date | null, Date | null]>([new Date(), null]);
   const [selectedMapDate, setSelectedMapDate] = useState<Date | null>(null);
   const [switchOn, setSwitchOn] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(1);
@@ -77,15 +78,16 @@ export default function EventsPage() {
     setSwitchOn((prev) => {
       const next = !prev;
 
-      if (next) {
-        const today = new Date();
-        const endDate = new Date(today);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
+      if (next) {
+        const endDate = new Date(today);
         endDate.setDate(today.getDate() + 6);
 
         setSelectedListDate([today, endDate]);
       } else {
-        setSelectedListDate([null, null]);
+        setSelectedListDate([today, today]);
       }
 
       return next;
@@ -186,12 +188,15 @@ export default function EventsPage() {
       <div className='flex gap-2.5 items-center w-full flex-1 min-w-0'>
         <ListDateDropdown
           value={selectedListDate}
-          onChange={(dates) => {
-            if (Array.isArray(dates)) {
-              setSelectedListDate(dates);
+          onChange={(date) => {
+            if (Array.isArray(date)) {
+              setSelectedListDate(date);
+            } else {
+              setSelectedListDate([date, date]);
             }
           }}
           isDateSelected={!!selectedListDate[0]}
+          isRange={switchOn}
         />
 
         <div className='flex shrink-0 items-center gap-1.5'>
@@ -202,10 +207,18 @@ export default function EventsPage() {
         </div>
       </div>
 
-      <div className='flex flex-col items-center justify-center py-25 gap-3.5'>
-        <Capybara className='w-25' />
-        <p className='font-pretendard font-medium text-base text-gray-700'>등록된 행사가 없어요.</p>
-      </div>
+      {mock.length > 0 ? (
+        mock.map((event) => (
+          <div className='mt-6 flex flex-col gap-4'>
+            <EventListCard key={event.id} id={event.id} image={event.image} title={event.title} date={event.date} location={event.location} likeCount={event.recommend} dislikeCount={event.unrecommend} />
+          </div>
+        ))
+      ) : (
+        <div className='flex flex-col items-center justify-center py-25 gap-3.5'>
+          <Capybara className='w-25' />
+          <p className='font-pretendard font-medium text-base text-gray-700'>등록된 행사가 없어요.</p>
+        </div>
+      )}
     </>
   );
 }
