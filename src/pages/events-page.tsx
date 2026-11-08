@@ -81,7 +81,7 @@ export default function EventsPage() {
     return `${date.getMonth() + 1}월 ${date.getDate()}일`;
   };
 
-  // 건물명/ 날짜 필터링
+  // 지도 건물명 / 날짜 필터링
   const filteredEvents = mock.filter((event) => {
     const isBuildingMatch = selectedBuilding ? event.location === selectedBuilding : true;
 
@@ -111,6 +111,30 @@ export default function EventsPage() {
       return next;
     });
   };
+
+  // 목록 날짜 비교
+  const isEventInDateRange = (eventDate: string, startDate: Date | null, endDate: Date | null) => {
+    if (!startDate) return false;
+
+    const eventMonthDay = eventDate.match(/(\d+)월\s*(\d+)일/);
+
+    if (!eventMonthDay) return false;
+
+    const [, month, day] = eventMonthDay;
+
+    const eventDateObj = new Date(startDate.getFullYear(), Number(month) - 1, Number(day));
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(endDate ?? startDate);
+    end.setHours(23, 59, 59, 999);
+
+    return eventDateObj >= start && eventDateObj <= end;
+  };
+
+  // 목록 날짜 필터링
+  const filteredListEvents = mock.filter((event) => isEventInDateRange(event.date, selectedListDate[0], switchOn ? selectedListDate[1] : selectedListDate[0]));
 
   return isMap ? (
     <>
@@ -239,23 +263,23 @@ export default function EventsPage() {
         />
 
         <div className='flex shrink-0 items-center gap-1.5'>
-          <span className='font-pretendard font-normal text-sm text-gray-800'>7일 간</span>
+          <span className='font-pretendard font-normal text-sm text-gray-800'>1주일 내 행사</span>
           <button type='button' onClick={handleSwitch}>
             {switchOn ? <SwitchOn className='rounded-full' /> : <SwitchOff className='border border-gray-300 rounded-full' />}
           </button>
         </div>
       </div>
 
-      {mock.length > 0 ? (
-        mock.map((event) => (
-          <div className='mt-6 flex flex-col gap-4'>
-            <EventListCard key={event.id} id={event.id} image={event.image} title={event.title} date={event.date} location={event.location} likeCount={event.recommend} dislikeCount={event.unrecommend} />
+      {filteredListEvents.length > 0 ? (
+        filteredListEvents.map((event) => (
+          <div key={event.id} className='mt-6 flex flex-col gap-4'>
+            <EventListCard id={event.id} image={event.image} title={event.title} date={event.date} location={event.location} likeCount={event.recommend} dislikeCount={event.unrecommend} />
           </div>
         ))
       ) : (
         <div className='flex flex-col items-center justify-center py-25 gap-3.5'>
           <Capybara className='w-25' />
-          <p className='font-pretendard font-medium text-base text-gray-700'>등록된 행사가 없어요.</p>
+          <p className='font-pretendard font-medium text-base text-gray-700'>선택한 날짜에 등록된 행사가 없어요.</p>
         </div>
       )}
     </div>
