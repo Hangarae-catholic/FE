@@ -155,6 +155,35 @@
   border-color: #6b7280 !important;
 }
 
+/* 범위 선택 중 마우스 오버 영역 */
+.react-datepicker__day--in-selecting-range {
+  background-color: #e6f9ee !important;
+  color: #333 !important;
+  border-radius: 0 !important;
+}
+
+/* 범위 선택 중 시작일과 종료일 */
+.react-datepicker__day--selecting-range-start,
+.react-datepicker__day--selecting-range-end {
+  background-color: #f36b0a !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+
+/* 종료일 */
+.custom-range-calendar .react-datepicker__day--range-end {
+  background-color: #f36b0a !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+
+/* 선택된 범위의 중간 날짜 */
+.custom-range-calendar .react-datepicker__day--in-range {
+  background-color: #fff5ec;
+  color: #5c636a;
+  border-radius: 0;
+}
+
 /* Chrome, Safari, Edge, Opera */
 /* input type number button delete */
 input::-webkit-outer-spin-button,
