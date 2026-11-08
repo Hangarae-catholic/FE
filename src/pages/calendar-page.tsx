@@ -36,7 +36,7 @@ const majorOptions = [
 const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
 
 interface CalendarEvent {
-  noticeId: number;
+  postId: number;
   name: string;
   startAt: string;
   endAt: string;
@@ -47,7 +47,7 @@ interface CalendarEvent {
 // TODO: 실제 캘린더 일정 조회 API로 교체
 const mockEvents: CalendarEvent[] = [
   {
-    noticeId: 1,
+    postId: 1,
     name: "컴퓨터정보공학부 학술제",
     startAt: "2026-11-13T14:00:00",
     endAt: "2026-11-13T18:00:00",
@@ -55,7 +55,7 @@ const mockEvents: CalendarEvent[] = [
     division: "AI전자정보융합대학",
   },
   {
-    noticeId: 2,
+    postId: 2,
     name: "정보통신전자공학부 학술제",
     startAt: "2026-11-13T13:00:00",
     endAt: "2026-11-13T17:00:00",
@@ -63,7 +63,7 @@ const mockEvents: CalendarEvent[] = [
     division: "AI전자정보융합대학",
   },
   {
-    noticeId: 3,
+    postId: 3,
     name: "2학기 수강신청",
     startAt: "2026-11-02T09:00:00",
     endAt: "2026-11-04T18:00:00",
@@ -71,7 +71,7 @@ const mockEvents: CalendarEvent[] = [
     division: null,
   },
   {
-    noticeId: 4,
+    postId: 4,
     name: "컴퓨터정보공학부 학술제",
     startAt: "2026-11-24T14:00:00",
     endAt: "2026-11-26T18:00:00",
@@ -79,7 +79,7 @@ const mockEvents: CalendarEvent[] = [
     division: "AI전자정보융합대학",
   },
   {
-    noticeId: 5,
+    postId: 5,
     name: "정보통신전자공학부 학술제",
     startAt: "2026-11-24T13:00:00",
     endAt: "2026-11-25T17:00:00",
@@ -87,7 +87,7 @@ const mockEvents: CalendarEvent[] = [
     division: "AI전자정보융합대학",
   },
   {
-    noticeId: 6,
+    postId: 6,
     name: "개인 일정",
     startAt: "2026-11-26T10:00:00",
     endAt: "2026-11-26T12:00:00",
@@ -95,7 +95,7 @@ const mockEvents: CalendarEvent[] = [
     division: null,
   },
   {
-    noticeId: 7,
+    postId: 7,
     name: "미디어콘텐츠학과 학술제",
     startAt: "2026-11-24T10:00:00",
     endAt: "2026-11-28T12:00:00",
@@ -197,7 +197,6 @@ const getWeekBars = (weekDates: Date[], events: CalendarEvent[]): WeekBar[] => {
       (date) => formatDateKey(date) >= start,
     );
 
-    // 해당 주에서 끝나는 칸
     let endColumn = -1;
 
     for (let i = 0; i < weekDates.length; i++) {
@@ -210,7 +209,6 @@ const getWeekBars = (weekDates: Date[], events: CalendarEvent[]): WeekBar[] => {
       continue;
     }
 
-    // 겹치는 일정은 다음 줄에 배치
     let lane = 0;
 
     while (true) {
@@ -525,7 +523,7 @@ const CalendarPage = () => {
 
                     return (
                       <div
-                        key={bar.event.noticeId}
+                        key={bar.event.postId}
                         className={`
                   absolute h-[18px]
                   overflow-hidden
@@ -582,11 +580,9 @@ const CalendarPage = () => {
 
                   return (
                     <button
-                      key={event.noticeId}
+                      key={event.postId}
                       type="button"
-                      onClick={() =>
-                        navigate(`/event-detail/${event.noticeId}`)
-                      }
+                      onClick={() => navigate(`/calendar/${event.postId}`)}
                       className="
                 flex w-full items-center
                 gap-4 rounded-[12px]

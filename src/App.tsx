@@ -26,6 +26,7 @@ import ProfileEditPage from "./pages/my/profile-edit-page";
 import EventDetailPage from "./pages/event-detail-page";
 import MyActivityPage from "./pages/my/my-activity-page";
 import CalendarPage from "./pages/calendar-page";
+import CalendarDetailPage from "./pages/calendar-detail-page";
 
 export default function App() {
   const routes: RouteObject[] = [
@@ -109,6 +110,10 @@ export default function App() {
         {
           path: "/calendar",
           element: <CalendarPage />,
+        },
+        {
+          path: "/calendar/:postId",
+          element: <CalendarDetailPage />,
         },
         {
           path: "test",
