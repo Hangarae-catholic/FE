@@ -10,6 +10,8 @@ import Marker from '/src/assets/icons/marker.svg?react';
 import Modal from '../components/common/Modal';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/common/TopBar';
+import BottomSheet from '../components/common/BottomSheet/BottomSheet';
+import { LOCATIONS } from '../constants/LOCATIONS';
 
 const mock = [
   {
@@ -40,6 +42,9 @@ export default function AddEventPage() {
   const [eventContent, setEventContent] = useState('');
   const [isOpenSubmitModal, setIsOpenSubmitModal] = useState(false);
   const [isOpenBackModal, setIsOpenBackModal] = useState(false);
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
+  const [bottomSheetSelected, setBottomSheetSelected] = useState('');
+  const [detailLocation, setDetailLocation] = useState('');
 
   // 타임 피커 영역 감지
   useEffect(() => {
@@ -229,11 +234,10 @@ export default function AddEventPage() {
           </div>
         </div>
         {/* 행사 위치 */}
-        {/* 클릭하면 바텀시트 */}
-        <button type='button' className='w-full bg-white border border-gray-300 rounded-xl px-2.5 py-4 flex items-center gap-3'>
+        <button type='button' className='w-full bg-white border border-gray-300 rounded-xl px-2.5 py-4 flex items-center gap-3' onClick={() => setShowBottomSheet(true)}>
           <div className='flex gap-1.5 items-center'>
             <Marker className='w-4 h-4 text-gray-600' />
-            <span className='font-pretendard font-normal text-[13px] text-gray-600'>행사 위치를 입력해주세요</span>
+            <span className={`font-pretendard font-normal text-[13px] ${bottomSheetSelected ? 'text-gray-800' : 'text-gray-600'}`}>{bottomSheetSelected && detailLocation ? `${bottomSheetSelected} / ${detailLocation}` : '행사 위치를 입력해주세요'}</span>
           </div>
         </button>
       </div>
@@ -254,7 +258,7 @@ export default function AddEventPage() {
       </div>
 
       {/* 완료 버튼 */}
-      <button type='button' className={`w-full mt-8.5 bg-main py-3.5 font-pretendard font-semibold text-base text-gray-50 rounded-xl disabled:bg-gray-400`} onClick={() => setIsOpenSubmitModal(true)} disabled={!eventName || !eventOrgan || !isEndDateSelected || !isStartDateSelected || !isEndTimeSelected || !isStartTimeSelected}>
+      <button type='button' className={`w-full mt-8.5 bg-main py-3.5 font-pretendard font-semibold text-base text-gray-50 rounded-xl disabled:bg-gray-400`} onClick={() => setIsOpenSubmitModal(true)} disabled={!eventName || !eventOrgan || !isEndDateSelected || !isStartDateSelected || !isEndTimeSelected || !isStartTimeSelected || !!bottomSheetSelected}>
         완료
       </button>
 
@@ -263,6 +267,31 @@ export default function AddEventPage() {
 
       {/* 완료 모달 */}
       {isOpenSubmitModal && <Modal title='행사를 등록하시겠어요?' content='등록한 행사 정보는 관리자의 승인 후 사용자들에게 공개돼요. 허위 또는 부적절한 내용은 관리자에 의해 수정되거나 삭제될 수 있어요.' leftBtn='취소' cancel={() => setIsOpenSubmitModal(false)} rightBtn='등록하기' onClick={handleSubmit} />}
+
+      {showBottomSheet && (
+        <BottomSheet
+          title='행사 위치 선택'
+          isOpen={showBottomSheet}
+          onClose={() => setShowBottomSheet(false)}
+          searchable
+          searchPlaceholder='장소를 검색해주세요'
+          options={LOCATIONS}
+          onChange={(values: string[]) => {
+            setBottomSheetSelected(values[0] ?? '');
+          }}
+          selected={[bottomSheetSelected]}
+          hasInput
+          bottomFixed
+          bottomInputChange={setDetailLocation}
+          bottomInputValue={detailLocation}
+          hasSubmit
+          children={
+            <button type='button' className={`w-full mt-8.5 bg-main py-3.5 font-pretendard font-semibold text-base text-gray-50 rounded-xl disabled:bg-gray-400`} onClick={() => setShowBottomSheet(false)} disabled={!bottomSheetSelected || !detailLocation}>
+              완료
+            </button>
+          }
+        />
+      )}
     </>
   );
 }
