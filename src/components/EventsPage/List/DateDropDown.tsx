@@ -12,13 +12,18 @@ import Calendar from '/src/assets/icons/calendar_event.svg?react';
 type DateButtonProps = {
   displayValue: string;
   onClick?: () => void;
+  isToday: boolean;
 };
 
-const DateButton = forwardRef<HTMLButtonElement, DateButtonProps>(({ displayValue, onClick }, ref) => (
+const DateButton = forwardRef<HTMLButtonElement, DateButtonProps>(({ displayValue, onClick, isToday }, ref) => (
   <button ref={ref} type='button' onClick={onClick} aria-label='행사 날짜 선택' className='flex justify-between items-center gap-0.5 w-full bg-white px-2 py-1.5 border border-gray-50 rounded-lg'>
     <div className='flex items-center gap-1'>
       <Calendar className='w-6 h-6 text-gray-600' />
-      <span className='font-pretendard font-normal text-sm text-gray-700 max-[330px]:text-xs'>{displayValue}</span>
+      <span className='font-pretendard font-normal text-sm text-gray-700 max-[330px]:text-xs'>
+        {displayValue}
+        &nbsp;
+        {isToday && '오늘'}
+      </span>
     </div>
 
     <ArrowDown className='w-6 h-6 text-gray-800' />
@@ -69,7 +74,7 @@ export default function DateDropdown({ value, onChange, isRange = false }: DateD
       selectsRange={isRange ? true : undefined}
       locale={ko}
       dateFormat='yyyy.MM.dd'
-      customInput={<DateButton displayValue={displayValue} />}
+      customInput={<DateButton displayValue={displayValue} isToday={!isRange && (!startDate || formatDate(startDate)) === formatDate(today)} />}
       popperClassName='!z-50'
       popperPlacement='bottom-start'
       popperModifiers={[

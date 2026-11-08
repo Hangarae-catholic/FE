@@ -179,8 +179,8 @@
 
 /* 선택된 범위의 중간 날짜 */
 .custom-range-calendar .react-datepicker__day--in-range {
-  background-color: #e6f9ee;
-  color: #333333;
+  background-color: #fff5ec;
+  color: #5c636a;
   border-radius: 0;
 }
 
