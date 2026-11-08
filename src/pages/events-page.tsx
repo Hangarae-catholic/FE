@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import TopBar from '../components/common/TopBar';
-import Map from '/src/assets/icons/map.svg?react';
+import MapIcon from '/src/assets/icons/map.svg?react';
 import List from '/src/assets/icons/list.svg?react';
 import ListDateDropdown from '../components/EventsPage/List/DateDropDown';
 import MapDateDropdown from '../components/EventsPage/Map/DateDropDown';
@@ -14,6 +14,7 @@ import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import EventListCard from '../components/AddEventPage/EventCard';
+import MiniMap from '../components/HomePage/MiniMap';
 
 interface Event {
   id: number;
@@ -71,6 +72,7 @@ export default function EventsPage() {
   const [currentSlide, setCurrentSlide] = useState(1);
   const [likeStates, setLikeStates] = useState<Record<number, boolean>>({});
   const [disLikeStates, setDisLikeStates] = useState<Record<number, boolean>>({});
+  const [showEventCard, setShowEventCard] = useState(false);
 
   const swiperRef = useRef<SwiperType | null>(null);
 
@@ -96,94 +98,105 @@ export default function EventsPage() {
 
   return isMap ? (
     <>
-      <TopBar title='행사 지도' rightIcon={List} rightBtnName='목록' rightOnClick={() => setIsMap(false)} />
-      <MapDateDropdown
-        value={selectedMapDate}
-        onChange={(date: Date | null) => {
-          setSelectedMapDate(date);
-        }}
-        isDateSelected={!!selectedMapDate}
-      />
+      <div className='flex h-dvh flex-col overflow-hidden'>
+        <TopBar title='행사 지도' rightIcon={List} rightBtnName='목록' rightOnClick={() => setIsMap(false)} />
 
-      <div className='fixed bottom-8 left-0 right-0 mx-auto w-full max-w-120 px-5'>
-        {mock.length > 1 ? (
-          <Swiper
-            spaceBetween={10}
-            slidesPerView={1}
-            className='w-full'
-            onSlideChange={(swiper) => setCurrentSlide(swiper.realIndex + 1)}
-            onSwiper={(swiper) => {
-              swiperRef.current = swiper;
-            }}
-          >
-            {mock.map((event) => (
-              <SwiperSlide key={event.id}>
-                <EventCard
-                  id={event.id}
-                  title={event.title}
-                  recommend={event.recommend}
-                  unrecommend={event.unrecommend}
-                  image={event.image}
-                  location={event.location}
-                  date={event.date}
-                  content={event.content}
-                  setCurrentSlide={setCurrentSlide}
-                  currentSlide={currentSlide}
-                  eventsNum={mock.length}
-                  onSlideChange={(index) => swiperRef.current?.slideTo(index)}
-                  like={likeStates[event.id] ?? false}
-                  setLike={(value) =>
-                    setLikeStates((prev) => ({
-                      ...prev,
-                      [event.id]: typeof value === 'function' ? value(prev[event.id] ?? false) : value,
-                    }))
-                  }
-                  disLike={disLikeStates[event.id] ?? false}
-                  setDisLike={(value) =>
-                    setDisLikeStates((prev) => ({
-                      ...prev,
-                      [event.id]: typeof value === 'function' ? value(prev[event.id] ?? false) : value,
-                    }))
-                  }
-                  liked={event.liked}
-                  disLiked={event.disLiked}
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        ) : (
-          <EventCard
-            id={mock[0].id}
-            title={mock[0].title}
-            recommend={mock[0].recommend}
-            unrecommend={mock[0].unrecommend}
-            location={mock[0].location}
-            date={mock[0].date}
-            image={mock[0].image}
-            content={mock[0].content}
-            like={likeStates[mock[0].id] ?? false}
-            setLike={(value) =>
-              setLikeStates((prev) => ({
-                ...prev,
-                [mock[0].id]: typeof value === 'function' ? value(prev[mock[0].id] ?? false) : value,
-              }))
-            }
-            disLike={disLikeStates[mock[0].id] ?? false}
-            setDisLike={(value) =>
-              setDisLikeStates((prev) => ({
-                ...prev,
-                [mock[0].id]: typeof value === 'function' ? value(prev[mock[0].id] ?? false) : value,
-              }))
-            }
-            liked={mock[0].liked}
-            disLiked={mock[0].disLiked}
-          />
-        )}
+        <div className='relative flex-1 min-h-0 w-full'>
+          <div className='absolute top-14 left-5 z-20'>
+            <MapDateDropdown
+              value={selectedMapDate}
+              onChange={(date: Date | null) => {
+                setSelectedMapDate(date);
+              }}
+              isDateSelected={!!selectedMapDate}
+            />
+          </div>
+
+          <MiniMap />
+        </div>
       </div>
+
+      {showEventCard && (
+        <div className='fixed bottom-8 left-0 right-0 mx-auto w-full max-w-120 px-5'>
+          {mock.length > 1 ? (
+            <Swiper
+              spaceBetween={10}
+              slidesPerView={1}
+              className='w-full'
+              onSlideChange={(swiper) => setCurrentSlide(swiper.realIndex + 1)}
+              onSwiper={(swiper) => {
+                swiperRef.current = swiper;
+              }}
+            >
+              {mock.map((event) => (
+                <SwiperSlide key={event.id}>
+                  <EventCard
+                    id={event.id}
+                    title={event.title}
+                    recommend={event.recommend}
+                    unrecommend={event.unrecommend}
+                    image={event.image}
+                    location={event.location}
+                    date={event.date}
+                    content={event.content}
+                    setCurrentSlide={setCurrentSlide}
+                    currentSlide={currentSlide}
+                    eventsNum={mock.length}
+                    onSlideChange={(index) => swiperRef.current?.slideTo(index)}
+                    like={likeStates[event.id] ?? false}
+                    setLike={(value) =>
+                      setLikeStates((prev) => ({
+                        ...prev,
+                        [event.id]: typeof value === 'function' ? value(prev[event.id] ?? false) : value,
+                      }))
+                    }
+                    disLike={disLikeStates[event.id] ?? false}
+                    setDisLike={(value) =>
+                      setDisLikeStates((prev) => ({
+                        ...prev,
+                        [event.id]: typeof value === 'function' ? value(prev[event.id] ?? false) : value,
+                      }))
+                    }
+                    liked={event.liked}
+                    disLiked={event.disLiked}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          ) : (
+            <EventCard
+              id={mock[0].id}
+              title={mock[0].title}
+              recommend={mock[0].recommend}
+              unrecommend={mock[0].unrecommend}
+              location={mock[0].location}
+              date={mock[0].date}
+              image={mock[0].image}
+              content={mock[0].content}
+              like={likeStates[mock[0].id] ?? false}
+              setLike={(value) =>
+                setLikeStates((prev) => ({
+                  ...prev,
+                  [mock[0].id]: typeof value === 'function' ? value(prev[mock[0].id] ?? false) : value,
+                }))
+              }
+              disLike={disLikeStates[mock[0].id] ?? false}
+              setDisLike={(value) =>
+                setDisLikeStates((prev) => ({
+                  ...prev,
+                  [mock[0].id]: typeof value === 'function' ? value(prev[mock[0].id] ?? false) : value,
+                }))
+              }
+              liked={mock[0].liked}
+              disLiked={mock[0].disLiked}
+            />
+          )}
+        </div>
+      )}
     </>
   ) : (
-    <>
-      <TopBar title='행사 목록' rightIcon={Map} rightBtnName='지도' rightOnClick={() => setIsMap(true)} />
+    <div className='px-5'>
+      <TopBar title='행사 목록' rightIcon={MapIcon} rightBtnName='지도' rightOnClick={() => setIsMap(true)} />
       {/* 날짜 선택 버튼 */}
       <div className='flex gap-2.5 items-center w-full flex-1 min-w-0'>
         <ListDateDropdown
@@ -219,6 +232,6 @@ export default function EventsPage() {
           <p className='font-pretendard font-medium text-base text-gray-700'>등록된 행사가 없어요.</p>
         </div>
       )}
-    </>
+    </div>
   );
 }

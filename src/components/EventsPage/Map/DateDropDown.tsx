@@ -16,7 +16,7 @@ type DateButtonProps = {
 };
 
 const DateButton = forwardRef<HTMLButtonElement, DateButtonProps>(({ displayValue, onClick, isToday }, ref) => (
-  <button ref={ref} type='button' onClick={onClick} aria-label='행사 날짜 선택' className='flex justify-between items-center gap-0.5 w-full bg-white px-2 py-1.5 border border-gray-50 rounded-lg'>
+  <button ref={ref} type='button' onClick={onClick} aria-label='행사 날짜 선택' className='flex justify-between items-center gap-0.5 w-full bg-white px-2 py-1.5 border border-gray-50 rounded-lg z-50'>
     <div className='flex items-center gap-1'>
       <Calendar className='w-6 h-6 text-gray-600' />
       <span className='font-pretendard font-normal text-sm text-gray-700 max-[330px]:text-xs'>
