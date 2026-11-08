@@ -15,8 +15,9 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import EventListCard from '../components/AddEventPage/EventCard';
 import MiniMap from '../components/HomePage/MiniMap';
+import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
 
-interface Event {
+export interface Event {
   id: number;
   recommend: number;
   unrecommend: number;
@@ -37,7 +38,7 @@ const mock: Event[] = [
     image: ExEventImg,
     location: '콘서트홀',
     title: '개교 170주년 기념 음악회',
-    date: '11월 21일(금) 19시',
+    date: '11월 11일(금) 19시',
     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
     liked: true,
   },
@@ -48,7 +49,7 @@ const mock: Event[] = [
     image: ExEventImg,
     location: '콘서트홀',
     title: '개교 170주년 기념 음악회',
-    date: '11월 21일(금) 19시',
+    date: '11월 11일(화) 19시',
     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
     disLiked: true,
   },
@@ -57,9 +58,9 @@ const mock: Event[] = [
     recommend: 12,
     unrecommend: 3,
     image: ExEventImg,
-    location: '콘서트홀',
+    location: '김수환관',
     title: '개교 170주년 기념 음악회',
-    date: '11월 21일(금) 19시',
+    date: '11월 15일(금) 19시',
     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
   },
 ];
@@ -67,12 +68,27 @@ const mock: Event[] = [
 export default function EventsPage() {
   const [isMap, setIsMap] = useState(true);
   const [selectedListDate, setSelectedListDate] = useState<[Date | null, Date | null]>([new Date(), null]);
-  const [selectedMapDate, setSelectedMapDate] = useState<Date | null>(null);
+  const [selectedMapDate, setSelectedMapDate] = useState<Date | null>(new Date());
   const [switchOn, setSwitchOn] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(1);
   const [likeStates, setLikeStates] = useState<Record<number, boolean>>({});
   const [disLikeStates, setDisLikeStates] = useState<Record<number, boolean>>({});
   const [showEventCard, setShowEventCard] = useState(false);
+  const [selectedBuilding, setSelectedBuilding] = useState<string | null>(null);
+
+  // 날짜 변환 함수
+  const formatEventDate = (date: Date) => {
+    return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+  };
+
+  // 건물명/ 날짜 필터링
+  const filteredEvents = mock.filter((event) => {
+    const isBuildingMatch = selectedBuilding ? event.location === selectedBuilding : true;
+
+    const isDateMatch = selectedMapDate ? event.date.startsWith(formatEventDate(selectedMapDate)) : true;
+
+    return isBuildingMatch && isDateMatch;
+  });
 
   const swiperRef = useRef<SwiperType | null>(null);
 
@@ -102,7 +118,7 @@ export default function EventsPage() {
         <TopBar title='행사 지도' rightIcon={List} rightBtnName='목록' rightOnClick={() => setIsMap(false)} />
 
         <div className='relative flex-1 min-h-0 w-full'>
-          <div className='absolute top-14 left-5 z-20'>
+          <div className='absolute top-4 left-5 z-20'>
             <MapDateDropdown
               value={selectedMapDate}
               onChange={(date: Date | null) => {
@@ -112,13 +128,21 @@ export default function EventsPage() {
             />
           </div>
 
-          <MiniMap />
+          <MiniMap
+            buildingNames={buildingCoordinates.map((bc) => bc.name)}
+            clickMarker={(buildingName) => {
+              setSelectedBuilding(buildingName);
+              setShowEventCard(true);
+              setCurrentSlide(1);
+            }}
+            events={mock.filter((event) => (selectedMapDate ? event.date.startsWith(formatEventDate(selectedMapDate)) : true))}
+          />
         </div>
       </div>
 
       {showEventCard && (
         <div className='fixed bottom-8 left-0 right-0 mx-auto w-full max-w-120 px-5'>
-          {mock.length > 1 ? (
+          {filteredEvents.length > 1 ? (
             <Swiper
               spaceBetween={10}
               slidesPerView={1}
@@ -128,7 +152,7 @@ export default function EventsPage() {
                 swiperRef.current = swiper;
               }}
             >
-              {mock.map((event) => (
+              {filteredEvents.map((event) => (
                 <SwiperSlide key={event.id}>
                   <EventCard
                     id={event.id}
@@ -141,7 +165,7 @@ export default function EventsPage() {
                     content={event.content}
                     setCurrentSlide={setCurrentSlide}
                     currentSlide={currentSlide}
-                    eventsNum={mock.length}
+                    eventsNum={filteredEvents.length}
                     onSlideChange={(index) => swiperRef.current?.slideTo(index)}
                     like={likeStates[event.id] ?? false}
                     setLike={(value) =>
@@ -159,38 +183,40 @@ export default function EventsPage() {
                     }
                     liked={event.liked}
                     disLiked={event.disLiked}
+                    onClose={setShowEventCard}
                   />
                 </SwiperSlide>
               ))}
             </Swiper>
-          ) : (
+          ) : filteredEvents.length === 1 ? (
             <EventCard
-              id={mock[0].id}
-              title={mock[0].title}
-              recommend={mock[0].recommend}
-              unrecommend={mock[0].unrecommend}
-              location={mock[0].location}
-              date={mock[0].date}
-              image={mock[0].image}
-              content={mock[0].content}
-              like={likeStates[mock[0].id] ?? false}
+              id={filteredEvents[0].id}
+              title={filteredEvents[0].title}
+              recommend={filteredEvents[0].recommend}
+              unrecommend={filteredEvents[0].unrecommend}
+              image={filteredEvents[0].image}
+              location={filteredEvents[0].location}
+              date={filteredEvents[0].date}
+              content={filteredEvents[0].content}
+              like={likeStates[filteredEvents[0].id] ?? false}
               setLike={(value) =>
                 setLikeStates((prev) => ({
                   ...prev,
-                  [mock[0].id]: typeof value === 'function' ? value(prev[mock[0].id] ?? false) : value,
+                  [filteredEvents[0].id]: typeof value === 'function' ? value(prev[filteredEvents[0].id] ?? false) : value,
                 }))
               }
-              disLike={disLikeStates[mock[0].id] ?? false}
+              disLike={disLikeStates[filteredEvents[0].id] ?? false}
               setDisLike={(value) =>
                 setDisLikeStates((prev) => ({
                   ...prev,
-                  [mock[0].id]: typeof value === 'function' ? value(prev[mock[0].id] ?? false) : value,
+                  [filteredEvents[0].id]: typeof value === 'function' ? value(prev[filteredEvents[0].id] ?? false) : value,
                 }))
               }
-              liked={mock[0].liked}
-              disLiked={mock[0].disLiked}
+              liked={filteredEvents[0].liked}
+              disLiked={filteredEvents[0].disLiked}
+              onClose={setShowEventCard}
             />
-          )}
+          ) : null}
         </div>
       )}
     </>
