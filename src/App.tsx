@@ -20,6 +20,9 @@ import ManageAccountPage from './pages/my/manage-account-page';
 import DeleteAccountPage from './pages/my/delete-account-page';
 import ProfileEditPage from './pages/my/profile-edit-page';
 import EventDetailPage from './pages/event-detail-page';
+import MyActivityPage from './pages/my/my-activity-page';
+import CalendarPage from './pages/calendar-page';
+import CalendarDetailPage from './pages/calendar-detail-page';
 import EventsPage from './pages/events-page';
 
 export default function App() {
@@ -96,6 +99,18 @@ export default function App() {
         {
           path: 'my/edit',
           element: <ProfileEditPage />,
+        },
+        {
+          path: 'my/activity',
+          element: <MyActivityPage />,
+        },
+        {
+          path: '/calendar',
+          element: <CalendarPage />,
+        },
+        {
+          path: '/calendar/:postId',
+          element: <CalendarDetailPage />,
         },
         {
           path: 'test',
