@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TopBar from '../components/common/TopBar';
 import MapIcon from '/src/assets/icons/map.svg?react';
 import List from '/src/assets/icons/list.svg?react';
@@ -75,6 +75,13 @@ export default function EventsPage() {
   const [disLikeStates, setDisLikeStates] = useState<Record<number, boolean>>({});
   const [showEventCard, setShowEventCard] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant',
+    });
+  }, []);
 
   // 날짜 변환 함수
   const formatEventDate = (date: Date) => {

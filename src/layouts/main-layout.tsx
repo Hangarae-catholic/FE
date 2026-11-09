@@ -18,7 +18,7 @@ function MainLayout() {
       <div className={`flex mx-auto min-h-screen w-full max-w-120 ${isHome ? 'bg-main-gradient' : 'bg-bg'}`}>
         <div className={`mx-auto flex w-full max-w-120 flex-col h-full ${isTeamMatchingDetailPage || isEventDetailPage || isEventsPage ? '' : 'px-5'}`}>
           {isHome && <HomeTopBar />}
-          <main className={`flex flex-1 flex-col ${isTeamMatchingIndexPage ? 'mt-2.5' : 'mt-15'}`}>
+          <main className={`flex flex-1 flex-col ${isTeamMatchingIndexPage ? 'mt-2.5' : isEventsPage ? 'mt-10' : 'mt-15'}`}>
             <Outlet />
           </main>
           {showNavBar && (
