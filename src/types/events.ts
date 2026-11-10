@@ -1,6 +1,7 @@
 import type { CommonResponse } from './common';
 
-type EventInfo = {
+// 행사 목록 조회
+export type EventInfo = {
   noticeId: number;
   name: string;
   startAt: Date;
@@ -11,3 +12,15 @@ type EventInfo = {
 };
 
 export type EventRetreiveResponse = CommonResponse<EventInfo[]>;
+
+// 행사 추천
+export type EventRecommend = {
+  noticeId: number;
+  name: string;
+  startAt: Date;
+  endAt: Date;
+  location: string;
+  approved: boolean;
+};
+
+export type EventRecommendResponse = CommonResponse<EventRecommend[]>;

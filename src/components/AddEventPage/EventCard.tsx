@@ -5,6 +5,7 @@ import Marker from '../../assets/icons/marker.svg?react';
 import RightArrow from '../../assets/icons/arrow_right.svg?react';
 import ThumbsUp from '../../assets/icons/thumbs-up.svg?react';
 import ThumbsDown from '../../assets/icons/thumbs-down.svg?react';
+import { formatDate } from '../../utils/FormatDate';
 
 type EventStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -12,10 +13,11 @@ interface EventCardProps {
   id: number;
   image?: string | null;
   title: string;
-  date: string;
-  location: string;
-  likeCount: number;
-  dislikeCount: number;
+  startDate: Date;
+  endDate: Date;
+  location: string | undefined;
+  likeCount?: number;
+  dislikeCount?: number;
   status?: EventStatus;
   onClick?: (id: number) => void;
 }
@@ -35,7 +37,7 @@ const statusStyles: Record<EventStatus, { label: string; className: string }> = 
   },
 };
 
-export default function EventCard({ id, image, title, date, location, likeCount, dislikeCount, status, onClick }: EventCardProps) {
+export default function EventCard({ id, image, title, startDate, endDate, location, likeCount, dislikeCount, status, onClick }: EventCardProps) {
   const navigate = useNavigate();
   const statusInfo = status ? statusStyles[status] : undefined;
 
@@ -123,7 +125,7 @@ export default function EventCard({ id, image, title, date, location, likeCount,
               text-gray-700
             '
           >
-            {date}
+            {formatDate(startDate)}~{formatDate(endDate)}
           </span>
         </div>
 
