@@ -13,8 +13,8 @@ interface EventCardProps {
   id: number;
   image?: string | null;
   title: string;
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
   location: string | undefined;
   likeCount?: number;
   dislikeCount?: number;
@@ -106,7 +106,7 @@ export default function EventCard({ id, image, title, startDate, endDate, locati
             font-pretendard
             text-base font-medium
             leading-6
-            text-[#343A40]
+            text-gray-800
             text-[16px]
             break-keep
           '
