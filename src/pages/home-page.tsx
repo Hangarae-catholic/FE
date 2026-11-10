@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
+import useGetTodayEventLocation from '../hooks/Home/useGetTodayEventLocation';
 
 const mock = [
   { id: 1, image: ExEvent, title: '[개교 170주년 기념] 음악과 현악합주', date: '11월 21일(금) 19시', location: '약학관' },
@@ -26,8 +27,10 @@ const mockInterests = ['IT•소프트웨어', 'AI•데이터', 'AI•데이터
 export default function HomePage() {
   const navigate = useNavigate();
 
+  const { data: Events, isPending: isLoadingEvents, isError: isErrorEvents } = useGetTodayEventLocation();
+
   // 행사 장소 중복 제거
-  const eventLocations = useMemo(() => [...new Set(mock.map((event) => event.location))], []);
+  const eventLocations = useMemo(() => [...new Set(Events?.map((event) => event.location))], [Events]);
 
   // 좌표 데이터가 존재하는 장소만 추출
   const markers = useMemo(() => buildingCoordinates.filter((location) => eventLocations.includes(location.name)), [eventLocations]);
@@ -115,6 +118,14 @@ export default function HomePage() {
   // 오늘 날짜 포맷팅 'm월 d일 e요일'
   const today = format(new Date(), 'M월 d일 EEEE', { locale: ko });
 
+  if (isLoadingEvents) {
+    return <div>loading...</div>;
+  }
+
+  if (isErrorEvents) {
+    return <div>Error!</div>;
+  }
+
   return (
     <>
       {/* 상단 내용 */}
@@ -161,7 +172,7 @@ export default function HomePage() {
         <div className='flex justify-between items-center'>
           <span className='font-pretendard font-normal text-base text-white leading-6'>교내 행사 미니맵</span>
 
-          <span className='font-pretendard font-normal text-[13px] text-white leading-5'>{mock.length}개 진행중</span>
+          <span className='font-pretendard font-normal text-[13px] text-white leading-5'>{Events?.length}개 진행중</span>
         </div>
 
         {/* 지도 프레임 */}
