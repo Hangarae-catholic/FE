@@ -32,41 +32,6 @@ export interface Event {
   disLiked?: boolean;
 }
 
-// const mock: Event[] = [
-//   {
-//     id: 1,
-//     recommend: 12,
-//     unrecommend: 3,
-//     image: ExEventImg,
-//     location: '콘서트홀',
-//     title: '개교 170주년 기념 음악회',
-//     date: '11월 11일(금) 19시',
-//     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
-//     liked: true,
-//   },
-//   {
-//     id: 2,
-//     recommend: 12,
-//     unrecommend: 3,
-//     image: ExEventImg,
-//     location: '콘서트홀',
-//     title: '개교 170주년 기념 음악회',
-//     date: '11월 11일(화) 19시',
-//     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
-//     disLiked: true,
-//   },
-//   {
-//     id: 3,
-//     recommend: 12,
-//     unrecommend: 3,
-//     image: ExEventImg,
-//     location: '김수환관',
-//     title: '개교 170주년 기념 음악회',
-//     date: '11월 15일(금) 19시',
-//     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
-//   },
-// ];
-
 export default function EventsPage() {
   const [isMap, setIsMap] = useState(true);
   const [selectedListDate, setSelectedListDate] = useState<[Date | null, Date | null]>([new Date(), null]);
@@ -105,11 +70,6 @@ export default function EventsPage() {
       behavior: 'instant',
     });
   }, []);
-
-  // 날짜 변환 함수
-  // const formatEventDate = (date: Date) => {
-  //   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
-  // };
 
   // 목록 날짜 비교
   // 선택한 날짜가 행사 시작일 ~ 종료일 사이에 포함되는지 확인
