@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import axios from "axios";
 import Button from "../../components/common/Button";
 import TopBar from "../../components/common/TopBar";
+import { sendEmailCode, signUp, verifyEmailCode } from "../../apis/auth";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -14,12 +16,22 @@ const SignupPage = () => {
   const [timeLeft, setTimeLeft] = useState(0);
 
   const [name, setName] = useState("");
+  const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [isConfirmTouched, setIsConfirmTouched] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [signupError, setSignupError] = useState("");
 
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/;
+  const loginIdRegex = /^[A-Za-z0-9]{6,}$/;
+
+  const isLoginIdValid = loginIdRegex.test(loginId);
+
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9\s])\S{8,16}$/;
 
   const isPasswordValid = passwordRegex.test(password);
 
@@ -31,6 +43,8 @@ const SignupPage = () => {
   const canSignup =
     isEmailVerified &&
     name.trim().length > 0 &&
+    isLoginIdValid &&
+    !isSigningUp &&
     isPasswordValid &&
     isPasswordMatch;
 
@@ -57,32 +71,143 @@ const SignupPage = () => {
   };
 
   // 이메일 인증번호 발송
-  const handleSendCode = () => {
-    if (!email.trim()) return;
+  const handleSendCode = async () => {
+    if (!email.trim() || isSendingCode) return;
 
-    // TODO: 이메일 인증번호 발송 API 연동
-    setIsCodeSent(true);
-    setVerificationCode("");
-    setTimeLeft(180);
+    setIsSendingCode(true);
+    setEmailError("");
+
+    try {
+      const response = await sendEmailCode({
+        email: email.trim(),
+        purpose: "JOIN",
+      });
+
+      console.log("이메일 발송 API 응답:", response);
+
+      if (response.code !== "AUTH010" || response.httpStatus !== "200 OK") {
+        console.error("예상과 다른 응답 코드:", response.code);
+        setEmailError(response.message || "인증번호 발송에 실패했습니다.");
+        return;
+      }
+
+      setIsCodeSent(true);
+      setVerificationCode("");
+      setTimeLeft(180);
+    } catch (error) {
+      console.error("인증번호 발송 오류:", error);
+
+      if (axios.isAxiosError(error)) {
+        console.error("HTTP 상태:", error.response?.status);
+        console.error("서버 응답:", error.response?.data);
+
+        setEmailError(
+          error.response?.data?.message ||
+            "인증번호 발송 중 오류가 발생했습니다.",
+        );
+      } else {
+        setEmailError(
+          error instanceof Error
+            ? error.message
+            : "인증번호 발송 중 오류가 발생했습니다.",
+        );
+      }
+    } finally {
+      setIsSendingCode(false);
+    }
   };
 
-  // 이메일 인증 확인
-  const handleVerifyEmail = () => {
+  // 이메일 인증번호 검증
+  const handleVerifyEmail = async () => {
     if (!isCodeSent || timeLeft <= 0) return;
-    if (!verificationCode.trim()) return;
+    if (!verificationCode.trim() || isVerifyingCode) return;
 
-    // TODO: 인증번호 검증 API 연동
-    // 서버 인증 성공 시에만 아래 상태 변경
+    setIsVerifyingCode(true);
+    setEmailError("");
 
-    setIsEmailVerified(true);
+    try {
+      const response = await verifyEmailCode({
+        email: email.trim(),
+        type: "JOIN",
+        code: verificationCode.trim(),
+      });
+
+      console.log("인증 확인 전체 응답:", JSON.stringify(response, null, 2));
+      console.log("응답 코드:", response.code);
+      console.log("인증 데이터:", response.data);
+
+      if (response.data?.verified === true) {
+        setIsEmailVerified(true);
+      } else {
+        console.error("예상과 다른 인증 응답:", response);
+        setEmailError("인증 결과를 확인할 수 없습니다.");
+      }
+
+      setIsEmailVerified(true);
+    } catch (error) {
+      console.error("이메일 인증 오류:", error);
+
+      if (axios.isAxiosError(error)) {
+        setEmailError(
+          error.response?.data?.message ||
+            "인증번호가 올바르지 않거나 만료되었습니다.",
+        );
+      } else {
+        setEmailError(
+          error instanceof Error
+            ? error.message
+            : "이메일 인증 중 오류가 발생했습니다.",
+        );
+      }
+    } finally {
+      setIsVerifyingCode(false);
+    }
   };
 
-  // 회원가입
-  const handleSignup = () => {
-    if (!canSignup) return;
+  // 로컬 회원가입
 
-    // TODO: 회원가입 API 연동
-    navigate("/welcome", { replace: true });
+  const handleSignup = async () => {
+    if (!canSignup || isSigningUp) return;
+
+    setIsSigningUp(true);
+    setSignupError("");
+
+    const body = {
+      name: name.trim(),
+      loginId: loginId.trim(),
+      email: email.trim(),
+      password,
+      confirmPassword,
+    };
+
+    // 비밀번호는 출력하지 않고 요청 필드만 확인
+    console.log("회원가입 요청 확인:", {
+      name: body.name,
+      loginId: body.loginId,
+      email: body.email,
+      fields: Object.keys(body),
+    });
+
+    try {
+      const response = await signUp(body);
+
+      console.log("회원가입 성공 응답:", response);
+      navigate("/welcome", { replace: true });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("HTTP 상태:", error.response?.status);
+        console.error("백엔드 응답:", error.response?.data);
+
+        setSignupError(
+          error.response?.data?.message || "회원가입에 실패했습니다.",
+        );
+      } else {
+        console.error("회원가입 오류:", error);
+        setSignupError("회원가입 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsSigningUp(false);
+    }
   };
 
   const inputStyle = `
@@ -199,6 +324,12 @@ const SignupPage = () => {
               </button>
             </div>
 
+            {emailError && (
+              <p role="alert" className="mt-3 px-[2px] text-[14px] text-error">
+                {emailError}
+              </p>
+            )}
+
             <div className="mt-5">
               <Button
                 text="다음"
@@ -234,6 +365,34 @@ const SignupPage = () => {
               aria-label="이름"
               className={`${inputStyle} mt-3`}
             />
+
+            <input
+              type="text"
+              value={loginId}
+              onChange={(e) => setLoginId(e.target.value)}
+              placeholder="아이디(영문 또는 숫자, 6자 이상) 입력"
+              autoComplete="username"
+              aria-label="아이디"
+              aria-describedby={
+                loginId.length > 0 ? "login-id-validation" : undefined
+              }
+              className={`${inputStyle} mt-3`}
+            />
+
+            {loginId.length > 0 && (
+              <p
+                id="login-id-validation"
+                aria-live="polite"
+                className={`
+      mt-3 px-[2px] text-[14px]
+      ${isLoginIdValid ? "text-success" : "text-error"}
+    `}
+              >
+                {isLoginIdValid
+                  ? "사용할 수 있는 아이디 형식이에요."
+                  : "영문 또는 숫자 6자 이상으로 입력해 주세요."}
+              </p>
+            )}
 
             <input
               type="password"
@@ -301,6 +460,12 @@ const SignupPage = () => {
                   비밀번호를 확인해주세요.
                 </p>
               )}
+
+            {signupError && (
+              <p role="alert" className="mt-3 px-[2px] text-[14px] text-error">
+                {signupError}
+              </p>
+            )}
 
             <div className="mt-5">
               <Button text="가입하기" type="submit" disabled={!canSignup} />

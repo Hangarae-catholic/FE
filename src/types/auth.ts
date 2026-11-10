@@ -17,10 +17,32 @@ export type LoginResponse = CommonResponse<LoginData>;
 export type SignUpRequest = {
   name: string;
   loginId: string;
-  nickname: string;
   email: string;
   password: string;
   confirmPassword: string;
 };
 
 export type SignUpResponse = CommonResponse<string>;
+
+// 이메일 인증
+export type EmailPurpose = "JOIN" | "FIND_ID" | "RESET_PASSWORD";
+
+export type SendEmailCodeRequest = {
+  email: string;
+  purpose: EmailPurpose;
+};
+
+export type SendEmailCodeResponse = CommonResponse<null>;
+
+export type VerifyEmailCodeRequest = {
+  email: string;
+  type: EmailPurpose;
+  code: string;
+};
+
+export type VerifyEmailCodeData = {
+  verified: boolean;
+  message: string;
+};
+
+export type VerifyEmailCodeResponse = CommonResponse<VerifyEmailCodeData>;
