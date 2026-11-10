@@ -5,6 +5,7 @@ import RightArrow from '/src/assets/icons/arrow_right.svg?react';
 import { useNavigate } from 'react-router-dom';
 import { STUDENT_STATUS } from '../../constants/STUDENT_STATUS';
 import { Department } from '../../constants/DEPARTMENT';
+import { formatDate } from '../../utils/FormatDate';
 
 interface TeamCardProps {
   //  임시 변경
@@ -45,7 +46,7 @@ export default function TeamCard({ id, image, title, content, startDate, endDate
             <div className='flex gap-1.5'>
               <Calendar className='w-4 h-4 text-gray-600' />
               <time className='font-pretendard font-normal text-xs text-gray-700'>
-                {startDate?.toDateString()} ~ {endDate?.toDateString()}
+                {formatDate(startDate)} ~ {formatDate(endDate)}
               </time>
             </div>
             <div className='flex gap-1.5'>
