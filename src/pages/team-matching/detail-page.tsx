@@ -16,6 +16,7 @@ import { getTeamPostDetail } from '../../apis/team';
 import type { TeamPostDetailResponse } from '../../types/team';
 import { Department } from '../../constants/DEPARTMENT';
 import { STUDENT_STATUS } from '../../constants/STUDENT_STATUS';
+import { formatDate } from '../../utils/FormatDate';
 
 // 사용자 정보 가져오기
 const user = '정다민';
@@ -145,7 +146,7 @@ export default function TeamMatchDetailPage() {
               <div className='flex flex-col'>
                 <span className='font-pretendard font-normal text-sm text-gray-700'>모집 기간</span>
                 <span className='font-pretendard font-medium text-base text-gray-800'>
-                  {post?.data?.startAt.toDateString()}~{post?.data?.endAt.toDateString()}
+                  {formatDate(post?.data?.startAt)}~{formatDate(post?.data?.endAt)}
                 </span>
               </div>
             </div>

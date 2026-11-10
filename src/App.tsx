@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider, type RouteObject } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import MainLayout from './layouts/main-layout';
 import LandingPage from './pages/auth/landing-page';
 import HomePage from './pages/home-page';
@@ -25,109 +26,117 @@ import CalendarPage from './pages/calendar-page';
 import CalendarDetailPage from './pages/calendar-detail-page';
 import EventsPage from './pages/events-page';
 
-export default function App() {
-  const routes: RouteObject[] = [
-    {
-      path: '/',
-      element: <MainLayout />,
-      children: [
-        { index: true, element: <LandingPage /> },
-        {
-          path: 'home',
-          element: <HomePage />,
-        },
-        {
-          path: 'add-event',
-          element: <AddEventPage />,
-        },
-        {
-          path: 'team-match',
-          element: <TeamMatchingPage />,
-        },
-        {
-          path: 'team-match/:postId',
-          element: <TeamMatchDetailPage />,
-        },
-        {
-          path: 'team-match/create',
-          element: <TeamCreatePage />,
-        },
-        {
-          path: 'team-match/edit/:postId',
-          element: <TeamMatchPostEditPage />,
-        },
-        {
-          path: 'login',
-          element: <LoginPage />,
-        },
-        {
-          path: 'tou',
-          element: <ToUPage />,
-        },
-        {
-          path: 'signup',
-          element: <SignupPage />,
-        },
-        {
-          path: 'welcome',
-          element: <WelcomePage />,
-        },
-        {
-          path: 'profile/setup',
-          element: <ProfileSetupPage />,
-        },
-        {
-          path: 'profile/info',
-          element: <ProfileInfoPage />,
-        },
-        {
-          path: 'profile/complete',
-          element: <ProfileCompletePage />,
-        },
-        {
-          path: 'my',
-          element: <MyPage />,
-        },
-        {
-          path: 'my/manage',
-          element: <ManageAccountPage />,
-        },
-        {
-          path: 'my/delete',
-          element: <DeleteAccountPage />,
-        },
-        {
-          path: 'my/edit',
-          element: <ProfileEditPage />,
-        },
-        {
-          path: 'my/activity',
-          element: <MyActivityPage />,
-        },
-        {
-          path: '/calendar',
-          element: <CalendarPage />,
-        },
-        {
-          path: '/calendar/:postId',
-          element: <CalendarDetailPage />,
-        },
-        {
-          path: 'test',
-          element: <BottomSheetTestPage />,
-        },
-        {
-          path: '/event-detail/:postId',
-          element: <EventDetailPage />,
-        },
-        {
-          path: '/events',
-          element: <EventsPage />,
-        },
-      ],
-    },
-  ];
-  const router = createBrowserRouter(routes);
+// eslint-disable-next-line react-refresh/only-export-components
+export const queryClient = new QueryClient();
 
-  return <RouterProvider router={router} />;
+const routes: RouteObject[] = [
+  {
+    path: '/',
+    element: <MainLayout />,
+    children: [
+      { index: true, element: <LandingPage /> },
+      {
+        path: 'home',
+        element: <HomePage />,
+      },
+      {
+        path: 'add-event',
+        element: <AddEventPage />,
+      },
+      {
+        path: 'team-match',
+        element: <TeamMatchingPage />,
+      },
+      {
+        path: 'team-match/:postId',
+        element: <TeamMatchDetailPage />,
+      },
+      {
+        path: 'team-match/create',
+        element: <TeamCreatePage />,
+      },
+      {
+        path: 'team-match/edit/:postId',
+        element: <TeamMatchPostEditPage />,
+      },
+      {
+        path: 'login',
+        element: <LoginPage />,
+      },
+      {
+        path: 'tou',
+        element: <ToUPage />,
+      },
+      {
+        path: 'signup',
+        element: <SignupPage />,
+      },
+      {
+        path: 'welcome',
+        element: <WelcomePage />,
+      },
+      {
+        path: 'profile/setup',
+        element: <ProfileSetupPage />,
+      },
+      {
+        path: 'profile/info',
+        element: <ProfileInfoPage />,
+      },
+      {
+        path: 'profile/complete',
+        element: <ProfileCompletePage />,
+      },
+      {
+        path: 'my',
+        element: <MyPage />,
+      },
+      {
+        path: 'my/manage',
+        element: <ManageAccountPage />,
+      },
+      {
+        path: 'my/delete',
+        element: <DeleteAccountPage />,
+      },
+      {
+        path: 'my/edit',
+        element: <ProfileEditPage />,
+      },
+      {
+        path: 'my/activity',
+        element: <MyActivityPage />,
+      },
+      {
+        path: '/calendar',
+        element: <CalendarPage />,
+      },
+      {
+        path: '/calendar/:postId',
+        element: <CalendarDetailPage />,
+      },
+      {
+        path: 'test',
+        element: <BottomSheetTestPage />,
+      },
+      {
+        path: '/event-detail/:postId',
+        element: <EventDetailPage />,
+      },
+      {
+        path: '/events',
+        element: <EventsPage />,
+      },
+    ],
+  },
+];
+
+const router = createBrowserRouter(routes);
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 }
