@@ -4,64 +4,50 @@ import RightArrow from '/src/assets/icons/arrow_right.svg?react';
 import Search from '/src/assets/icons/search.svg?react';
 import CategoryGroup from '../../components/TeamMatch/Category/Category';
 import TeamCard from '../../components/TeamMatch/TeamCard';
-import ExTeamMatching from '/src/assets/images/ex_team-matching.png';
 import { createPortal } from 'react-dom';
 import X from '/src/assets/icons/x.svg?react';
 import Capybara from '/src/assets/images/capy_face_surprise.svg?react';
 import ArrowDown from '/src/assets/icons/arrow_down.svg?react';
 import Dropdown from 'react-dropdown';
+import { getTeamPosts } from '../../apis/team';
+import type { TeamPostRetrieveResponse } from '../../types/team';
+import { CATEGORIES } from '../../constants/CATEGORY';
 
 // 무한스크롤?
-
-const mock = [
-  {
-    id: 1,
-    image: ExTeamMatching,
-    title: '컴퓨터공학부 학술제',
-    content: '학술제 같이 나가실 분 구해요! 성실히 참ㅇㄹㅇ여하실 분으로 구해봅니다. 프로젝트 경험 있으신 분 환영합니다!',
-    date: '26.11.04. ~ 26.11.08.',
-    writerName: '정다민',
-    writerMajor: '미디어기술콘텐츠학부',
-    writerGrage: 4,
-    category: '공모전•대회',
-    limitMember: 6,
-    currentMember: 2,
-  },
-  {
-    id: 2,
-    image: ExTeamMatching,
-    title: '미디어콘텐츠학과 학술제',
-    content: '학술제 같이 나가실 분 구해요! 성실히 참ㅇㄹㅇ여하실 분으로 구해봅니다. 프로젝트 경험 있으신 분 환영합니다!',
-    date: '26.11.04. ~ 26.11.08.',
-    writerName: '정다민',
-    writerMajor: '미디어기술콘텐츠학부',
-    writerGrage: 4,
-    category: '기타',
-    limitMember: 6,
-    currentMember: 6,
-  },
-  {
-    id: 3,
-    image: ExTeamMatching,
-    title: '코딩테스트 스터디',
-    content: '학술제 같이 나가실 분 구해요! 성실히 참ㅇㄹㅇ여하실 분으로 구해봅니다. 프로젝트 경험 있으신 분 환영합니다!',
-    date: '26.11.04. ~ 26.11.08.',
-    writerName: '정다민',
-    writerMajor: '미디어기술콘텐츠학부',
-    writerGrage: 4,
-    category: '스터디',
-    limitMember: 6,
-    currentMember: 3,
-  },
-];
 
 export default function TeamMatchingPage() {
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
   const [selected, setSelected] = useState<string>('전체');
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [submittedKeyword, setSubmittedKeyword] = useState('');
 
   const options = ['최신 순', '오래된 순'];
   const [sorted, setSorted] = useState(options[0]);
+
+  const [teamPosts, setTeamPosts] = useState<TeamPostRetrieveResponse>();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeamPosts = async () => {
+      try {
+        setLoading(true);
+
+        const category = selected === '전체' ? undefined : CATEGORIES.find((c) => c.type === selected)?.id;
+
+        const keyword = submittedKeyword.trim() || undefined;
+
+        const data = await getTeamPosts(category, keyword);
+
+        setTeamPosts(data);
+      } catch (error) {
+        console.error('팀 모집글 조회 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeamPosts();
+  }, [selected, submittedKeyword]);
 
   useEffect(() => {
     if (!isMoreModalOpen) return;
@@ -77,6 +63,11 @@ export default function TeamMatchingPage() {
       document.body.style.overflow = prevOverflow;
     };
   }, [isMoreModalOpen]);
+
+  // 로딩스피너
+  if (loading) {
+    return <div>loading...</div>;
+  }
 
   return (
     <>
@@ -120,10 +111,31 @@ export default function TeamMatchingPage() {
             <label htmlFor='search' className='hidden'>
               검색창
             </label>
-            <input type='text' name='search' id='search' placeholder='관심 있는 행사나 활동 내용을 검색해보세요.' className='flex-1 min-w-0  placeholder:text-gray-700 text-gray-900 font-pretendard font-normal text-[13px]' value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value)} />
+            <input
+              type='text'
+              name='search'
+              id='search'
+              placeholder='관심 있는 행사나 활동 내용을 검색해보세요.'
+              className='flex-1 min-w-0 placeholder:text-gray-700 text-gray-900 font-pretendard font-normal text-[13px]'
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setSubmittedKeyword(searchKeyword.trim());
+                }
+              }}
+            />
           </div>
           {searchKeyword && (
-            <button type='button' onClick={() => setSearchKeyword('')} className='shrink-0' aria-label='검색어 삭제'>
+            <button
+              type='button'
+              onClick={() => {
+                setSearchKeyword('');
+                setSubmittedKeyword('');
+              }}
+              className='shrink-0'
+              aria-label='검색어 삭제'
+            >
               <X className='w-6 h-6 text-gray-700' />
             </button>
           )}
@@ -152,26 +164,8 @@ export default function TeamMatchingPage() {
 
       {/* 팀매칭 카드 */}
       <div className='mt-55 flex flex-col gap-4'>
-        {mock.filter((m) => {
-          const matchCategory = selected === '전체' || selected === m.category;
-
-          const keyword = searchKeyword.trim().toLowerCase();
-
-          const matchKeyword = m.title.toLowerCase().includes(keyword) || m.content.toLowerCase().includes(keyword);
-
-          return matchCategory && matchKeyword;
-        }).length > 0 ? (
-          mock
-            .filter((m) => {
-              const matchCategory = selected === '전체' || selected === m.category;
-
-              const keyword = searchKeyword.trim().toLowerCase();
-
-              const matchKeyword = m.title.toLowerCase().includes(keyword) || m.content.toLowerCase().includes(keyword);
-
-              return matchCategory && matchKeyword;
-            })
-            .map((m) => <TeamCard key={m.title} image={m.image} title={m.title} content={m.content} date={m.date} writerName={m.writerName} writerMajor={m.writerMajor} writerGrage={m.writerGrage} category={m.category} limitMember={m.limitMember} currentMember={m.currentMember} id={m.id} />)
+        {teamPosts?.data && teamPosts.data.length > 0 ? (
+          teamPosts.data.map((tp) => <TeamCard key={tp.teamId} title={tp.title} startDate={tp.startAt} endDate={tp.endAt} writerName={tp.userName} writerMajor={tp.department} writerStatus={tp.studentStatus} category={tp.category} limitMember={tp.maxMember} currentMember={tp.maxMember - tp.remainingMember} status={tp.teamStatus} id={tp.teamId} />)
         ) : (
           <div className='flex flex-col items-center justify-center py-25 gap-3.5'>
             <Capybara className='w-25' />
