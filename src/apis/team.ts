@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { TeamPostRetrieveResponse } from '../types/team';
+import type { TeamPostDetailResponse, TeamPostRetrieveResponse } from '../types/team';
 
 // 임시 키값을 활용한 axios
 export const api = axios.create({
@@ -18,6 +18,13 @@ export const getTeamPosts = async (category?: string, keyword?: string): Promise
       keyword,
     },
   });
+
+  return data;
+};
+
+// 팀매칭 상세 조회
+export const getTeamPostDetail = async (teamId: number): Promise<TeamPostDetailResponse> => {
+  const { data } = await api.get(`/api/teams/${teamId}`);
 
   return data;
 };

@@ -16,3 +16,28 @@ export type TeamRecruitPost = {
 };
 
 export type TeamPostRetrieveResponse = CommonResponse<TeamRecruitPost[]>;
+
+// 팀매칭 상세 조회
+export type TeamRecruitPostDetail = {
+  teamId: number;
+  title: string;
+  startAt: Date;
+  endAt: Date;
+  maxMember: number;
+  remainingMember: number;
+  userName: string;
+  studentStatus: string;
+  department: string;
+  category: string;
+  teamStatus: 'RECRUITING' | 'CLOSED';
+  detail: string;
+  contacts: [
+    {
+      type: string;
+      url: string;
+    },
+  ];
+  imageUrls: string[];
+};
+
+export type TeamPostDetailResponse = CommonResponse<TeamRecruitPostDetail>;
