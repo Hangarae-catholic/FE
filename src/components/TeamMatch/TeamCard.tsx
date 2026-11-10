@@ -6,19 +6,21 @@ import { useNavigate } from 'react-router-dom';
 
 interface TeamCardProps {
   id: number;
-  image: string;
+  image?: string;
   title: string;
-  content: string;
-  date: string;
+  content?: string;
+  startDate: Date;
+  endDate: Date;
   writerName: string;
   writerMajor: string;
-  writerGrage: number;
+  writerGrage: string;
   limitMember: number;
   currentMember: number;
   category: string;
+  status: string;
 }
 
-export default function TeamCard({ id, image, title, content, date, writerName, writerMajor, writerGrage, limitMember, currentMember, category }: TeamCardProps) {
+export default function TeamCard({ id, image, title, content, startDate, endDate, writerName, writerMajor, writerGrage, limitMember, currentMember, category, status }: TeamCardProps) {
   const navigate = useNavigate();
 
   return (
@@ -27,7 +29,7 @@ export default function TeamCard({ id, image, title, content, date, writerName, 
         <img src={image} alt={title} className='w-20 h-29 object-fill rounded-sm' />
         <div className='flex flex-col gap-1.5'>
           <div className='flex gap-1.5 items-center'>
-            <span className={`font-pretendard font-normal text-xs py-0.5 px-2 rounded-3xl ${limitMember === currentMember ? 'text-gray-600 bg-gray-300' : 'bg-[#DAF6DF] text-[#0D8D3D]'}`}>{limitMember === currentMember ? '모집완료' : '모집중'}</span>
+            <span className={`font-pretendard font-normal text-xs py-0.5 px-2 rounded-3xl ${limitMember === currentMember ? 'text-gray-600 bg-gray-300' : 'bg-[#DAF6DF] text-[#0D8D3D]'}`}>{status === 'CLOSED' ? '모집완료' : '모집중'}</span>
             <span className='font-pretendard font-normal text-xs bg-white text-gray-700 py-0.5 px-2 rounded-3xl border border-orange-300'>{category}</span>
           </div>
 
@@ -39,7 +41,9 @@ export default function TeamCard({ id, image, title, content, date, writerName, 
           <div>
             <div className='flex gap-1.5'>
               <Calendar className='w-4 h-4 text-gray-600' />
-              <time className='font-pretendard font-normal text-xs text-gray-700'>{date}</time>
+              <time className='font-pretendard font-normal text-xs text-gray-700'>
+                {startDate.toDateString()} ~ {endDate.toDateString()}
+              </time>
             </div>
             <div className='flex gap-1.5'>
               <Writer className='w-4 h-4 text-gray-600' />
