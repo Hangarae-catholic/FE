@@ -3,6 +3,7 @@ import Writer from '/src/assets/icons/writer.svg?react';
 import Member from '/src/assets/icons/member.svg?react';
 import RightArrow from '/src/assets/icons/arrow_right.svg?react';
 import { useNavigate } from 'react-router-dom';
+import { STUDENT_STATUS } from '../../constants/STUDENT_STATUS';
 
 interface TeamCardProps {
   id: number;
@@ -13,14 +14,14 @@ interface TeamCardProps {
   endDate: Date;
   writerName: string;
   writerMajor: string;
-  writerGrage: string;
+  writerStatus: string;
   limitMember: number;
   currentMember: number;
   category: string;
   status: string;
 }
 
-export default function TeamCard({ id, image, title, content, startDate, endDate, writerName, writerMajor, writerGrage, limitMember, currentMember, category, status }: TeamCardProps) {
+export default function TeamCard({ id, image, title, content, startDate, endDate, writerName, writerMajor, writerStatus, limitMember, currentMember, category, status }: TeamCardProps) {
   const navigate = useNavigate();
 
   return (
@@ -48,7 +49,7 @@ export default function TeamCard({ id, image, title, content, startDate, endDate
             <div className='flex gap-1.5'>
               <Writer className='w-4 h-4 text-gray-600' />
               <time className='font-pretendard font-normal text-xs text-gray-700'>
-                {writerName}•{writerMajor}•{writerGrage}학년
+                {writerName}•{writerMajor}•{STUDENT_STATUS.find((ss) => ss.id === writerStatus)?.name}
               </time>
             </div>
           </div>
