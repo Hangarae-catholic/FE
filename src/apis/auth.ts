@@ -1,5 +1,7 @@
 import { api } from "./axios";
 import type {
+  KakaoCallbackRequest,
+  KakaoLoginResponse,
   LoginRequest,
   LoginResponse,
   SendEmailCodeRequest,
@@ -13,6 +15,17 @@ import type {
 // 로컬 로그인 API
 export const login = async (body: LoginRequest): Promise<LoginResponse> => {
   const { data } = await api.post<LoginResponse>("/api/auth/login", body);
+  return data;
+};
+
+// 카카오 로그인
+export const kakaoCallback = async (
+  body: KakaoCallbackRequest,
+): Promise<KakaoLoginResponse> => {
+  const { data } = await api.post<KakaoLoginResponse>(
+    "/api/auth/kakao/callback",
+    body,
+  );
   return data;
 };
 
