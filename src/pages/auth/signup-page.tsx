@@ -16,7 +16,6 @@ const SignupPage = () => {
   const [timeLeft, setTimeLeft] = useState(0);
 
   const [name, setName] = useState("");
-  const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -26,10 +25,6 @@ const SignupPage = () => {
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [signupError, setSignupError] = useState("");
-
-  const loginIdRegex = /^[A-Za-z0-9]{6,}$/;
-
-  const isLoginIdValid = loginIdRegex.test(loginId);
 
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9\s])\S{8,16}$/;
 
@@ -43,7 +38,6 @@ const SignupPage = () => {
   const canSignup =
     isEmailVerified &&
     name.trim().length > 0 &&
-    isLoginIdValid &&
     !isSigningUp &&
     isPasswordValid &&
     isPasswordMatch;
@@ -132,18 +126,16 @@ const SignupPage = () => {
         code: verificationCode.trim(),
       });
 
-      console.log("인증 확인 전체 응답:", JSON.stringify(response, null, 2));
-      console.log("응답 코드:", response.code);
-      console.log("인증 데이터:", response.data);
+      console.log("이메일 인증 응답:", response);
 
-      if (response.data?.verified === true) {
+      if (
+        response.code === "AUTH011" &&
+        response.message === "인증되었습니다."
+      ) {
         setIsEmailVerified(true);
       } else {
-        console.error("예상과 다른 인증 응답:", response);
-        setEmailError("인증 결과를 확인할 수 없습니다.");
+        setEmailError(response.message || "이메일 인증에 실패했습니다.");
       }
-
-      setIsEmailVerified(true);
     } catch (error) {
       console.error("이메일 인증 오류:", error);
 
@@ -165,7 +157,6 @@ const SignupPage = () => {
   };
 
   // 로컬 회원가입
-
   const handleSignup = async () => {
     if (!canSignup || isSigningUp) return;
 
@@ -174,19 +165,10 @@ const SignupPage = () => {
 
     const body = {
       name: name.trim(),
-      loginId: loginId.trim(),
-      email: email.trim(),
+      loginId: email.trim(),
       password,
       confirmPassword,
     };
-
-    // 비밀번호는 출력하지 않고 요청 필드만 확인
-    console.log("회원가입 요청 확인:", {
-      name: body.name,
-      loginId: body.loginId,
-      email: body.email,
-      fields: Object.keys(body),
-    });
 
     try {
       const response = await signUp(body);
@@ -257,8 +239,10 @@ const SignupPage = () => {
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setIsCodeSent(false);
+                  setIsEmailVerified(false);
                   setVerificationCode("");
                   setTimeLeft(0);
+                  setEmailError("");
                 }}
                 placeholder="이메일 입력"
                 autoComplete="email"
@@ -269,23 +253,32 @@ const SignupPage = () => {
               <button
                 type="button"
                 onClick={handleSendCode}
-                disabled={!email.trim()}
+                disabled={!email.trim() || isSendingCode || isCodeSent}
                 className="
-                  shrink-0 h-[52px]
-                  px-5
-                  rounded-[12px]
-                  border border-[#FB811C]
-                  bg-transparent
-                  text-[#FB811C] text-[16px]
-                  font-semibold
-                  cursor-pointer
-                  hover:bg-gray-300
-                  disabled:opacity-50
-                  disabled:cursor-not-allowed
-                  transition-colors duration-150
-                "
+    shrink-0 h-[52px]
+    px-5
+    rounded-[12px]
+    border border-[#FB811C]
+    bg-transparent
+    text-[#FB811C] text-[16px]
+    font-semibold
+    cursor-pointer
+    hover:bg-[#FFF4EA]
+    active:bg-[#FFE8D5]
+    disabled:border-[#CED4DA]
+    disabled:bg-[#F1F3F5]
+    disabled:text-[#ADB5BD]
+    disabled:cursor-not-allowed
+    disabled:opacity-100
+    disabled:hover:bg-[#F1F3F5]
+    transition-colors duration-150
+  "
               >
-                인증 받기
+                {isSendingCode
+                  ? "발송 중"
+                  : isCodeSent
+                    ? "발송 완료"
+                    : "인증 받기"}
               </button>
             </div>
 
@@ -312,7 +305,7 @@ const SignupPage = () => {
               <button
                 type="button"
                 onClick={handleSendCode}
-                disabled={!email.trim()}
+                disabled={!email.trim() || isSendingCode}
                 className="
                   underline underline-offset-4
                   cursor-pointer
@@ -365,34 +358,6 @@ const SignupPage = () => {
               aria-label="이름"
               className={`${inputStyle} mt-3`}
             />
-
-            <input
-              type="text"
-              value={loginId}
-              onChange={(e) => setLoginId(e.target.value)}
-              placeholder="아이디(영문 또는 숫자, 6자 이상) 입력"
-              autoComplete="username"
-              aria-label="아이디"
-              aria-describedby={
-                loginId.length > 0 ? "login-id-validation" : undefined
-              }
-              className={`${inputStyle} mt-3`}
-            />
-
-            {loginId.length > 0 && (
-              <p
-                id="login-id-validation"
-                aria-live="polite"
-                className={`
-      mt-3 px-[2px] text-[14px]
-      ${isLoginIdValid ? "text-success" : "text-error"}
-    `}
-              >
-                {isLoginIdValid
-                  ? "사용할 수 있는 아이디 형식이에요."
-                  : "영문 또는 숫자 6자 이상으로 입력해 주세요."}
-              </p>
-            )}
 
             <input
               type="password"

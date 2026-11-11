@@ -7,12 +7,11 @@ const WelcomePage = () => {
   const navigate = useNavigate();
 
   const handleStart = () => {
-    // TODO: 프로필 설정 페이지 경로에 맞게 수정
     navigate("/profile/setup", { replace: true });
   };
 
-  const handleGoHome = () => {
-    navigate("/home");
+  const handleGoFirst = () => {
+    navigate("/");
   };
 
   return (
@@ -80,7 +79,7 @@ const WelcomePage = () => {
 
         <button
           type="button"
-          onClick={handleGoHome}
+          onClick={handleGoFirst}
           className="
             mt-[16px]
             font-normal

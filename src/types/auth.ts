@@ -17,7 +17,6 @@ export type LoginResponse = CommonResponse<LoginData>;
 export type SignUpRequest = {
   name: string;
   loginId: string;
-  email: string;
   password: string;
   confirmPassword: string;
 };

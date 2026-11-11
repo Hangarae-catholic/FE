@@ -37,7 +37,7 @@ const LoginPage = () => {
         throw new Error(response.message || "로그인에 실패했습니다.");
       }
 
-      // 로그인 성공 시 Zustand에 토큰 저장
+      // 로그인 성공 시 토큰 저장
       setAuth(response.data);
 
       navigate("/home", { replace: true });
@@ -102,9 +102,9 @@ const LoginPage = () => {
             type="text"
             value={loginId}
             onChange={(e) => setLoginId(e.target.value)}
-            placeholder="아이디 입력"
+            placeholder="이메일 입력"
             autoComplete="username"
-            aria-label="아이디"
+            aria-label="이메일"
             className="
               w-full h-[52px]
               px-5
