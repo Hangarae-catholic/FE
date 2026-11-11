@@ -92,9 +92,12 @@ export default function EventsPage() {
     return eventStart <= selectedEnd && eventEnd >= selectedStart;
   };
 
+  // 승인된 행사만 필터링
+  const approvedEvents = Events?.data?.filter((event) => event.approved === true) ?? [];
+
   // 지도 건물명 / 날짜 필터링
   // 선택한 날짜에 해당하는 전체 행사
-  const filteredEvents = Events?.data?.filter((event) => isEventInDateRange(event.startAt, event.endAt, selectedMapDate, selectedMapDate)) ?? [];
+  const filteredEvents = approvedEvents?.filter((event) => isEventInDateRange(event.startAt, event.endAt, selectedMapDate, selectedMapDate)) ?? [];
 
   // 클릭한 건물에 해당하는 행사
   const selectedBuildingEvents = filteredEvents.filter((event) => {
