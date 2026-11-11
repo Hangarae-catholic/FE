@@ -13,50 +13,53 @@ interface EventCardProps {
   id: number;
   recommend?: number;
   unrecommend?: number;
-  image?: string;
+  image?: string[];
   location: string | undefined;
   title: string;
   startDate: Date;
   endDate: Date;
   content: string;
-  liked?: boolean;
-  disLiked?: boolean;
-  like: boolean;
-  disLike: boolean;
-  setLike: Dispatch<SetStateAction<boolean>>;
-  setDisLike: Dispatch<SetStateAction<boolean>>;
   currentSlide?: number;
   setCurrentSlide?: Dispatch<SetStateAction<number>>;
   eventsNum?: number;
   onSlideChange?: (index: number) => void;
   onClose?: Dispatch<SetStateAction<boolean>>;
+  userReaction: 'LIKE' | 'DISLIKE' | null;
+  onReact: (reaction: 'LIKE' | 'DISLIKE') => void;
+  isLoading?: boolean;
 }
 
-export default function EventCard({ id, recommend, unrecommend, image, location, title, startDate, endDate, content, currentSlide, eventsNum, onSlideChange, like, disLike, setLike, setDisLike, liked, disLiked, onClose }: EventCardProps) {
+export default function EventCard({ id, recommend, unrecommend, image, location, title, startDate, endDate, content, currentSlide, eventsNum, onSlideChange, onClose, userReaction, onReact, isLoading }: EventCardProps) {
   const navigate = useNavigate();
 
-  // 서버 초기 상태와 변경 상태가 서로 다르면 최종 투표 상태가 반전(XOR)
-  const isLiked = !!liked !== like;
-  const isDisLiked = !!disLiked !== disLike;
+  // 서버에서 받은 사용자 반응
+  const isLiked = userReaction === 'LIKE';
+  const isDisLiked = userReaction === 'DISLIKE';
   // 추천 수 계산
-  const currentRecommend = recommend ? recommend + Number(isLiked) - Number(!!liked) : 0;
-  const currentUnrecommend = unrecommend ? unrecommend + Number(isDisLiked) - Number(!!disLiked) : 0;
+  // const currentRecommend = recommend ? recommend + Number(isLiked) - Number(!!liked) : 0;
+  // const currentUnrecommend = unrecommend ? unrecommend + Number(isDisLiked) - Number(!!disLiked) : 0;
+
+  // 로딩 스피너
+  if (isLoading) {
+    return <div className='w-full h-50 px-5 py-4 flex items-center justify-center flex-col gap-2 rounded-[20px] bg-[#FEFEFE]'>loading...</div>;
+  }
 
   return (
     <div className='flex flex-col gap-3 z-30'>
-      {/* 추천 버튼 */}
+      {/* 추천 / 비추천 버튼 */}
       <div className='flex items-center gap-2'>
-        <button type='button' className={`flex items-center gap-1 px-2 py-1.5 rounded-full ${isLiked ? 'bg-main' : 'bg-gray-50'}`} disabled={isDisLiked} onClick={() => setLike((prev) => !prev)}>
+        {/* 추천 버튼 */}
+        <button type='button' className={`flex items-center gap-1 px-2 py-1.5 rounded-full ${isLiked ? 'bg-main' : 'bg-gray-50'}`} disabled={userReaction !== null || isLoading} onClick={() => onReact('LIKE')}>
           <ThumbUp className={`w-5.5 h-5.5 ${isLiked ? 'text-bg' : 'text-orange-600'}`} />
 
-          <span className={`font-pretendard font-normal text-[13px] ${isLiked ? 'text-bg' : 'text-gray-700'}`}>추천해요 {currentRecommend}</span>
+          <span className={`font-pretendard font-normal text-[13px] ${isLiked ? 'text-bg' : 'text-gray-700'}`}>추천해요 {recommend ?? 0}</span>
         </button>
 
         {/* 비추천 버튼 */}
-        <button type='button' className={`flex items-center gap-1 px-2 py-1.5 rounded-full ${isDisLiked ? 'bg-gray-800' : 'bg-gray-50'}`} disabled={isLiked} onClick={() => setDisLike((prev) => !prev)}>
+        <button type='button' className={`flex items-center gap-1 px-2 py-1.5 rounded-full ${isDisLiked ? 'bg-gray-800' : 'bg-gray-50'}`} disabled={userReaction !== null || isLoading} onClick={() => onReact('DISLIKE')}>
           <ThumbDown className={`w-5.5 h-5.5 ${isDisLiked ? 'text-bg' : 'text-gray-600'}`} />
 
-          <span className={`font-pretendard font-normal text-[13px] ${isDisLiked ? 'text-bg' : 'text-gray-700'}`}>비추천해요 {currentUnrecommend}</span>
+          <span className={`font-pretendard font-normal text-[13px] ${isDisLiked ? 'text-bg' : 'text-gray-700'}`}>비추천해요 {unrecommend ?? 0}</span>
         </button>
       </div>
 
@@ -70,9 +73,9 @@ export default function EventCard({ id, recommend, unrecommend, image, location,
             </button>
           </div>
 
-          {image ? (
+          {image && image.length > 0 ? (
             <div className='flex items-center gap-3'>
-              <img src={image} alt={title} className='w-19.5 h-30.5 object-fill rounded-lg' />
+              <img src={image?.[0]} alt={title} className='w-19.5 h-30.5 object-fill rounded-lg' />
               <div className='flex flex-col gap-1.5'>
                 <span className='font-pretendard font-medium text-base text-gray-800 break-keep'>{title}</span>
 

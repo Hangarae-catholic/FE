@@ -49,9 +49,10 @@ export default function HomePage() {
   // 오늘 날짜 기준 행사 필터링
   const todayEvents = useMemo(() => {
     const today = new Date();
+    const approveEvents = Events?.data?.filter((event) => event.approved === true);
 
     return (
-      Events?.data?.filter((event) => {
+      approveEvents?.filter((event) => {
         const startDate = new Date(event.startAt);
         const endDate = new Date(event.endAt);
 
@@ -196,14 +197,7 @@ export default function HomePage() {
             {Recommend?.map((r, idx) => {
               return (
                 <SwiperSlide key={idx}>
-                  <EventCard
-                    // image={r.image}
-                    title={r.name}
-                    startDate={r.startAt}
-                    endDate={r.endAt}
-                    location={r.location}
-                    id={r.noticeId}
-                  />
+                  <EventCard image={r.imageUrls} title={r.name} startDate={r.startAt} endDate={r.endAt} location={r.location} id={r.noticeId} />
                 </SwiperSlide>
               );
             })}

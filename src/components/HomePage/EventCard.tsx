@@ -7,7 +7,7 @@ import { buildingCoordinates } from '../../constants/BUILDING_COORDINATES';
 
 interface EventCardProps {
   id: number;
-  image?: string;
+  image?: string[];
   title: string;
   startDate?: Date;
   endDate?: Date;
@@ -17,9 +17,9 @@ interface EventCardProps {
 export default function EventCard({ image, title, startDate, endDate, location, id }: EventCardProps) {
   const navigate = useNavigate();
 
-  return image ? (
+  return image && image?.length > 0 ? (
     <div className='w-full bg-white rounded-[18px] flex gap-2.5 p-4 break-keep'>
-      <img src={image} alt={title} className='w-19 h-26.5 object-fill rounded-sm' />
+      <img src={image?.[0]} alt={title} className='w-19 h-26.5 object-fill rounded-sm' />
 
       <div className='flex flex-col w-full gap-1'>
         <h2 className='font-pretendard font-medium text-base'>{title}</h2>

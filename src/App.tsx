@@ -48,7 +48,7 @@ const routes: RouteObject[] = [
         element: <TeamMatchingPage />,
       },
       {
-        path: 'team-match/:postId',
+        path: 'team-match/:id',
         element: <TeamMatchDetailPage />,
       },
       {
@@ -56,7 +56,7 @@ const routes: RouteObject[] = [
         element: <TeamCreatePage />,
       },
       {
-        path: 'team-match/edit/:postId',
+        path: 'team-match/edit/:id',
         element: <TeamMatchPostEditPage />,
       },
       {
@@ -120,7 +120,7 @@ const routes: RouteObject[] = [
         element: <BottomSheetTestPage />,
       },
       {
-        path: '/event-detail/:postId',
+        path: '/event-detail/:id',
         element: <EventDetailPage />,
       },
       {
