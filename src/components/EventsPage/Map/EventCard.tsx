@@ -7,15 +7,17 @@ import RightArrow from '/src/assets/icons/arrow_right.svg?react';
 import LeftArrow from '/src/assets/icons/arrow_left.svg?react';
 import { useNavigate } from 'react-router-dom';
 import type { Dispatch, SetStateAction } from 'react';
+import { formatDate } from '../../../utils/FormatDate';
 
 interface EventCardProps {
   id: number;
-  recommend: number;
-  unrecommend: number;
-  image: string;
-  location: string;
+  recommend?: number;
+  unrecommend?: number;
+  image?: string;
+  location: string | undefined;
   title: string;
-  date: string;
+  startDate: Date;
+  endDate: Date;
   content: string;
   liked?: boolean;
   disLiked?: boolean;
@@ -30,15 +32,15 @@ interface EventCardProps {
   onClose?: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function EventCard({ id, recommend, unrecommend, image, location, title, date, content, currentSlide, eventsNum, onSlideChange, like, disLike, setLike, setDisLike, liked, disLiked, onClose }: EventCardProps) {
+export default function EventCard({ id, recommend, unrecommend, image, location, title, startDate, endDate, content, currentSlide, eventsNum, onSlideChange, like, disLike, setLike, setDisLike, liked, disLiked, onClose }: EventCardProps) {
   const navigate = useNavigate();
 
   // 서버 초기 상태와 변경 상태가 서로 다르면 최종 투표 상태가 반전(XOR)
   const isLiked = !!liked !== like;
   const isDisLiked = !!disLiked !== disLike;
   // 추천 수 계산
-  const currentRecommend = recommend + Number(isLiked) - Number(!!liked);
-  const currentUnrecommend = unrecommend + Number(isDisLiked) - Number(!!disLiked);
+  const currentRecommend = recommend ? recommend + Number(isLiked) - Number(!!liked) : 0;
+  const currentUnrecommend = unrecommend ? unrecommend + Number(isDisLiked) - Number(!!disLiked) : 0;
 
   return (
     <div className='flex flex-col gap-3 z-30'>
@@ -77,7 +79,9 @@ export default function EventCard({ id, recommend, unrecommend, image, location,
                 <div className='flex flex-col gap-1.5'>
                   <div className='flex items-center gap-1'>
                     <Calendar className='w-4.5 h-4.5 text-gray-600' />
-                    <span className='font-pretendard font-normal text-[13px] text-gray-700'>{date}</span>
+                    <span className='font-pretendard font-normal text-[13px] text-gray-700'>
+                      {formatDate(startDate)}~{formatDate(endDate)}
+                    </span>
                   </div>
                   <div className='flex items-center gap-1'>
                     <Location className='w-4.5 h-4.5 text-gray-600' />
@@ -95,7 +99,9 @@ export default function EventCard({ id, recommend, unrecommend, image, location,
               <div className='flex flex-col gap-1.5'>
                 <div className='flex items-center gap-1'>
                   <Calendar className='w-4.5 h-4.5 text-gray-600' />
-                  <span className='font-pretendard font-normal text-[13px] text-gray-700'>{date}</span>
+                  <span className='font-pretendard font-normal text-[13px] text-gray-700'>
+                    {formatDate(startDate)}~{formatDate(endDate)}
+                  </span>
                 </div>
                 <div className='flex items-center gap-1'>
                   <Location className='w-4.5 h-4.5 text-gray-600' />

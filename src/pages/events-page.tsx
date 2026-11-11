@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TopBar from '../components/common/TopBar';
 import MapIcon from '/src/assets/icons/map.svg?react';
 import List from '/src/assets/icons/list.svg?react';
@@ -8,7 +8,7 @@ import SwitchOn from '/src/assets/icons/switch_on.svg?react';
 import SwitchOff from '/src/assets/icons/switch_off.svg?react';
 import Capybara from '/src/assets/images/capy_face_surprise.svg?react';
 import EventCard from '../components/EventsPage/Map/EventCard';
-import ExEventImg from '/src/assets/images/event_ex.png';
+// import ExEventImg from '/src/assets/images/event_ex.png';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
@@ -16,6 +16,8 @@ import 'swiper/css/pagination';
 import EventListCard from '../components/AddEventPage/EventCard';
 import MiniMap from '../components/HomePage/MiniMap';
 import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
+import type { EventRetreiveResponse } from '../types/events';
+import { getEventRetreive } from '../apis/events';
 
 export interface Event {
   id: number;
@@ -30,40 +32,40 @@ export interface Event {
   disLiked?: boolean;
 }
 
-const mock: Event[] = [
-  {
-    id: 1,
-    recommend: 12,
-    unrecommend: 3,
-    image: ExEventImg,
-    location: '콘서트홀',
-    title: '개교 170주년 기념 음악회',
-    date: '11월 11일(금) 19시',
-    content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
-    liked: true,
-  },
-  {
-    id: 2,
-    recommend: 12,
-    unrecommend: 3,
-    image: ExEventImg,
-    location: '콘서트홀',
-    title: '개교 170주년 기념 음악회',
-    date: '11월 11일(화) 19시',
-    content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
-    disLiked: true,
-  },
-  {
-    id: 3,
-    recommend: 12,
-    unrecommend: 3,
-    image: ExEventImg,
-    location: '김수환관',
-    title: '개교 170주년 기념 음악회',
-    date: '11월 15일(금) 19시',
-    content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
-  },
-];
+// const mock: Event[] = [
+//   {
+//     id: 1,
+//     recommend: 12,
+//     unrecommend: 3,
+//     image: ExEventImg,
+//     location: '콘서트홀',
+//     title: '개교 170주년 기념 음악회',
+//     date: '11월 11일(금) 19시',
+//     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
+//     liked: true,
+//   },
+//   {
+//     id: 2,
+//     recommend: 12,
+//     unrecommend: 3,
+//     image: ExEventImg,
+//     location: '콘서트홀',
+//     title: '개교 170주년 기념 음악회',
+//     date: '11월 11일(화) 19시',
+//     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
+//     disLiked: true,
+//   },
+//   {
+//     id: 3,
+//     recommend: 12,
+//     unrecommend: 3,
+//     image: ExEventImg,
+//     location: '김수환관',
+//     title: '개교 170주년 기념 음악회',
+//     date: '11월 15일(금) 19시',
+//     content: '가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다. 가톨릭대학교 개교 170주년을 기념하는 음악과 현악 합주 콘서트가 진행됩니다.',
+//   },
+// ];
 
 export default function EventsPage() {
   const [isMap, setIsMap] = useState(true);
@@ -76,18 +78,71 @@ export default function EventsPage() {
   const [showEventCard, setShowEventCard] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<string | null>(null);
 
+  const [Events, setEvents] = useState<EventRetreiveResponse>();
+  const [eventLoading, setEventLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setEventLoading(true);
+
+        const data = await getEventRetreive();
+
+        setEvents(data);
+      } catch (error) {
+        console.error('행사 목록 조회 실패:', error);
+      } finally {
+        setEventLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant',
+    });
+  }, []);
+
   // 날짜 변환 함수
-  const formatEventDate = (date: Date) => {
-    return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+  // const formatEventDate = (date: Date) => {
+  //   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+  // };
+
+  // 목록 날짜 비교
+  // 선택한 날짜가 행사 시작일 ~ 종료일 사이에 포함되는지 확인
+  const isEventInDateRange = (eventStartAt: Date | string, eventEndAt: Date | string, selectedStartDate: Date | null, selectedEndDate: Date | null) => {
+    if (!selectedStartDate) return true;
+
+    const eventStart = new Date(eventStartAt);
+    eventStart.setHours(0, 0, 0, 0);
+
+    const eventEnd = new Date(eventEndAt);
+    eventEnd.setHours(23, 59, 59, 999);
+
+    const selectedStart = new Date(selectedStartDate);
+    selectedStart.setHours(0, 0, 0, 0);
+
+    const selectedEnd = new Date(selectedEndDate ?? selectedStartDate);
+    selectedEnd.setHours(23, 59, 59, 999);
+
+    // 행사 기간과 선택한 날짜 범위가 겹치는지 확인
+    return eventStart <= selectedEnd && eventEnd >= selectedStart;
   };
 
   // 지도 건물명 / 날짜 필터링
-  const filteredEvents = mock.filter((event) => {
-    const isBuildingMatch = selectedBuilding ? event.location === selectedBuilding : true;
+  // 선택한 날짜에 해당하는 전체 행사
+  const filteredEvents = Events?.data?.filter((event) => isEventInDateRange(event.startAt, event.endAt, selectedMapDate, selectedMapDate)) ?? [];
 
-    const isDateMatch = selectedMapDate ? event.date.startsWith(formatEventDate(selectedMapDate)) : true;
+  // 클릭한 건물에 해당하는 행사
+  const selectedBuildingEvents = filteredEvents.filter((event) => {
+    if (!selectedBuilding) return false;
 
-    return isBuildingMatch && isDateMatch;
+    const buildingId = buildingCoordinates.find((building) => building.name === selectedBuilding)?.id;
+
+    return event.location === buildingId;
   });
 
   const swiperRef = useRef<SwiperType | null>(null);
@@ -112,29 +167,13 @@ export default function EventsPage() {
     });
   };
 
-  // 목록 날짜 비교
-  const isEventInDateRange = (eventDate: string, startDate: Date | null, endDate: Date | null) => {
-    if (!startDate) return false;
-
-    const eventMonthDay = eventDate.match(/(\d+)월\s*(\d+)일/);
-
-    if (!eventMonthDay) return false;
-
-    const [, month, day] = eventMonthDay;
-
-    const eventDateObj = new Date(startDate.getFullYear(), Number(month) - 1, Number(day));
-
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-
-    const end = new Date(endDate ?? startDate);
-    end.setHours(23, 59, 59, 999);
-
-    return eventDateObj >= start && eventDateObj <= end;
-  };
-
   // 목록 날짜 필터링
-  const filteredListEvents = mock.filter((event) => isEventInDateRange(event.date, selectedListDate[0], switchOn ? selectedListDate[1] : selectedListDate[0]));
+  const filteredListEvents = Events?.data?.filter((event) => isEventInDateRange(event.startAt, event.endAt, selectedListDate[0], switchOn ? selectedListDate[1] : selectedListDate[0])) ?? [];
+
+  // 로딩 스피너
+  if (eventLoading) {
+    return <div>loading...</div>;
+  }
 
   return isMap ? (
     <>
@@ -159,14 +198,14 @@ export default function EventsPage() {
               setShowEventCard(true);
               setCurrentSlide(1);
             }}
-            events={mock.filter((event) => (selectedMapDate ? event.date.startsWith(formatEventDate(selectedMapDate)) : true))}
+            events={filteredEvents}
           />
         </div>
       </div>
 
       {showEventCard && (
         <div className='fixed bottom-8 left-0 right-0 mx-auto w-full max-w-120 px-5'>
-          {filteredEvents.length > 1 ? (
+          {selectedBuildingEvents.length > 1 ? (
             <Swiper
               spaceBetween={10}
               slidesPerView={1}
@@ -176,68 +215,70 @@ export default function EventsPage() {
                 swiperRef.current = swiper;
               }}
             >
-              {filteredEvents.map((event) => (
-                <SwiperSlide key={event.id}>
+              {selectedBuildingEvents.map((event) => (
+                <SwiperSlide key={event.noticeId}>
                   <EventCard
-                    id={event.id}
-                    title={event.title}
-                    recommend={event.recommend}
-                    unrecommend={event.unrecommend}
-                    image={event.image}
-                    location={event.location}
-                    date={event.date}
-                    content={event.content}
+                    id={event.noticeId}
+                    title={event.name}
+                    // recommend={event.}
+                    // unrecommend={event.unrecommend}
+                    // image={event.}
+                    location={buildingCoordinates.find((bc) => bc.id === event.location)?.name}
+                    startDate={event.startAt}
+                    endDate={event.endAt}
+                    content={event.summary}
                     setCurrentSlide={setCurrentSlide}
                     currentSlide={currentSlide}
-                    eventsNum={filteredEvents.length}
+                    eventsNum={selectedBuildingEvents.length}
                     onSlideChange={(index) => swiperRef.current?.slideTo(index)}
-                    like={likeStates[event.id] ?? false}
+                    like={likeStates[event.noticeId] ?? false}
                     setLike={(value) =>
                       setLikeStates((prev) => ({
                         ...prev,
-                        [event.id]: typeof value === 'function' ? value(prev[event.id] ?? false) : value,
+                        [event.noticeId]: typeof value === 'function' ? value(prev[event.noticeId] ?? false) : value,
                       }))
                     }
-                    disLike={disLikeStates[event.id] ?? false}
+                    disLike={disLikeStates[event.noticeId] ?? false}
                     setDisLike={(value) =>
                       setDisLikeStates((prev) => ({
                         ...prev,
-                        [event.id]: typeof value === 'function' ? value(prev[event.id] ?? false) : value,
+                        [event.noticeId]: typeof value === 'function' ? value(prev[event.noticeId] ?? false) : value,
                       }))
                     }
-                    liked={event.liked}
-                    disLiked={event.disLiked}
+                    // liked={event.liked}
+                    // disLiked={event.disLiked}
                     onClose={setShowEventCard}
                   />
                 </SwiperSlide>
               ))}
             </Swiper>
-          ) : filteredEvents.length === 1 ? (
+          ) : selectedBuildingEvents.length === 1 ? (
             <EventCard
-              id={filteredEvents[0].id}
-              title={filteredEvents[0].title}
-              recommend={filteredEvents[0].recommend}
-              unrecommend={filteredEvents[0].unrecommend}
-              image={filteredEvents[0].image}
-              location={filteredEvents[0].location}
-              date={filteredEvents[0].date}
-              content={filteredEvents[0].content}
-              like={likeStates[filteredEvents[0].id] ?? false}
+              id={selectedBuildingEvents[0].noticeId}
+              title={selectedBuildingEvents[0].name}
+              // recommend={selectedBuildingEvents[0]}
+              // unrecommend={selectedBuildingEvents[0].unrecommend}
+              // image={filteredselectedBuildingEventsEvents[0].image}
+              location={buildingCoordinates.find((bc) => bc.id === selectedBuildingEvents[0].location)?.name}
+              startDate={selectedBuildingEvents[0].startAt}
+              endDate={selectedBuildingEvents[0].endAt}
+              content={selectedBuildingEvents[0].summary}
+              like={likeStates[selectedBuildingEvents[0].noticeId] ?? false}
               setLike={(value) =>
                 setLikeStates((prev) => ({
                   ...prev,
-                  [filteredEvents[0].id]: typeof value === 'function' ? value(prev[filteredEvents[0].id] ?? false) : value,
+                  [selectedBuildingEvents[0].noticeId]: typeof value === 'function' ? value(prev[selectedBuildingEvents[0].noticeId] ?? false) : value,
                 }))
               }
-              disLike={disLikeStates[filteredEvents[0].id] ?? false}
+              disLike={disLikeStates[selectedBuildingEvents[0].noticeId] ?? false}
               setDisLike={(value) =>
                 setDisLikeStates((prev) => ({
                   ...prev,
-                  [filteredEvents[0].id]: typeof value === 'function' ? value(prev[filteredEvents[0].id] ?? false) : value,
+                  [selectedBuildingEvents[0].noticeId]: typeof value === 'function' ? value(prev[selectedBuildingEvents[0].noticeId] ?? false) : value,
                 }))
               }
-              liked={filteredEvents[0].liked}
-              disLiked={filteredEvents[0].disLiked}
+              // liked={filteredEvents[0].liked}
+              // disLiked={filteredEvents[0].disLiked}
               onClose={setShowEventCard}
             />
           ) : null}
@@ -272,8 +313,17 @@ export default function EventsPage() {
 
       {filteredListEvents.length > 0 ? (
         filteredListEvents.map((event) => (
-          <div key={event.id} className='mt-6 flex flex-col gap-4'>
-            <EventListCard id={event.id} image={event.image} title={event.title} date={event.date} location={event.location} likeCount={event.recommend} dislikeCount={event.unrecommend} />
+          <div key={event.noticeId} className='mt-6 flex flex-col gap-4'>
+            <EventListCard
+              id={event.noticeId}
+              //  image={event.image}
+              title={event.name}
+              location={buildingCoordinates.find((bc) => bc.id === event.location)?.name}
+              startDate={event.startAt}
+              endDate={event.endAt}
+              // likeCount={event.recommend}
+              // dislikeCount={event.unrecommend}
+            />
           </div>
         ))
       ) : (

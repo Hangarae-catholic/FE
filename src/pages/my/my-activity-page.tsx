@@ -257,7 +257,18 @@ const MyActivityPage = () => {
             >
               <div className='flex flex-col gap-4'>
                 {mockEvents.map((event) => (
-                  <EventCard key={event.id} id={event.id} image={event.image} title={event.title} date={event.date} location={event.location} likeCount={event.likeCount} dislikeCount={event.dislikeCount} status={event.status} />
+                  <EventCard
+                    key={event.id}
+                    id={event.id}
+                    image={event.image}
+                    title={event.title}
+                    // startDate={event.date}
+                    // endDate={event.date}
+                    location={event.location}
+                    likeCount={event.likeCount}
+                    dislikeCount={event.dislikeCount}
+                    status={event.status}
+                  />
                 ))}
               </div>
             </div>

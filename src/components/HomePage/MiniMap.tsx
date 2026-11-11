@@ -3,11 +3,11 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import Map from '/src/assets/images/map.png';
 import { buildingCoordinates, type BuildingCoordinate } from '../../constants/BUILDING_COORDINATES';
 import MapMarker from '/src/assets/icons/map-marker.svg?react';
-import type { Event } from '../../pages/events-page';
+import type { EventInfo } from '../../types/events';
 
 interface MiniMapProps {
   buildingNames?: string[];
-  events: Event[];
+  events: EventInfo[];
   clickMarker?: (buildingName: string) => void;
 }
 
@@ -57,8 +57,8 @@ export default function MiniMap({ buildingNames = [], clickMarker, events }: Min
   const selectedBuildings = buildingCoordinates.filter((building: BuildingCoordinate) => buildingNames.includes(building.name));
 
   // 건물별 행사 개수
-  const getEventCount = (buildingName: string) => {
-    return events.filter((event) => event.location === buildingName).length;
+  const getEventCount = (buildingId: string) => {
+    return events.filter((event) => event.location === buildingId).length;
   };
 
   return (
@@ -99,7 +99,7 @@ export default function MiniMap({ buildingNames = [], clickMarker, events }: Min
 
               {/* 건물별 마커 */}
               {selectedBuildings.map((building) => {
-                const eventCount = getEventCount(building.name);
+                const eventCount = getEventCount(building.id);
 
                 if (eventCount === 0) return null;
 
