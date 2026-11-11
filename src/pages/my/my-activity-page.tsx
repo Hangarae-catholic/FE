@@ -260,7 +260,7 @@ const MyActivityPage = () => {
                   <EventCard
                     key={event.id}
                     id={event.id}
-                    image={event.image}
+                    // image={event.image}
                     title={event.title}
                     // startDate={event.date}
                     // endDate={event.date}
