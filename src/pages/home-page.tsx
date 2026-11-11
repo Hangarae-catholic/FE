@@ -197,14 +197,7 @@ export default function HomePage() {
             {Recommend?.map((r, idx) => {
               return (
                 <SwiperSlide key={idx}>
-                  <EventCard
-                    // image={r.image}
-                    title={r.name}
-                    startDate={r.startAt}
-                    endDate={r.endAt}
-                    location={r.location}
-                    id={r.noticeId}
-                  />
+                  <EventCard image={r.imageUrls} title={r.name} startDate={r.startAt} endDate={r.endAt} location={r.location} id={r.noticeId} />
                 </SwiperSlide>
               );
             })}
