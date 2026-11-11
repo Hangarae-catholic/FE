@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import axios from "axios";
 import Button from "../../components/common/Button";
 import TopBar from "../../components/common/TopBar";
+import { sendEmailCode, signUp, verifyEmailCode } from "../../apis/auth";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -18,8 +20,13 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [isConfirmTouched, setIsConfirmTouched] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [signupError, setSignupError] = useState("");
 
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9\s])\S{8,16}$/;
 
   const isPasswordValid = passwordRegex.test(password);
 
@@ -31,6 +38,7 @@ const SignupPage = () => {
   const canSignup =
     isEmailVerified &&
     name.trim().length > 0 &&
+    !isSigningUp &&
     isPasswordValid &&
     isPasswordMatch;
 
@@ -57,32 +65,131 @@ const SignupPage = () => {
   };
 
   // 이메일 인증번호 발송
-  const handleSendCode = () => {
-    if (!email.trim()) return;
+  const handleSendCode = async () => {
+    if (!email.trim() || isSendingCode) return;
 
-    // TODO: 이메일 인증번호 발송 API 연동
-    setIsCodeSent(true);
-    setVerificationCode("");
-    setTimeLeft(180);
+    setIsSendingCode(true);
+    setEmailError("");
+
+    try {
+      const response = await sendEmailCode({
+        email: email.trim(),
+        purpose: "JOIN",
+      });
+
+      console.log("이메일 발송 API 응답:", response);
+
+      if (response.code !== "AUTH010" || response.httpStatus !== "200 OK") {
+        console.error("예상과 다른 응답 코드:", response.code);
+        setEmailError(response.message || "인증번호 발송에 실패했습니다.");
+        return;
+      }
+
+      setIsCodeSent(true);
+      setVerificationCode("");
+      setTimeLeft(180);
+    } catch (error) {
+      console.error("인증번호 발송 오류:", error);
+
+      if (axios.isAxiosError(error)) {
+        console.error("HTTP 상태:", error.response?.status);
+        console.error("서버 응답:", error.response?.data);
+
+        setEmailError(
+          error.response?.data?.message ||
+            "인증번호 발송 중 오류가 발생했습니다.",
+        );
+      } else {
+        setEmailError(
+          error instanceof Error
+            ? error.message
+            : "인증번호 발송 중 오류가 발생했습니다.",
+        );
+      }
+    } finally {
+      setIsSendingCode(false);
+    }
   };
 
-  // 이메일 인증 확인
-  const handleVerifyEmail = () => {
+  // 이메일 인증번호 검증
+  const handleVerifyEmail = async () => {
     if (!isCodeSent || timeLeft <= 0) return;
-    if (!verificationCode.trim()) return;
+    if (!verificationCode.trim() || isVerifyingCode) return;
 
-    // TODO: 인증번호 검증 API 연동
-    // 서버 인증 성공 시에만 아래 상태 변경
+    setIsVerifyingCode(true);
+    setEmailError("");
 
-    setIsEmailVerified(true);
+    try {
+      const response = await verifyEmailCode({
+        email: email.trim(),
+        type: "JOIN",
+        code: verificationCode.trim(),
+      });
+
+      console.log("이메일 인증 응답:", response);
+
+      if (
+        response.code === "AUTH011" &&
+        response.message === "인증되었습니다."
+      ) {
+        setIsEmailVerified(true);
+      } else {
+        setEmailError(response.message || "이메일 인증에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("이메일 인증 오류:", error);
+
+      if (axios.isAxiosError(error)) {
+        setEmailError(
+          error.response?.data?.message ||
+            "인증번호가 올바르지 않거나 만료되었습니다.",
+        );
+      } else {
+        setEmailError(
+          error instanceof Error
+            ? error.message
+            : "이메일 인증 중 오류가 발생했습니다.",
+        );
+      }
+    } finally {
+      setIsVerifyingCode(false);
+    }
   };
 
-  // 회원가입
-  const handleSignup = () => {
-    if (!canSignup) return;
+  // 로컬 회원가입
+  const handleSignup = async () => {
+    if (!canSignup || isSigningUp) return;
 
-    // TODO: 회원가입 API 연동
-    navigate("/welcome", { replace: true });
+    setIsSigningUp(true);
+    setSignupError("");
+
+    const body = {
+      name: name.trim(),
+      loginId: email.trim(),
+      password,
+      confirmPassword,
+    };
+
+    try {
+      const response = await signUp(body);
+
+      console.log("회원가입 성공 응답:", response);
+      navigate("/welcome", { replace: true });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("HTTP 상태:", error.response?.status);
+        console.error("백엔드 응답:", error.response?.data);
+
+        setSignupError(
+          error.response?.data?.message || "회원가입에 실패했습니다.",
+        );
+      } else {
+        console.error("회원가입 오류:", error);
+        setSignupError("회원가입 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsSigningUp(false);
+    }
   };
 
   const inputStyle = `
@@ -132,8 +239,10 @@ const SignupPage = () => {
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setIsCodeSent(false);
+                  setIsEmailVerified(false);
                   setVerificationCode("");
                   setTimeLeft(0);
+                  setEmailError("");
                 }}
                 placeholder="이메일 입력"
                 autoComplete="email"
@@ -144,23 +253,32 @@ const SignupPage = () => {
               <button
                 type="button"
                 onClick={handleSendCode}
-                disabled={!email.trim()}
+                disabled={!email.trim() || isSendingCode || isCodeSent}
                 className="
-                  shrink-0 h-[52px]
-                  px-5
-                  rounded-[12px]
-                  border border-[#FB811C]
-                  bg-transparent
-                  text-[#FB811C] text-[16px]
-                  font-semibold
-                  cursor-pointer
-                  hover:bg-gray-300
-                  disabled:opacity-50
-                  disabled:cursor-not-allowed
-                  transition-colors duration-150
-                "
+    shrink-0 h-[52px]
+    px-5
+    rounded-[12px]
+    border border-[#FB811C]
+    bg-transparent
+    text-[#FB811C] text-[16px]
+    font-semibold
+    cursor-pointer
+    hover:bg-[#FFF4EA]
+    active:bg-[#FFE8D5]
+    disabled:border-[#CED4DA]
+    disabled:bg-[#F1F3F5]
+    disabled:text-[#ADB5BD]
+    disabled:cursor-not-allowed
+    disabled:opacity-100
+    disabled:hover:bg-[#F1F3F5]
+    transition-colors duration-150
+  "
               >
-                인증 받기
+                {isSendingCode
+                  ? "발송 중"
+                  : isCodeSent
+                    ? "발송 완료"
+                    : "인증 받기"}
               </button>
             </div>
 
@@ -187,7 +305,7 @@ const SignupPage = () => {
               <button
                 type="button"
                 onClick={handleSendCode}
-                disabled={!email.trim()}
+                disabled={!email.trim() || isSendingCode}
                 className="
                   underline underline-offset-4
                   cursor-pointer
@@ -198,6 +316,12 @@ const SignupPage = () => {
                 인증번호 재전송
               </button>
             </div>
+
+            {emailError && (
+              <p role="alert" className="mt-3 px-[2px] text-[14px] text-error">
+                {emailError}
+              </p>
+            )}
 
             <div className="mt-5">
               <Button
@@ -301,6 +425,12 @@ const SignupPage = () => {
                   비밀번호를 확인해주세요.
                 </p>
               )}
+
+            {signupError && (
+              <p role="alert" className="mt-3 px-[2px] text-[14px] text-error">
+                {signupError}
+              </p>
+            )}
 
             <div className="mt-5">
               <Button text="가입하기" type="submit" disabled={!canSignup} />

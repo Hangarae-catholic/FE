@@ -1,31 +1,57 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../../apis/auth";
+import { AuthStore } from "../../store/AuthStore";
 
 import Button from "../../components/common/Button";
 import TopBar from "../../components/common/TopBar";
 import visibleIcon from "../../assets/icons/icon_visible.svg";
 import invisibleIcon from "../../assets/icons/icon_invisible.svg";
+import axios from "axios";
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  const [userId, setUserId] = useState("");
+  const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState(false);
 
-  // 추후 로그인 API 연동
+  const setAuth = AuthStore((state) => state.setAuth);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleLogin = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
     setLoginError(false);
 
-    // TODO: 실제 로그인 API 연동
+    try {
+      const response = await login({
+        loginId,
+        password,
+      });
 
-    const isLoginSuccess = false;
+      if (response.code !== "AUTH002" || !response.data) {
+        throw new Error(response.message || "로그인에 실패했습니다.");
+      }
 
-    if (isLoginSuccess) {
-      navigate("/home");
-    } else {
+      // 로그인 성공 시 토큰 저장
+      setAuth(response.data);
+
+      navigate("/home", { replace: true });
+    } catch (error) {
       setLoginError(true);
+
+      if (axios.isAxiosError(error)) {
+        console.error("HTTP 상태:", error.response?.status);
+        console.error("백엔드 오류 응답:", error.response?.data);
+      } else {
+        console.error("로그인 실패:", error);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,11 +100,11 @@ const LoginPage = () => {
         >
           <input
             type="text"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            placeholder="아이디 입력"
+            value={loginId}
+            onChange={(e) => setLoginId(e.target.value)}
+            placeholder="이메일 입력"
             autoComplete="username"
-            aria-label="아이디"
+            aria-label="이메일"
             className="
               w-full h-[52px]
               px-5
