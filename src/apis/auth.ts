@@ -10,6 +10,7 @@ import type {
   SignUpResponse,
   VerifyEmailCodeRequest,
   VerifyEmailCodeResponse,
+  WithdrawResponse,
 } from "../types/auth";
 
 // 로컬 로그인 API
@@ -53,5 +54,18 @@ export const verifyEmailCode = async (
     "/api/auth/verify-code/confirm",
     body,
   );
+  return data;
+};
+
+// 계정 삭제
+export const withdraw = async (
+  accessToken: string,
+): Promise<WithdrawResponse> => {
+  const { data } = await api.delete<WithdrawResponse>("/api/auth/withdraw", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
   return data;
 };

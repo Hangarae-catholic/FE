@@ -7,8 +7,7 @@ import Button from "../../components/common/Button";
 import TopBar from "../../components/common/TopBar";
 import visibleIcon from "../../assets/icons/icon_visible.svg";
 import invisibleIcon from "../../assets/icons/icon_invisible.svg";
-import axios from "axios";
-import { getMyProfile } from "../../apis/user";
+import { checkProfile } from "../../apis/user";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -29,8 +28,9 @@ const LoginPage = () => {
     setLoginError(false);
 
     try {
+      // 1. 로그인 API 호출
       const response = await login({
-        loginId,
+        loginId: loginId.trim(),
         password,
       });
 
@@ -44,23 +44,18 @@ const LoginPage = () => {
         throw new Error("로그인 토큰이 없습니다.");
       }
 
+      // 2. 로그인 토큰 저장
       setAuth({ accessToken, refreshToken });
 
-      const profileResponse = await getMyProfile(accessToken);
+      // 3. 프로필 생성 여부 확인
+      const profileResponse = await checkProfile(accessToken);
 
-      if (profileResponse.data) {
+      if (profileResponse.data === true) {
         navigate("/home", { replace: true });
-      } else {
+      } else if (profileResponse.data === false) {
         navigate("/profile/setup", { replace: true });
-      }
-    } catch (error) {
-      setLoginError(true);
-
-      if (axios.isAxiosError(error)) {
-        console.error("HTTP 상태:", error.response?.status);
-        console.error("백엔드 오류 응답:", error.response?.data);
       } else {
-        console.error("로그인 실패:", error);
+        throw new Error("프로필 생성 여부를 확인할 수 없습니다.");
       }
     } finally {
       setIsLoading(false);
@@ -138,7 +133,7 @@ const LoginPage = () => {
                 setPassword(e.target.value);
                 setLoginError(false);
               }}
-              placeholder="비밀번호(영문+숫자, 8-16자) 입력"
+              placeholder="비밀번호(영문+숫자+특수문자, 8-16자) 입력"
               autoComplete="current-password"
               className="
       w-full h-[52px]

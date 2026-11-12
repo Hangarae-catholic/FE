@@ -59,3 +59,6 @@ export type VerifyEmailCodeData = {
 };
 
 export type VerifyEmailCodeResponse = CommonResponse<VerifyEmailCodeData>;
+
+// 회원탈퇴 응답
+export type WithdrawResponse = CommonResponse<string>;
