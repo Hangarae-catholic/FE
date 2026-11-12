@@ -11,22 +11,25 @@ import jumpCapy from "../../assets/images/capy_jump.svg";
 import landingBackground from "../../assets/images/landing_background.svg";
 import starIcon from "../../assets/icons/icon_star.svg";
 import sunIcon from "../../assets/icons/icon_sun.svg";
-import logoText from "../../assets/icons/logo_text.svg";
+import logoText from "../../assets/icons/logo_text_orange.svg";
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
-  const K_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
-  const K_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
-  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${K_REST_API_KEY}&redirect_uri=${K_REDIRECT_URI}&prompt=login`;
-
   const handleKakaoLogin = () => {
-    // 추후 카카오 소셜 로그인 연동 및 수정 예정
-    window.location.href = kakaoURL;
+    const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+
+    if (!baseURL) return;
+
+    window.location.assign(`${baseURL}/api/auth/kakao`);
   };
 
   const handleGoogleLogin = () => {
-    // TODO: 구글 로그인 연동
+    const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+
+    if (!baseURL) return;
+
+    window.location.assign(`${baseURL}/api/auth/google`);
   };
 
   useEffect(() => {
@@ -160,7 +163,7 @@ const LandingPage = () => {
 
           <AuthButton
             text="구글로 시작하기"
-            icon={googleIcon} // 구글 로그인 아이콘 화질 문제 추후 수정 필요
+            icon={googleIcon}
             variant="google"
             onClick={handleGoogleLogin}
           />

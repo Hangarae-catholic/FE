@@ -13,6 +13,20 @@ export type LoginData = {
 
 export type LoginResponse = CommonResponse<LoginData>;
 
+// 소셜 로그인
+export type OAuthTicketRequest = {
+  ticket: string;
+};
+
+export type OAuthLoginData = {
+  nextStep: "LOGIN" | "SIGN_UP" | "PROFILE_SETUP";
+  email: string | null;
+  name: string | null;
+  tokens: LoginData | null;
+};
+
+export type OAuthTicketResponse = CommonResponse<OAuthLoginData>;
+
 // 회원가입
 export type SignUpRequest = {
   name: string;
@@ -45,3 +59,6 @@ export type VerifyEmailCodeData = {
 };
 
 export type VerifyEmailCodeResponse = CommonResponse<VerifyEmailCodeData>;
+
+// 회원탈퇴 응답
+export type WithdrawResponse = CommonResponse<string>;

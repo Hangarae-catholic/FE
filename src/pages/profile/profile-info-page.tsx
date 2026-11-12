@@ -7,117 +7,90 @@ import ProgressBar from "../../components/common/ProgressBar";
 import BottomSheet from "../../components/common/BottomSheet/BottomSheet";
 import arrowDown from "../../assets/icons/arrow_down.svg";
 import deleteOrange from "../../assets/icons/delete-orange.svg";
+import { Department } from "../../constants/DEPARTMENT";
+import { Division } from "../../constants/DIVISION";
+import { Interest } from "../../constants/INTEREST";
+import { STUDENT_STATUS } from "../../constants/STUDENT_STATUS";
 
 type SheetType =
   | "primaryCollege"
   | "primaryDepartment"
   | "secondaryCollege"
   | "secondaryDepartment"
+  | "minorCollege"
+  | "minorDepartment"
   | "academicStatus"
   | "interests";
 
-const collegeOptions = [
-  "경영대학",
-  "바이오헬스융합대학",
-  "AI전자정보융합대학",
-  "약학대학",
-  "인문사회계열",
-  "자연공학계열",
-  "예체능계열",
-  "교직과정",
-  "자유전공학부",
-  "대학융합전공",
-];
-
-const departmentOptions: Record<string, string[]> = {
-  경영대학: [
-    "경영학과",
-    "회계학과",
-    "국제경영학과",
-    "세무회계금융학과",
-    "IT파이낸스학과",
+const departmentIdsByDivision: Record<string, string[]> = {
+  BUSINESS: ["BUSINESS_ADMINISTRATION", "ACCOUNTING"],
+  GLOBAL_BUSINESS_SCHOOL: [
+    "INTERNATIONAL_BUSINESS",
+    "TAX_ACCOUNTING_FINANCE",
+    "IT_FINANCE",
   ],
-  바이오헬스융합대학: [
-    "생명공학과",
-    "바이오메디컬화학공학과",
-    "바이오로직스공학부",
-    "AI의공학과",
-    "의생명공학과",
-    "바이오메디컬소프트웨어학과",
+  BIO_HEALTH_CONVERGENCE: [
+    "BIOTECHNOLOGY",
+    "BIOMEDICAL_CHEMICAL_ENGINEERING",
+    "BIOLOGICS_ENGINEERING",
+    "AI_BIOMEDICAL_ENGINEERING",
+    "BIOMEDICAL_SCIENCE",
+    "BIOMEDICAL_SOFTWARE",
   ],
-  AI전자정보융합대학: [
-    "컴퓨터정보공학부",
-    "미디어기술콘텐츠학과",
-    "정보통신전자공학부",
-    "인공지능학과",
-    "데이터사이언스학과",
+  AI_ELECTRONICS_INFORMATION_CONVERGENCE: [
+    "COMPUTER_INFORMATION_ENGINEERING",
+    "MEDIA_TECHNOLOGY_CONTENTS",
+    "INFORMATION_COMMUNICATION_ELECTRONICS_ENGINEERING",
+    "ARTIFICIAL_INTELLIGENCE",
+    "DATA_SCIENCE",
   ],
-  약학대학: ["약학과"],
-  인문사회계열: [
-    "국어국문학과",
-    "철학과",
-    "국사학과",
-    "영어영문학부",
-    "중국언어문화학과",
-    "일어일본문화학과",
-    "프랑스어문화학과",
-    "사회복지학과",
-    "심리학과",
-    "사회학과",
-    "아동학과",
-    "특수교육과",
-    "국제학부",
-    "법학과",
-    "경제학과",
-    "행정학과",
+  PHARMACY: ["PHARMACY"],
+  HUMANITIES: ["KOREAN_LANGUAGE_LITERATURE", "PHILOSOPHY", "KOREAN_HISTORY"],
+  LANGUAGES: [
+    "ENGLISH_LANGUAGE_LITERATURE",
+    "CHINESE_LANGUAGE_CULTURE",
+    "JAPANESE_LANGUAGE_CULTURE",
+    "FRENCH_CULTURE",
   ],
-  자연공학계열: [
-    "수학과",
-    "화학과",
-    "물리학과",
-    "에너지환경공학과",
-    "공간디자인・소비자학과",
-    "의류학과",
-    "식품영양학과",
+  SOCIAL_SCIENCES: [
+    "SOCIAL_WELFARE",
+    "PSYCHOLOGY",
+    "SOCIOLOGY",
+    "CHILD_STUDIES",
   ],
-  예체능계열: ["음악과", "예술미디어융합학과"],
-  교직과정: ["교직과"],
-  자유전공: ["자유전공학부"],
-  대학융합전공: ["융합전공학부"],
+  SPECIAL_EDUCATION: ["SPECIAL_EDUCATION"],
+  INTERNATIONAL_LAW_ECONOMICS: [
+    "INTERNATIONAL_STUDIES",
+    "LAW",
+    "ECONOMICS",
+    "PUBLIC_ADMINISTRATION",
+  ],
+  GLOBAL_BUSINESS: ["GLOBAL_BUSINESS"],
+  NATURAL_SCIENCES: ["CHEMISTRY", "MATHEMATICS", "PHYSICS"],
+  ENGINEERING: ["ENERGY_ENVIRONMENTAL_ENGINEERING"],
+  HUMAN_ECOLOGY: [
+    "SPATIAL_DESIGN_CONSUMER_STUDIES",
+    "CLOTHING_TEXTILES",
+    "FOOD_NUTRITION",
+  ],
+  MUSIC: ["MUSIC"],
+  APPLIED_ARTS: ["ART_MEDIA_CONVERGENCE"],
+  TEACHER_TRAINING: ["TEACHER_TRAINING"],
+  LIBERAL_STUDIES: ["LIBERAL_STUDIES"],
+  INTERDISCIPLINARY_STUDIES: ["INTERDISCIPLINARY_STUDIES"],
 };
 
-const academicStatusOptions = [
-  "1학년",
-  "2학년",
-  "3학년",
-  "4학년",
-  "휴학",
-  "졸업유예",
-  "졸업",
-];
+const collegeOptions = Division.map((item) => item.name);
+const interestOptions = Interest.map((item) => item.name);
 
-const interestOptions = [
-  "경영·회계·금융",
-  "경제·무역·국제",
-  "인문·역사·철학",
-  "사회·복지·심리",
-  "바이오·생명과학",
-  "화학·에너지·환경",
-  "반도체·전자·통신",
-  "의료·보건·약학",
-  "IT·소프트웨어",
-  "AI·데이터",
-  "마케팅·광고·홍보",
-  "기획·PM",
-  "디자인·패션·공간",
-  "콘텐츠·미디어·예술",
-  "교육·교직",
-  "법률·정책",
-  "행정·공공기관",
-  "외국어·언어",
-  "자격증·시험",
-  "취업·창업·대외활동",
-];
+const getDepartmentOptions = (divisionName: string): string[] => {
+  const divisionId = Division.find((item) => item.name === divisionName)?.id;
+  if (!divisionId) return [];
+  const allowed = new Set(departmentIdsByDivision[divisionId] ?? []);
+  return Department.filter((item) => allowed.has(item.id)).map(
+    (item) => item.name,
+  );
+};
 
 interface SelectFieldProps {
   value: string;
@@ -182,23 +155,32 @@ const ProfileInfoPage = () => {
   const [secondaryCollege, setSecondaryCollege] = useState("");
   const [secondaryDepartment, setSecondaryDepartment] = useState("");
 
+  const [hasMinor, setHasMinor] = useState(false);
+  const [minorCollege, setMinorCollege] = useState("");
+  const [minorDepartment, setMinorDepartment] = useState("");
+
   const [academicStatus, setAcademicStatus] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
-
   const [activeSheet, setActiveSheet] = useState<SheetType | null>(null);
 
   const isValid =
-    primaryCollege !== "" &&
-    primaryDepartment !== "" &&
-    academicStatus !== "" &&
+    !!primaryCollege &&
+    !!primaryDepartment &&
+    !!academicStatus &&
     interests.length > 0 &&
-    (!hasSecondMajor ||
-      (secondaryCollege !== "" && secondaryDepartment !== ""));
+    (!hasSecondMajor || (!!secondaryCollege && !!secondaryDepartment)) &&
+    (!hasMinor || (!!minorCollege && !!minorDepartment));
 
   const handleRemoveSecondMajor = () => {
     setHasSecondMajor(false);
     setSecondaryCollege("");
     setSecondaryDepartment("");
+  };
+
+  const handleRemoveMinor = () => {
+    setHasMinor(false);
+    setMinorCollege("");
+    setMinorDepartment("");
   };
 
   const handleNext = () => {
@@ -211,6 +193,8 @@ const ProfileInfoPage = () => {
         primaryDepartment,
         secondaryCollege: hasSecondMajor ? secondaryCollege : null,
         secondaryDepartment: hasSecondMajor ? secondaryDepartment : null,
+        minorCollege: hasMinor ? minorCollege : null,
+        minorDepartment: hasMinor ? minorDepartment : null,
         academicStatus,
         interests,
       },
@@ -231,19 +215,15 @@ const ProfileInfoPage = () => {
             setPrimaryDepartment("");
           },
         };
-
       case "primaryDepartment":
         return {
           title: "제 1전공 학과 선택",
-          options: departmentOptions[primaryCollege] ?? [],
+          options: getDepartmentOptions(primaryCollege),
           selected: [primaryDepartment],
           searchable: true,
           searchPlaceholder: "학과를 검색해주세요",
-          onChange: (values: string[]) => {
-            setPrimaryDepartment(values[0] ?? "");
-          },
+          onChange: (values: string[]) => setPrimaryDepartment(values[0] ?? ""),
         };
-
       case "secondaryCollege":
         return {
           title: "복수 전공 계열 선택",
@@ -256,30 +236,47 @@ const ProfileInfoPage = () => {
             setSecondaryDepartment("");
           },
         };
-
       case "secondaryDepartment":
         return {
           title: "복수 전공 학과 선택",
-          options: departmentOptions[secondaryCollege] ?? [],
+          options: getDepartmentOptions(secondaryCollege),
           selected: [secondaryDepartment],
           searchable: true,
           searchPlaceholder: "학과를 검색해주세요",
+          onChange: (values: string[]) =>
+            setSecondaryDepartment(values[0] ?? ""),
+        };
+      case "minorCollege":
+        return {
+          title: "부전공 계열 선택",
+          options: collegeOptions,
+          selected: [minorCollege],
+          searchable: true,
+          searchPlaceholder: "계열을 검색해주세요",
           onChange: (values: string[]) => {
-            setSecondaryDepartment(values[0] ?? "");
+            setMinorCollege(values[0] ?? "");
+            setMinorDepartment("");
           },
         };
-
+      case "minorDepartment":
+        return {
+          title: "부전공 학과 선택",
+          options: getDepartmentOptions(minorCollege),
+          selected: [minorDepartment],
+          searchable: true,
+          searchPlaceholder: "학과를 검색해주세요",
+          onChange: (values: string[]) => setMinorDepartment(values[0] ?? ""),
+        };
       case "academicStatus":
         return {
           title: "학적 상태 선택",
-          options: academicStatusOptions,
+          options: STUDENT_STATUS.map((status) => status.name),
           selected: [academicStatus],
           searchable: false,
           onChange: (values: string[]) => {
             setAcademicStatus(values[0] ?? "");
           },
         };
-
       case "interests":
         return {
           title: "관심 분야 선택",
@@ -292,11 +289,8 @@ const ProfileInfoPage = () => {
           searchable: true,
           searchPlaceholder: "관심 분야를 검색해보세요",
           columns: 2 as const,
-          onChange: (values: string[]) => {
-            setInterests(values);
-          },
+          onChange: (values: string[]) => setInterests(values),
         };
-
       default:
         return null;
     }
@@ -428,6 +422,48 @@ const ProfileInfoPage = () => {
             >
               <span className="text-[24px] font-normal leading-none">+</span>
               복수 전공 추가하기
+            </button>
+          )}
+        </section>
+
+        <section className="mt-7">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[16px] font-medium text-gray-900">
+              부전공 <span className="text-gray-600">(선택)</span>
+            </h2>
+            {hasMinor && (
+              <button
+                type="button"
+                onClick={handleRemoveMinor}
+                className="text-[14px] text-gray-600 underline underline-offset-4 cursor-pointer"
+              >
+                삭제
+              </button>
+            )}
+          </div>
+
+          {hasMinor ? (
+            <div className="flex flex-col gap-3">
+              <SelectField
+                value={minorCollege}
+                placeholder="계열을 선택해주세요"
+                onClick={() => setActiveSheet("minorCollege")}
+              />
+              <SelectField
+                value={minorDepartment}
+                placeholder="학과를 선택해주세요"
+                disabled={!minorCollege}
+                onClick={() => setActiveSheet("minorDepartment")}
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setHasMinor(true)}
+              className="flex items-center justify-center gap-4 w-full h-[52px] rounded-[12px] border border-[#CED4DA] text-gray-700 text-[16px] font-medium cursor-pointer"
+            >
+              <span className="text-[24px] font-normal leading-none">+</span>
+              부전공 추가하기
             </button>
           )}
         </section>
