@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { AuthStore } from "../../store/AuthStore";
 import { getOAuthTicket } from "../../apis/auth";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const SocialOAuthHandler = () => {
   const navigate = useNavigate();
@@ -101,28 +102,7 @@ const SocialOAuthHandler = () => {
     void handleOAuthResult();
   }, [navigate, setAuth]);
 
-  return (
-    <main
-      className="
-      flex items-center justify-center
-      w-full min-h-dvh
-      bg-bg
-    "
-    >
-      <div
-        role="status"
-        aria-label="소셜 로그인 처리 중"
-        className="
-        w-[64px] h-[64px]
-        rounded-full
-        border-[6px]
-        border-[#FF8A1D]
-        border-t-transparent
-        animate-spin
-      "
-      />
-    </main>
-  );
+  return <LoadingSpinner />;
 };
 
 export default SocialOAuthHandler;
