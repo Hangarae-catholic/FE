@@ -365,7 +365,7 @@ const SignupPage = () => {
               onChange={(e) => {
                 setPassword(e.target.value);
               }}
-              placeholder="비밀번호(영문+숫자, 8-16자) 입력"
+              placeholder="비밀번호(영문+숫자+특수문자, 8-16자) 입력"
               autoComplete="new-password"
               aria-label="비밀번호"
               aria-describedby={
@@ -386,7 +386,7 @@ const SignupPage = () => {
               >
                 {isPasswordValid
                   ? "사용할 수 있는 비밀번호예요."
-                  : "영문과 숫자를 조합해 8~16자로 입력해 주세요."}
+                  : "영문과 숫자, 특수문자를 조합해 8~16자로 입력해 주세요."}
               </p>
             )}
 
