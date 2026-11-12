@@ -1,7 +1,7 @@
 import CapyCheerUp from '/src/assets/images/capy_cheer_up.svg?react';
 import CapyGreeting from '/src/assets/images/capy_greeting.svg?react';
 import CapyThumbsUp from '/src/assets/images/capy_thumbs_up.svg?react';
-import CapyV from '/src/assets/images/capy_V.svg?react';
+import CapyV from '/src/assets/images/capy_v.svg?react';
 import CapyMatchHand from '/src/assets/images/capy_match_hand.svg?react';
 
 const CHARACTERS = [CapyCheerUp, CapyGreeting, CapyThumbsUp, CapyV, CapyMatchHand];
