@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api, publicApi } from "./axios";
 import type {
   OAuthTicketRequest,
   OAuthTicketResponse,
@@ -11,11 +11,12 @@ import type {
   VerifyEmailCodeRequest,
   VerifyEmailCodeResponse,
   WithdrawResponse,
+  LogoutResponse,
 } from "../types/auth";
 
 // 로컬 로그인 API
 export const login = async (body: LoginRequest): Promise<LoginResponse> => {
-  const { data } = await api.post<LoginResponse>("/api/auth/login", body);
+  const { data } = await publicApi.post<LoginResponse>("/api/auth/login", body);
   return data;
 };
 
@@ -23,7 +24,7 @@ export const login = async (body: LoginRequest): Promise<LoginResponse> => {
 export const getOAuthTicket = async (
   body: OAuthTicketRequest,
 ): Promise<OAuthTicketResponse> => {
-  const { data } = await api.post<OAuthTicketResponse>(
+  const { data } = await publicApi.post<OAuthTicketResponse>(
     "/api/auth/oauth/ticket",
     body,
   );
@@ -32,7 +33,10 @@ export const getOAuthTicket = async (
 
 // 회원가입 API
 export const signUp = async (body: SignUpRequest): Promise<SignUpResponse> => {
-  const { data } = await api.post<SignUpResponse>("/api/auth/sign-up", body);
+  const { data } = await publicApi.post<SignUpResponse>(
+    "/api/auth/sign-up",
+    body,
+  );
   return data;
 };
 
@@ -40,7 +44,7 @@ export const signUp = async (body: SignUpRequest): Promise<SignUpResponse> => {
 export const sendEmailCode = async (
   body: SendEmailCodeRequest,
 ): Promise<SendEmailCodeResponse> => {
-  const { data } = await api.post<SendEmailCodeResponse>(
+  const { data } = await publicApi.post<SendEmailCodeResponse>(
     "/api/auth/verify-code/send",
     body,
   );
@@ -50,14 +54,21 @@ export const sendEmailCode = async (
 export const verifyEmailCode = async (
   body: VerifyEmailCodeRequest,
 ): Promise<VerifyEmailCodeResponse> => {
-  const { data } = await api.post<VerifyEmailCodeResponse>(
+  const { data } = await publicApi.post<VerifyEmailCodeResponse>(
     "/api/auth/verify-code/confirm",
     body,
   );
   return data;
 };
 
-// 계정 삭제
+// 로그아웃 API
+export const logout = async (): Promise<LogoutResponse> => {
+  const { data } = await api.post<LogoutResponse>("/api/auth/logout");
+
+  return data;
+};
+
+// 계정 탈퇴 API
 export const withdraw = async (
   accessToken: string,
 ): Promise<WithdrawResponse> => {

@@ -60,5 +60,12 @@ export type VerifyEmailCodeData = {
 
 export type VerifyEmailCodeResponse = CommonResponse<VerifyEmailCodeData>;
 
-// 회원탈퇴 응답
+export type ReissueRequest = {
+  refreshToken: string;
+};
+
+export type ReissueResponse = CommonResponse<LoginData>;
+
+export type LogoutResponse = CommonResponse<string>;
+
 export type WithdrawResponse = CommonResponse<string>;
