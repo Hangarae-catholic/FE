@@ -1,7 +1,7 @@
 import { api } from "./axios";
 import type {
-  KakaoCallbackRequest,
-  KakaoLoginResponse,
+  OAuthTicketRequest,
+  OAuthTicketResponse,
   LoginRequest,
   LoginResponse,
   SendEmailCodeRequest,
@@ -18,12 +18,12 @@ export const login = async (body: LoginRequest): Promise<LoginResponse> => {
   return data;
 };
 
-// 카카오 로그인
-export const kakaoCallback = async (
-  body: KakaoCallbackRequest,
-): Promise<KakaoLoginResponse> => {
-  const { data } = await api.post<KakaoLoginResponse>(
-    "/api/auth/kakao/callback",
+// 소셜 로그인 API
+export const getOAuthTicket = async (
+  body: OAuthTicketRequest,
+): Promise<OAuthTicketResponse> => {
+  const { data } = await api.post<OAuthTicketResponse>(
+    "/api/auth/oauth/ticket",
     body,
   );
   return data;

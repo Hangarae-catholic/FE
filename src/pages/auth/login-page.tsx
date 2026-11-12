@@ -8,6 +8,7 @@ import TopBar from "../../components/common/TopBar";
 import visibleIcon from "../../assets/icons/icon_visible.svg";
 import invisibleIcon from "../../assets/icons/icon_invisible.svg";
 import axios from "axios";
+import { getMyProfile } from "../../apis/user";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -37,10 +38,21 @@ const LoginPage = () => {
         throw new Error(response.message || "로그인에 실패했습니다.");
       }
 
-      // 로그인 성공 시 토큰 저장
-      setAuth(response.data);
+      const { accessToken, refreshToken } = response.data;
 
-      navigate("/home", { replace: true });
+      if (!accessToken || !refreshToken) {
+        throw new Error("로그인 토큰이 없습니다.");
+      }
+
+      setAuth({ accessToken, refreshToken });
+
+      const profileResponse = await getMyProfile(accessToken);
+
+      if (profileResponse.data) {
+        navigate("/home", { replace: true });
+      } else {
+        navigate("/profile/setup", { replace: true });
+      }
     } catch (error) {
       setLoginError(true);
 

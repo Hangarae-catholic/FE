@@ -13,24 +13,19 @@ export type LoginData = {
 
 export type LoginResponse = CommonResponse<LoginData>;
 
-// 카카오 로그인
-export type KakaoCallbackRequest = {
-  code: string;
+// 소셜 로그인
+export type OAuthTicketRequest = {
+  ticket: string;
 };
 
-export type KakaoNextStep = "LOGIN" | "SIGN_UP";
-
-export type KakaoLoginData = {
-  nextStep: KakaoNextStep;
-  email: string;
-  name: string;
-  tokens: {
-    accessToken: string;
-    refreshToken: string;
-  } | null;
+export type OAuthLoginData = {
+  nextStep: "LOGIN" | "SIGN_UP" | "PROFILE_SETUP";
+  email: string | null;
+  name: string | null;
+  tokens: LoginData | null;
 };
 
-export type KakaoLoginResponse = CommonResponse<KakaoLoginData>;
+export type OAuthTicketResponse = CommonResponse<OAuthLoginData>;
 
 // 회원가입
 export type SignUpRequest = {

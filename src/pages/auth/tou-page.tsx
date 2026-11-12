@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import TopBar from "../../components/common/TopBar";
 import BottomButton from "../../components/common/BottomButton";
@@ -63,6 +63,16 @@ const ToUPage = () => {
 
   const allAgreed = agreeTerms && agreePrivacy;
 
+  const location = useLocation();
+
+  const signupType = (
+    location.state as {
+      signupType?: "SOCIAL";
+      email?: string | null;
+      name?: string | null;
+    } | null
+  )?.signupType;
+
   const handleAllAgree = () => {
     const nextValue = !allAgreed;
     setAgreeTerms(nextValue);
@@ -72,7 +82,13 @@ const ToUPage = () => {
   const handleAgree = () => {
     if (!allAgreed) return;
 
-    // TODO: 실제 회원가입 다음 단계 경로로 수정
+    if (signupType === "SOCIAL") {
+      navigate("/profile/setup", {
+        state: location.state,
+      });
+      return;
+    }
+
     navigate("/signup");
   };
 
