@@ -151,7 +151,7 @@ export default function TeamMatchingPage() {
             baseClassName='CustomDropdown'
             className='w-fit px-2 py-1 rounded-sm border border-gray-300 bg-white relative'
             options={options}
-            value={latestFirst ? '최신순' : '오래된순'}
+            value={latestFirst ? '최신 순' : '오래된 순'}
             onChange={(option) => setLatestFirst(option.value === '최신 순')}
             controlClassName='flex items-center w-full flex justify-between'
             placeholderClassName='font-pretendard font-normal text-[13px] text-gray-800 select-none'
