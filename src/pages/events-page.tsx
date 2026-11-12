@@ -17,6 +17,7 @@ import MiniMap from '../components/HomePage/MiniMap';
 import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
 import type { EventLikeResponse, EventRetreiveResponse } from '../types/events';
 import { getEventLikes, getEventRetreive, postEventLikes } from '../apis/events';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
 export interface Event {
   id: number;
@@ -168,7 +169,7 @@ export default function EventsPage() {
 
   // 로딩 스피너
   if (eventLoading) {
-    return <div>loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return isMap ? (

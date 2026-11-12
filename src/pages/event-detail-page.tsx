@@ -11,6 +11,7 @@ import { getEventDetail } from '../apis/events';
 import type { EventDetailResponse } from '../types/events';
 import { formatDate } from '../utils/FormatDate';
 import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
 // const mock = [
 //   {
@@ -51,7 +52,7 @@ export default function EventDetailPage() {
 
   // 로딩스피너
   if (eventDetailLoading) {
-    return <div>loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return (

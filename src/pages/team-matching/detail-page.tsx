@@ -18,6 +18,7 @@ import { Department } from '../../constants/DEPARTMENT';
 import { STUDENT_STATUS } from '../../constants/STUDENT_STATUS';
 import { formatDate } from '../../utils/FormatDate';
 import { getCharacter } from '../../constants/CHARACTER';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 // 사용자 정보 가져오기
 const user = '정다민';
@@ -77,7 +78,7 @@ export default function TeamMatchDetailPage() {
 
   // 로딩 스피너
   if (loading) {
-    return <div>loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return (

@@ -73,7 +73,7 @@ export default function TeamCreatePage() {
       // s3에 업로드한 이미지 url
       const uploadedUrls: string[] = [];
 
-      if (selectedImages) {
+      if (selectedImages.length > 0) {
         for (const file of selectedImages) {
           const res = await uploadImageToS3(file);
 

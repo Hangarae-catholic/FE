@@ -1,5 +1,5 @@
 import type { EventDetailResponse, EventLikeRequest, EventLikeResponse, EventRecommendResponse, EventRetreiveResponse } from '../types/events';
-import { api } from './team';
+import { api } from './axios';
 
 // 행사 조회
 export const getEventRetreive = async (): Promise<EventRetreiveResponse> => {

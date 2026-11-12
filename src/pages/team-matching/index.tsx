@@ -12,6 +12,7 @@ import Dropdown from 'react-dropdown';
 import { getTeamPosts } from '../../apis/team';
 import type { TeamPostRetrieveResponse } from '../../types/team';
 import { CATEGORIES } from '../../constants/CATEGORY';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 // 무한스크롤?
 
@@ -66,7 +67,7 @@ export default function TeamMatchingPage() {
 
   // 로딩스피너
   if (loading) {
-    return <div>loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return (
