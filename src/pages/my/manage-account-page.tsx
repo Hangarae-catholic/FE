@@ -4,15 +4,49 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../../components/common/TopBar";
 import RightArrow from "../../assets/icons/arrow_right.svg?react";
 import Modal from "../../components/common/Modal";
+import { AuthStore } from "../../store/AuthStore";
+import { UserStore } from "../../store/UserStore";
+import axios from "axios";
+import { logout } from "../../apis/auth";
 
 const ManageAccountPage = () => {
   const navigate = useNavigate();
+
+  const clearAuth = AuthStore((state) => state.clearAuth);
+  const clearUser = UserStore((state) => state.clearUser);
+
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
 
-  const handleLogout = () => {
-    setIsLogoutModalOpen(false);
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
 
-    navigate("/", { replace: true });
+    setIsLoggingOut(true);
+    setLogoutError("");
+
+    try {
+      await logout();
+
+      clearAuth();
+
+      clearUser();
+
+      setIsLogoutModalOpen(false);
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+
+      setLogoutError(
+        axios.isAxiosError(error)
+          ? (error.response?.data?.message ?? "로그아웃에 실패했습니다.")
+          : "로그아웃에 실패했습니다. 다시 시도해주세요.",
+      );
+
+      setIsLogoutModalOpen(false);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const handleWithdraw = () => {
@@ -38,7 +72,6 @@ const ManageAccountPage = () => {
           px-5 py-4
         "
       >
-        {/* 카드 제목 */}
         <h2
           className="
             mb-3
@@ -106,6 +139,12 @@ const ManageAccountPage = () => {
           />
         </button>
       </section>
+
+      {logoutError && (
+        <p role="alert" className="mt-4 text-center text-[14px] text-error">
+          {logoutError}
+        </p>
+      )}
 
       {isLogoutModalOpen && (
         <Modal
