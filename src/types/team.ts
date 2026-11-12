@@ -60,3 +60,26 @@ export type TeamCreate = {
 };
 
 export type TeamCreateRequest = CommonResponse<number>;
+
+// 팀매칭 수정
+export type TeamEdit = {
+  title: string;
+  startAt: Date;
+  endAt: Date;
+  remainingMember: number;
+  category: string | undefined;
+  detail: string;
+  contacts: {
+    type: string;
+    url: string;
+  }[];
+  imageUrls: string[];
+};
+
+export type TeamEditRequest = CommonResponse<number>;
+
+// 팀매칭 삭제
+export type TeamDeleteResponse = CommonResponse<string>;
+
+// 팀매칭 수동 마감
+export type TeamPostCloseResponse = CommonResponse<number>;

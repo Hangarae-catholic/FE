@@ -12,7 +12,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import Picture from '/src/assets/icons/picture.svg?react';
-import { getTeamPostDetail } from '../../apis/team';
+import { deleteTeamPost, getTeamPostDetail } from '../../apis/team';
 import type { TeamPostDetailResponse } from '../../types/team';
 import { Department } from '../../constants/DEPARTMENT';
 import { STUDENT_STATUS } from '../../constants/STUDENT_STATUS';
@@ -21,7 +21,7 @@ import { getCharacter } from '../../constants/CHARACTER';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 // 사용자 정보 가져오기
-const user = '정다민';
+const user = '이소민';
 
 export default function TeamMatchDetailPage() {
   const navigate = useNavigate();
@@ -65,10 +65,18 @@ export default function TeamMatchDetailPage() {
     };
   }, [isMoreModalOpen]);
 
-  const handleDelete = () => {
-    // 삭제 후 알림
-    alert('삭제되었습니다.');
-    navigate('/team-match');
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await deleteTeamPost(Number(postId));
+      alert('삭제되었습니다.');
+      navigate('/team-match');
+    } catch (e) {
+      alert('삭제에 실패했습니다.');
+      console.error('팀매칭 모집글 삭제 실패:', e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -78,7 +86,7 @@ export default function TeamMatchDetailPage() {
 
   // 로딩 스피너
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner bgColor='transparent' />;
   }
 
   return (

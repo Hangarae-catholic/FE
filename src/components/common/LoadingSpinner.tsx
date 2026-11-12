@@ -6,9 +6,13 @@ import CapyMatchHand from '/src/assets/images/capy_match_hand.svg?react';
 
 const CHARACTERS = [CapyCheerUp, CapyGreeting, CapyThumbsUp, CapyV, CapyMatchHand];
 
-const LoadingSpinner = () => {
+interface LoadingSpinnerProps {
+  bgColor?: 'transparent' | 'orange';
+}
+
+const LoadingSpinner = ({ bgColor = 'transparent' }: LoadingSpinnerProps) => {
   return (
-    <div className='flex h-screen flex-col items-center justify-center bg-main'>
+    <div className={`flex h-screen flex-col items-center justify-center ${bgColor === 'orange' ? 'bg-main' : 'bg-transparent'}`}>
       <div className='flex items-end gap-[5px]'>
         {CHARACTERS.map((Character, index) => {
           const delays = [0, 200, 400, 600, 800];

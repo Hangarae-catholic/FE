@@ -44,7 +44,7 @@ export default function EventCard({ id, recommend, unrecommend, image, location,
   if (isLoading) {
     return (
       <div className='w-full h-50 px-5 py-4 flex items-center justify-center flex-col gap-2 rounded-[20px] bg-[#FEFEFE]'>
-        <LoadingSpinner />
+        <LoadingSpinner bgColor='transparent' />
       </div>
     );
   }

@@ -3,7 +3,7 @@ import type { CommonResponse } from '../types/common';
 import { api } from './axios';
 
 // S3 이미지 업로드
-export const uploadImageToS3 = async (file: File): Promise<CommonResponse<{ url: string }>> => {
+export const uploadImageToS3 = async (file: File | string): Promise<CommonResponse<{ url: string }>> => {
   const accessToken = AuthStore.getState().accessToken;
 
   const formData = new FormData();

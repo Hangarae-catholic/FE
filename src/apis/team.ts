@@ -1,4 +1,4 @@
-import type { TeamCreate, TeamCreateRequest } from './../types/team';
+import type { TeamCreate, TeamCreateRequest, TeamDeleteResponse, TeamEdit, TeamEditRequest, TeamPostCloseResponse } from './../types/team';
 // import axios from 'axios';
 import type { TeamPostDetailResponse, TeamPostRetrieveResponse } from '../types/team';
 import { api } from './axios';
@@ -37,6 +37,29 @@ export const postTeamCreate = async (TeamCreate: TeamCreate): Promise<TeamCreate
   const { data } = await api.post(`/api/teams`, {
     ...TeamCreate,
   });
+
+  return data;
+};
+
+// 팀매칭 수정
+export const putTeamPost = async (teamId: number, TeamEdit: TeamEdit): Promise<TeamEditRequest> => {
+  const { data } = await api.put(`/api/teams/${teamId}`, {
+    ...TeamEdit,
+  });
+
+  return data;
+};
+
+// 팀매칭 삭제
+export const deleteTeamPost = async (teamId: number): Promise<TeamDeleteResponse> => {
+  const { data } = await api.delete(`/api/teams/${teamId}`);
+
+  return data;
+};
+
+// 팀매칭 수동 마감
+export const patchTeamClose = async (teamId: number): Promise<TeamPostCloseResponse> => {
+  const { data } = await api.patch(`/api/teams/${teamId}/close`);
 
   return data;
 };
