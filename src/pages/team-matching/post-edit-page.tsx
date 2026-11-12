@@ -14,7 +14,7 @@ import Minus from '/src/assets/icons/minus.svg?react';
 import Camera from '/src/assets/icons/camera.svg?react';
 import Delete from '/src/assets/icons/delete.svg?react';
 import Dash from '/src/assets/icons/dash.svg?react';
-import { getTeamPostDetail, putTeamPost } from '../../apis/team';
+import { deleteTeamPost, getTeamPostDetail, patchTeamClose, putTeamPost } from '../../apis/team';
 import { CATEGORIES } from '../../constants/CATEGORY';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { Department } from '../../constants/DEPARTMENT';
@@ -48,7 +48,6 @@ export default function TeamMatchPostEditPage() {
   const [writerName, setWriterName] = useState('');
   const [writerStatus, setWriterStatus] = useState('');
   const [writerDepartment, setWriterDepartment] = useState('');
-  const [teamStatus, setTeamStatus] = useState('');
 
   const options = ['교과', '공모전•대회', '스터디', '기타'];
 
@@ -77,7 +76,6 @@ export default function TeamMatchPostEditPage() {
         setWriterName(data.data?.userName ?? '');
         setWriterStatus(data.data?.studentStatus ?? '');
         setWriterDepartment(Department.find((d) => d.id === data.data?.department)?.name ?? '');
-        setTeamStatus(data.data?.teamStatus ?? '');
       } catch (error) {
         console.error('팀 모집글 불러오기 실패:', error);
       } finally {
@@ -112,6 +110,7 @@ export default function TeamMatchPostEditPage() {
     if (!recruitName || !recruitStartDate || !recruitEndDate || !recruitNumber || !category || !(kakaoUrl || instagramUrl || mailUrl)) return;
 
     try {
+      setLoading(true);
       // 기존 이미지 URL 유지
       const uploadedUrls: string[] = selectedImages.filter((image): image is string => typeof image === 'string');
 
@@ -145,18 +144,36 @@ export default function TeamMatchPostEditPage() {
     } catch (e) {
       console.error(e);
       alert('게시글 수정에 실패했습니다.');
+    } finally {
+      setLoading(false);
     }
   };
-  const handleDeadline = () => {
-    // 마감 등록 후 알림 기능
-    alert('모집을 마감했습니다.');
-    navigate('/team-match');
+  const handleDeadline = async () => {
+    try {
+      setLoading(true);
+      await patchTeamClose(Number(postId));
+      alert('모집을 마감했습니다.');
+      navigate('/team-match');
+    } catch (e) {
+      alert('모집 마감을 실패했습니다.');
+      console.log('모집 마감 실패:', e);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = () => {
-    // 삭제 후 알림 기능
-    alert('팀 모집글을 삭제했습니다.');
-    navigate('/team-match');
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await deleteTeamPost(Number(postId));
+      alert('삭제되었습니다.');
+    } catch (e) {
+      alert('삭제에 실패했습니다.');
+      console.error('팀매칭 모집글 삭제 실패:', e);
+    } finally {
+      setLoading(false);
+      navigate('/team-match');
+    }
   };
 
   if (loading) {
@@ -440,7 +457,7 @@ export default function TeamMatchPostEditPage() {
 
         {/* 마감 버튼 */}
         <div className='flex gap-2.5 items-center'>
-          <button type='button' className={`w-full mt-8.5 bg-main py-3.5 font-pretendard font-semibold text-base text-gray-50 rounded-xl `} onClick={() => setIsOpenDeadlineModal(true)} disabled={!recruitName || !isRecruitStartDateSelected || !isRecruitEndDateSelected || !recruitNumber || !category || (!kakaoUrl && !instagramUrl && !mailUrl) || teamStatus === 'CLOSED'}>
+          <button type='button' className={`w-full mt-8.5 bg-main py-3.5 font-pretendard font-semibold text-base text-gray-50 rounded-xl `} onClick={() => setIsOpenDeadlineModal(true)}>
             모집 마감
           </button>
           {/* 삭제 버튼 */}

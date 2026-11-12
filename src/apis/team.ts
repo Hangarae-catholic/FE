@@ -52,14 +52,14 @@ export const putTeamPost = async (teamId: number, TeamEdit: TeamEdit): Promise<T
 
 // 팀매칭 삭제
 export const deleteTeamPost = async (teamId: number): Promise<TeamDeleteResponse> => {
-  const { data } = await api.put(`/api/teams/${teamId}`);
+  const { data } = await api.delete(`/api/teams/${teamId}`);
 
   return data;
 };
 
 // 팀매칭 수동 마감
 export const patchTeamClose = async (teamId: number): Promise<TeamPostCloseResponse> => {
-  const { data } = await api.put(`/api/teams/${teamId}/close`);
+  const { data } = await api.patch(`/api/teams/${teamId}/close`);
 
   return data;
 };
