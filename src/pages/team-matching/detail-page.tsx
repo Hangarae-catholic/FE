@@ -17,6 +17,7 @@ import type { TeamPostDetailResponse } from '../../types/team';
 import { Department } from '../../constants/DEPARTMENT';
 import { STUDENT_STATUS } from '../../constants/STUDENT_STATUS';
 import { formatDate } from '../../utils/FormatDate';
+import { getCharacter } from '../../constants/CHARACTER';
 
 // 사용자 정보 가져오기
 const user = '정다민';
@@ -129,8 +130,7 @@ export default function TeamMatchDetailPage() {
         {/* 작성자 정보 */}
         <div>
           <div className='flex gap-2 items-center mt-4.5'>
-            {/* 작성자 프로필 이미지 추가 */}
-            <img src='{post?.data?.}' alt={`${post?.data?.userName}의 프로필`} className='w-10.5 h-10.5 rounded-full object-fill' />
+            <img src={getCharacter(post?.data?.character)?.image} alt={`${post?.data?.userName}의 프로필`} className='w-10.5 h-10.5 rounded-full object-fill' />
             <div className='flex flex-col'>
               <span className='font-pretendard font-normal text-[13px] text-gray-800'>{post?.data?.userName}</span>
               <span className='font-pretendard font-normal text-sm text-gray-600'>

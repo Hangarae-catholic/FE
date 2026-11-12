@@ -28,15 +28,14 @@ export type TeamRecruitPostDetail = {
   userName: string;
   studentStatus: string;
   department: string;
+  character: string;
   category: string;
   teamStatus: 'RECRUITING' | 'CLOSED';
   detail: string;
-  contacts: [
-    {
-      type: string;
-      url: string;
-    },
-  ];
+  contacts: {
+    type: string;
+    url: string;
+  }[];
   imageUrls: string[];
 };
 

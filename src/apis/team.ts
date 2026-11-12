@@ -12,11 +12,12 @@ export const api = axios.create({
 });
 
 // 팀매칭 목록 조회
-export const getTeamPosts = async (category?: string, keyword?: string): Promise<TeamPostRetrieveResponse> => {
+export const getTeamPosts = async (category?: string, keyword?: string, latestFirst?: boolean): Promise<TeamPostRetrieveResponse> => {
   const { data } = await api.get(`/api/teams`, {
     params: {
       category,
       keyword,
+      latestFirst,
     },
   });
 

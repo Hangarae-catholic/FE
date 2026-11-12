@@ -22,7 +22,7 @@ export default function TeamMatchingPage() {
   const [submittedKeyword, setSubmittedKeyword] = useState('');
 
   const options = ['최신 순', '오래된 순'];
-  const [sorted, setSorted] = useState(options[0]);
+  const [latestFirst, setLatestFirst] = useState(true);
 
   const [teamPosts, setTeamPosts] = useState<TeamPostRetrieveResponse>();
   const [loading, setLoading] = useState(true);
@@ -36,7 +36,7 @@ export default function TeamMatchingPage() {
 
         const keyword = submittedKeyword.trim() || undefined;
 
-        const data = await getTeamPosts(category, keyword);
+        const data = await getTeamPosts(category, keyword, latestFirst);
 
         setTeamPosts(data);
       } catch (error) {
@@ -47,7 +47,7 @@ export default function TeamMatchingPage() {
     };
 
     fetchTeamPosts();
-  }, [selected, submittedKeyword]);
+  }, [selected, submittedKeyword, latestFirst]);
 
   useEffect(() => {
     if (!isMoreModalOpen) return;
@@ -150,8 +150,8 @@ export default function TeamMatchingPage() {
             baseClassName='CustomDropdown'
             className='w-fit px-2 py-1 rounded-sm border border-gray-300 bg-white relative'
             options={options}
-            value={sorted}
-            onChange={(option) => setSorted(option.value.toString())}
+            value={latestFirst ? '최신순' : '오래된순'}
+            onChange={(option) => setLatestFirst(option.value === '최신 순')}
             controlClassName='flex items-center w-full flex justify-between'
             placeholderClassName='font-pretendard font-normal text-[13px] text-gray-800 select-none'
             menuClassName='absolute left-0 top-full w-full z-50 overflow-y-auto rounded-sm border border-gray-300 bg-white'
