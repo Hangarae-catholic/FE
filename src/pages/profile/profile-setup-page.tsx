@@ -27,7 +27,7 @@ const ProfileSetupPage = () => {
     navigate("/profile/info", {
       state: {
         nickname: nickname.trim(),
-        character: selectedCharacter,
+        character: CHARACTERS[selectedCharacter].apiValue,
       },
     });
   };
