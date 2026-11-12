@@ -1,3 +1,4 @@
+import type { TeamCreate, TeamCreateRequest } from './../types/team';
 import axios from 'axios';
 import type { TeamPostDetailResponse, TeamPostRetrieveResponse } from '../types/team';
 
@@ -25,6 +26,15 @@ export const getTeamPosts = async (category?: string, keyword?: string): Promise
 // 팀매칭 상세 조회
 export const getTeamPostDetail = async (teamId: number): Promise<TeamPostDetailResponse> => {
   const { data } = await api.get(`/api/teams/${teamId}`);
+
+  return data;
+};
+
+// 팀 생성 등록
+export const postTeamCreate = async (TeamCreate: TeamCreate): Promise<TeamCreateRequest> => {
+  const { data } = await api.post(`/api/teams`, {
+    ...TeamCreate,
+  });
 
   return data;
 };

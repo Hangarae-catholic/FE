@@ -188,10 +188,10 @@ export default function TeamMatchDetailPage() {
           </div>
         )}
 
-        {post?.data?.contacts.find((c) => c.type !== 'INSTAGRAM' && c.type !== 'KAKAO_OPEN_CHAT') && (
+        {post?.data?.contacts.find((c) => c.type === 'ETC') && (
           <div className='flex gap-2 px-3.5 py-2.5 bg-white rounded-xl border border-gray-300'>
             <Mail className='w-6 h-6' />
-            <a href={post?.data?.contacts.find((c) => c.type !== 'INSTAGRAM' && c.type !== 'KAKAO_OPEN_CHAT')?.url} target='_blank' rel='noopener noreferrer' className='font-pretendard font-normal text-base text-gray-700 underline truncate'>
+            <a href={post?.data?.contacts.find((c) => c.type === 'ETC')?.url} target='_blank' rel='noopener noreferrer' className='font-pretendard font-normal text-base text-gray-700 underline truncate'>
               {post?.data?.contacts.find((c) => c.type !== 'INSTAGRAM' && c.type !== 'KAKAO_OPEN_CHAT')?.url}
             </a>
           </div>

@@ -41,3 +41,20 @@ export type TeamRecruitPostDetail = {
 };
 
 export type TeamPostDetailResponse = CommonResponse<TeamRecruitPostDetail>;
+
+// 팀매칭 생성
+export type TeamCreate = {
+  title: string;
+  startAt: Date | null;
+  endAt: Date | null;
+  maxMember: number;
+  category: string | undefined;
+  detail: string;
+  contacts: {
+    type: string;
+    url: string;
+  }[];
+  imageUrls: string[];
+};
+
+export type TeamCreateRequest = CommonResponse<number>;
