@@ -166,7 +166,7 @@ export default function TeamMatchingPage() {
       {/* 팀매칭 카드 */}
       <div className='mt-55 flex flex-col gap-4'>
         {teamPosts?.data && teamPosts.data.length > 0 ? (
-          teamPosts.data.map((tp) => <TeamCard key={tp.teamId} title={tp.title} startDate={tp.startAt} endDate={tp.endAt} writerName={tp.userName} writerMajor={tp.department} writerStatus={tp.studentStatus} category={tp.category} limitMember={tp.maxMember} currentMember={tp.maxMember - tp.remainingMember} status={tp.teamStatus} id={tp.teamId} />)
+          teamPosts.data.map((tp) => <TeamCard key={tp.teamId} title={tp.title} startDate={tp.startAt} endDate={tp.endAt} writerName={tp.userName} writerMajor={tp.department} writerStatus={tp.studentStatus} category={tp.category} limitMember={tp.maxMember} currentMember={tp.maxMember - tp.remainingMember} status={tp.teamStatus} id={tp.teamId} image={tp.imageUrl} content={tp.detail} />)
         ) : (
           <div className='flex flex-col items-center justify-center py-25 gap-3.5'>
             <Capybara className='w-25' />

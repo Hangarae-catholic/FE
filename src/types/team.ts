@@ -13,6 +13,9 @@ export type TeamRecruitPost = {
   department: string;
   category: 'COURSE' | 'CONTEST_COMPETITION' | 'STUDY' | 'OTHER';
   teamStatus: 'RECRUITING' | 'CLOSED';
+  detail: string;
+  imageUrl: string;
+  createdAt: Date;
 };
 
 export type TeamPostRetrieveResponse = CommonResponse<TeamRecruitPost[]>;
