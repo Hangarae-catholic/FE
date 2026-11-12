@@ -8,7 +8,7 @@ const CHARACTERS = [CapyCheerUp, CapyGreeting, CapyThumbsUp, CapyV, CapyMatchHan
 
 const LoadingSpinner = () => {
   return (
-    <div className='flex h-screen flex-col items-center justify-center'>
+    <div className='flex h-screen flex-col items-center justify-center bg-main'>
       <div className='flex items-end gap-[5px]'>
         {CHARACTERS.map((Character, index) => {
           const delays = [0, 200, 400, 600, 800];
