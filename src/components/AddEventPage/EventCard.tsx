@@ -11,7 +11,7 @@ type EventStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 interface EventCardProps {
   id: number;
-  image?: string | null;
+  image?: string[];
   title: string;
   startDate?: Date;
   endDate?: Date;
@@ -61,9 +61,9 @@ export default function EventCard({ id, image, title, startDate, endDate, locati
         cursor-pointer
       '
     >
-      {image && (
+      {image && image.length > 0 && (
         <img
-          src={image}
+          src={image?.[0]}
           alt={title}
           className='
             w-22 h-28

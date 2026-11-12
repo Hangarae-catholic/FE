@@ -9,6 +9,7 @@ export type EventInfo = {
   location: string;
   summary: string;
   approved: boolean;
+  imageUrls: string[];
 };
 
 export type EventRetreiveResponse = CommonResponse<EventInfo[]>;
@@ -21,6 +22,42 @@ export type EventRecommend = {
   endAt: Date;
   location: string;
   approved: boolean;
+  imageUrls: string[];
 };
 
 export type EventRecommendResponse = CommonResponse<EventRecommend[]>;
+
+// 행사 추천/비추천 조회
+export type EventLike = {
+  likeCount: number;
+  dislikeCount: number;
+  userReaction: 'LIKE' | 'DISLIKE';
+};
+
+export type EventLikeResponse = CommonResponse<EventLike>;
+
+// 행사 추천/비추천 등록
+export type EventLikeRequest = CommonResponse<{
+  type: 'LIKE' | 'DISLIKE';
+}>;
+
+// 행사 상세 조회
+export type EventDetail = {
+  noticeId: number;
+  name: string;
+  startAt: Date;
+  endAt: Date;
+  location: string;
+  information: string;
+  responsible: string;
+  url: string;
+  type: string;
+  category: string;
+  scheduleType: string;
+  approved: boolean;
+  division: string;
+  department: string;
+  imageUrls: string[];
+};
+
+export type EventDetailResponse = CommonResponse<EventDetail>;

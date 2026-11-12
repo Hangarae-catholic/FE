@@ -53,7 +53,7 @@ const routes: RouteObject[] = [
         element: <TeamMatchingPage />,
       },
       {
-        path: "team-match/:postId",
+        path: "team-match/:id",
         element: <TeamMatchDetailPage />,
       },
       {
