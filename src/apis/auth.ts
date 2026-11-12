@@ -1,5 +1,7 @@
 import { api } from "./axios";
 import type {
+  OAuthTicketRequest,
+  OAuthTicketResponse,
   LoginRequest,
   LoginResponse,
   SendEmailCodeRequest,
@@ -8,11 +10,23 @@ import type {
   SignUpResponse,
   VerifyEmailCodeRequest,
   VerifyEmailCodeResponse,
+  WithdrawResponse,
 } from "../types/auth";
 
 // 로컬 로그인 API
 export const login = async (body: LoginRequest): Promise<LoginResponse> => {
   const { data } = await api.post<LoginResponse>("/api/auth/login", body);
+  return data;
+};
+
+// 소셜 로그인 API
+export const getOAuthTicket = async (
+  body: OAuthTicketRequest,
+): Promise<OAuthTicketResponse> => {
+  const { data } = await api.post<OAuthTicketResponse>(
+    "/api/auth/oauth/ticket",
+    body,
+  );
   return data;
 };
 
@@ -40,5 +54,18 @@ export const verifyEmailCode = async (
     "/api/auth/verify-code/confirm",
     body,
   );
+  return data;
+};
+
+// 계정 삭제
+export const withdraw = async (
+  accessToken: string,
+): Promise<WithdrawResponse> => {
+  const { data } = await api.delete<WithdrawResponse>("/api/auth/withdraw", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
   return data;
 };

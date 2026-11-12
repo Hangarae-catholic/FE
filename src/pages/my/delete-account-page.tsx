@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { withdraw } from "../../apis/auth";
+import { AuthStore } from "../../store/AuthStore";
 
 import TopBar from "../../components/common/TopBar";
 import Modal from "../../components/common/Modal";
@@ -20,6 +22,11 @@ const deleteReasons = [
 
 const DeleteAccountPage = () => {
   const navigate = useNavigate();
+  const accessToken = AuthStore((state) => state.accessToken);
+  const clearAuth = AuthStore((state) => state.clearAuth);
+
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const [selectedReason, setSelectedReason] = useState<DeleteReason>(null);
 
@@ -36,19 +43,30 @@ const DeleteAccountPage = () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (!selectedReason) return;
+    if (!selectedReason || isDeleting) return;
+
+    if (!accessToken) {
+      setDeleteError("로그인 정보가 없습니다. 다시 로그인해주세요.");
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError("");
 
     try {
-      // TODO: 회원탈퇴 API 연동
-      // await deleteAccount({ reason: selectedReason });
+      await withdraw(accessToken);
 
-      console.log("회원탈퇴 사유:", selectedReason);
+      clearAuth();
 
       setIsDeleteModalOpen(false);
 
       navigate("/", { replace: true });
     } catch (error) {
       console.error("회원탈퇴 실패:", error);
+      setDeleteError("회원탈퇴에 실패했습니다. 다시 시도해주세요.");
+      setIsDeleteModalOpen(false);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -155,9 +173,15 @@ const DeleteAccountPage = () => {
         </div>
       </section>
 
+      {deleteError && (
+        <p role="alert" className="mt-4 text-center text-[14px] text-error">
+          {deleteError}
+        </p>
+      )}
+
       <BottomButton
         text="탈퇴하기"
-        disabled={!selectedReason}
+        disabled={!selectedReason || isDeleting}
         onClick={handleOpenDeleteModal}
       />
 
