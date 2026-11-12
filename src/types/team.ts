@@ -13,6 +13,9 @@ export type TeamRecruitPost = {
   department: string;
   category: 'COURSE' | 'CONTEST_COMPETITION' | 'STUDY' | 'OTHER';
   teamStatus: 'RECRUITING' | 'CLOSED';
+  detail: string;
+  imageUrl: string;
+  createdAt: Date;
 };
 
 export type TeamPostRetrieveResponse = CommonResponse<TeamRecruitPost[]>;
@@ -28,16 +31,32 @@ export type TeamRecruitPostDetail = {
   userName: string;
   studentStatus: string;
   department: string;
+  character: string;
   category: string;
   teamStatus: 'RECRUITING' | 'CLOSED';
   detail: string;
-  contacts: [
-    {
-      type: string;
-      url: string;
-    },
-  ];
+  contacts: {
+    type: string;
+    url: string;
+  }[];
   imageUrls: string[];
 };
 
 export type TeamPostDetailResponse = CommonResponse<TeamRecruitPostDetail>;
+
+// 팀매칭 생성
+export type TeamCreate = {
+  title: string;
+  startAt: Date | null;
+  endAt: Date | null;
+  maxMember: number;
+  category: string | undefined;
+  detail: string;
+  contacts: {
+    type: string;
+    url: string;
+  }[];
+  imageUrls: string[];
+};
+
+export type TeamCreateRequest = CommonResponse<number>;

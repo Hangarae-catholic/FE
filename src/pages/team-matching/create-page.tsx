@@ -13,6 +13,12 @@ import Add from '/src/assets/icons/add.svg?react';
 import Minus from '/src/assets/icons/minus.svg?react';
 import Camera from '/src/assets/icons/camera.svg?react';
 import Delete from '/src/assets/icons/delete.svg?react';
+import { STUDENT_STATUS } from '../../constants/STUDENT_STATUS';
+import { Department } from '../../constants/DEPARTMENT';
+import { uploadImageToS3 } from '../../apis/s3';
+import type { TeamCreate } from '../../types/team';
+import { postTeamCreate } from '../../apis/team';
+import { CATEGORIES } from '../../constants/CATEGORY';
 
 export default function TeamCreatePage() {
   const navigate = useNavigate();
@@ -56,10 +62,47 @@ export default function TeamCreatePage() {
     }
   };
 
-  const handleSubmit = () => {
-    // 모집글 등록 후
-    alert('모집글이 등록되었습니다.');
-    navigate('/team-match');
+  // 사용자 정보 불러오기
+  const userName = '정다민';
+  const userStatus = 'YEAR_4';
+  const userDepartment = 'MEDIA_TECHNOLOGY_CONTENTS';
+
+  const handleSubmit = async () => {
+    try {
+      // 이미지 존재 시 이미지 업로드
+      // s3에 업로드한 이미지 url
+      const uploadedUrls: string[] = [];
+
+      if (selectedImages.length > 0) {
+        for (const file of selectedImages) {
+          const res = await uploadImageToS3(file);
+
+          if (res.httpStatus === '200 OK' && res.data) {
+            uploadedUrls.push(res.data?.url);
+          } else {
+            console.error('이미지 업로드 실패', res.message);
+          }
+        }
+      }
+
+      const postData: TeamCreate = {
+        title: recruitName,
+        startAt: recruitStartDate,
+        endAt: recruitEndDate,
+        maxMember: Number(recruitNumber),
+        category: CATEGORIES.find((c) => c.type === category)?.id,
+        detail: recruitContent,
+        contacts: [...(kakaoUrl ? [{ type: 'KAKAO_OPEN_CHAT', url: kakaoUrl }] : []), ...(instagramUrl ? [{ type: 'INSTAGRAM', url: instagramUrl }] : []), ...(mailUrl ? [{ type: 'ETC', url: mailUrl }] : [])],
+        imageUrls: uploadedUrls ?? [],
+      };
+
+      await postTeamCreate(postData);
+      alert('모집글이 등록되었습니다.');
+      navigate('/team-match');
+    } catch (e) {
+      console.error(e);
+      alert('게시글 작성을 실패했습니다.');
+    }
   };
 
   return (
@@ -306,7 +349,9 @@ export default function TeamCreatePage() {
         {/* 팀장 정보 */}
         <div>
           <span className='font-pretendard font-medium text-base text-gray-800 leading-6'>담당자 정보</span>
-          <p className='font-pretendard font-normal text-sm text-gray-700 leading-5.5'>정다민•4학년•미디어기술콘텐츠학부</p>
+          <p className='font-pretendard font-normal text-sm text-gray-700 leading-5.5'>
+            {userName}•{STUDENT_STATUS.find((ss) => ss.id === userStatus)?.name}•{Department.find((d) => d.id === userDepartment)?.name}
+          </p>
         </div>
 
         {/* 완료 버튼 */}

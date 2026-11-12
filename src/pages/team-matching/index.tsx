@@ -12,6 +12,7 @@ import Dropdown from 'react-dropdown';
 import { getTeamPosts } from '../../apis/team';
 import type { TeamPostRetrieveResponse } from '../../types/team';
 import { CATEGORIES } from '../../constants/CATEGORY';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 // 무한스크롤?
 
@@ -22,7 +23,7 @@ export default function TeamMatchingPage() {
   const [submittedKeyword, setSubmittedKeyword] = useState('');
 
   const options = ['최신 순', '오래된 순'];
-  const [sorted, setSorted] = useState(options[0]);
+  const [latestFirst, setLatestFirst] = useState(true);
 
   const [teamPosts, setTeamPosts] = useState<TeamPostRetrieveResponse>();
   const [loading, setLoading] = useState(true);
@@ -36,7 +37,7 @@ export default function TeamMatchingPage() {
 
         const keyword = submittedKeyword.trim() || undefined;
 
-        const data = await getTeamPosts(category, keyword);
+        const data = await getTeamPosts(category, keyword, latestFirst);
 
         setTeamPosts(data);
       } catch (error) {
@@ -47,7 +48,7 @@ export default function TeamMatchingPage() {
     };
 
     fetchTeamPosts();
-  }, [selected, submittedKeyword]);
+  }, [selected, submittedKeyword, latestFirst]);
 
   useEffect(() => {
     if (!isMoreModalOpen) return;
@@ -66,7 +67,7 @@ export default function TeamMatchingPage() {
 
   // 로딩스피너
   if (loading) {
-    return <div>loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return (
@@ -150,8 +151,8 @@ export default function TeamMatchingPage() {
             baseClassName='CustomDropdown'
             className='w-fit px-2 py-1 rounded-sm border border-gray-300 bg-white relative'
             options={options}
-            value={sorted}
-            onChange={(option) => setSorted(option.value.toString())}
+            value={latestFirst ? '최신 순' : '오래된 순'}
+            onChange={(option) => setLatestFirst(option.value === '최신 순')}
             controlClassName='flex items-center w-full flex justify-between'
             placeholderClassName='font-pretendard font-normal text-[13px] text-gray-800 select-none'
             menuClassName='absolute left-0 top-full w-full z-50 overflow-y-auto rounded-sm border border-gray-300 bg-white'
@@ -165,7 +166,7 @@ export default function TeamMatchingPage() {
       {/* 팀매칭 카드 */}
       <div className='mt-55 flex flex-col gap-4'>
         {teamPosts?.data && teamPosts.data.length > 0 ? (
-          teamPosts.data.map((tp) => <TeamCard key={tp.teamId} title={tp.title} startDate={tp.startAt} endDate={tp.endAt} writerName={tp.userName} writerMajor={tp.department} writerStatus={tp.studentStatus} category={tp.category} limitMember={tp.maxMember} currentMember={tp.maxMember - tp.remainingMember} status={tp.teamStatus} id={tp.teamId} />)
+          teamPosts.data.map((tp) => <TeamCard key={tp.teamId} title={tp.title} startDate={tp.startAt} endDate={tp.endAt} writerName={tp.userName} writerMajor={tp.department} writerStatus={tp.studentStatus} category={tp.category} limitMember={tp.maxMember} currentMember={tp.maxMember - tp.remainingMember} status={tp.teamStatus} id={tp.teamId} image={tp.imageUrl} content={tp.detail} />)
         ) : (
           <div className='flex flex-col items-center justify-center py-25 gap-3.5'>
             <Capybara className='w-25' />

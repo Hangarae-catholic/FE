@@ -8,6 +8,7 @@ import LeftArrow from '/src/assets/icons/arrow_left.svg?react';
 import { useNavigate } from 'react-router-dom';
 import type { Dispatch, SetStateAction } from 'react';
 import { formatDate } from '../../../utils/FormatDate';
+import LoadingSpinner from '../../common/LoadingSpinner';
 
 interface EventCardProps {
   id: number;
@@ -41,7 +42,11 @@ export default function EventCard({ id, recommend, unrecommend, image, location,
 
   // 로딩 스피너
   if (isLoading) {
-    return <div className='w-full h-50 px-5 py-4 flex items-center justify-center flex-col gap-2 rounded-[20px] bg-[#FEFEFE]'>loading...</div>;
+    return (
+      <div className='w-full h-50 px-5 py-4 flex items-center justify-center flex-col gap-2 rounded-[20px] bg-[#FEFEFE]'>
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   return (

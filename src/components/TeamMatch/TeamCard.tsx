@@ -30,7 +30,7 @@ export default function TeamCard({ id, image, title, content, startDate, endDate
   return (
     <div className={`flex flex-col gap-3 px-5 py-3.5 rounded-[20px] ${status === 'CLOSED' ? 'bg-gray-200' : 'bg-white'}`}>
       <div className='flex gap-2 items-center'>
-        <img src={image} alt={title} className='w-20 h-29 object-fill rounded-sm' />
+        {image && <img src={image} alt={title} className='w-20 h-29 object-fill rounded-sm' />}
         <div className='flex flex-col gap-1.5'>
           <div className='flex gap-1.5 items-center'>
             <span className={`font-pretendard font-normal text-xs py-0.5 px-2 rounded-3xl ${status === 'CLOSED' ? 'text-gray-600 bg-gray-300' : 'bg-[#DAF6DF] text-[#0D8D3D]'}`}>{status === 'CLOSED' ? '모집완료' : '모집중'}</span>
