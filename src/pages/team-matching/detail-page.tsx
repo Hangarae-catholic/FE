@@ -21,7 +21,7 @@ import { getCharacter } from '../../constants/CHARACTER';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 // 사용자 정보 가져오기
-const user = '정다민';
+const user = '이소민';
 
 export default function TeamMatchDetailPage() {
   const navigate = useNavigate();
@@ -78,7 +78,7 @@ export default function TeamMatchDetailPage() {
 
   // 로딩 스피너
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner bgColor='transparent' />;
   }
 
   return (
