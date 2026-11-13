@@ -1,5 +1,5 @@
 interface ProfileChipProps {
-  name: string;
+  name: string | undefined;
 }
 
 export default function ProfileChip({ name }: ProfileChipProps) {
