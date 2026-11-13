@@ -141,7 +141,14 @@ export default function TeamMatchDetailPage() {
         {/* 작성자 정보 */}
         <div>
           <div className='flex gap-2 items-center mt-4.5'>
-            <img src={getCharacter(post?.data?.character)?.image} alt={`${post?.data?.userName}의 프로필`} className='w-10.5 h-10.5 rounded-full object-fill' />
+            <img
+              src={getCharacter(post?.data?.character)?.image}
+              alt={`${post?.data?.userName}의 프로필`}
+              className='w-10.5 h-10.5 rounded-full object-fill'
+              style={{
+                backgroundColor: getCharacter(post?.data?.character)?.color,
+              }}
+            />
             <div className='flex flex-col'>
               <span className='font-pretendard font-normal text-[13px] text-gray-800'>{post?.data?.userName}</span>
               <span className='font-pretendard font-normal text-sm text-gray-600'>
