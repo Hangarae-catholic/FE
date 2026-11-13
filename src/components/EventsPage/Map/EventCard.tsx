@@ -8,7 +8,7 @@ import LeftArrow from '/src/assets/icons/arrow_left.svg?react';
 import { useNavigate } from 'react-router-dom';
 import type { Dispatch, SetStateAction } from 'react';
 import { formatDate } from '../../../utils/FormatDate';
-import LoadingSpinner from '../../common/LoadingSpinner';
+import CardLoadingSpinner from '../../common/CardLoadingSpinner';
 
 interface EventCardProps {
   id: number;
@@ -36,15 +36,12 @@ export default function EventCard({ id, recommend, unrecommend, image, location,
   // 서버에서 받은 사용자 반응
   const isLiked = userReaction === 'LIKE';
   const isDisLiked = userReaction === 'DISLIKE';
-  // 추천 수 계산
-  // const currentRecommend = recommend ? recommend + Number(isLiked) - Number(!!liked) : 0;
-  // const currentUnrecommend = unrecommend ? unrecommend + Number(isDisLiked) - Number(!!disLiked) : 0;
 
   // 로딩 스피너
   if (isLoading) {
     return (
       <div className='w-full h-50 px-5 py-4 flex items-center justify-center flex-col gap-2 rounded-[20px] bg-[#FEFEFE]'>
-        <LoadingSpinner bgColor='transparent' />
+        <CardLoadingSpinner />
       </div>
     );
   }
