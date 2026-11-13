@@ -13,10 +13,10 @@ import { getTeamPosts } from '../../apis/team';
 import type { TeamPostRetrieveResponse } from '../../types/team';
 import { CATEGORIES } from '../../constants/CATEGORY';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-
-// 무한스크롤?
+import { useNavigate } from 'react-router-dom';
 
 export default function TeamMatchingPage() {
+  const navigate = useNavigate();
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
   const [selected, setSelected] = useState<string>('전체');
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -92,13 +92,8 @@ export default function TeamMatchingPage() {
               createPortal(
                 <div className='fixed inset-x-0 top-0 z-50 mx-auto w-full max-w-120'>
                   <div className='absolute right-5 top-10 flex w-34 flex-col rounded-xl bg-[#fcfbfb] px-3'>
-                    <button type='button' className='flex items-center justify-between border-b border-gray-200 py-2'>
+                    <button type='button' className='flex items-center justify-between border-b border-gray-200 py-2' onClick={() => navigate(`/my/activity`)}>
                       <span className='font-pretendard text-sm font-normal text-gray-800'>내 게시물</span>
-                      <RightArrow className='h-2.5 w-2.5' />
-                    </button>
-
-                    <button type='button' className='flex items-center justify-between py-2'>
-                      <span className='font-pretendard text-sm font-normal text-gray-800'>최근 본</span>
                       <RightArrow className='h-2.5 w-2.5' />
                     </button>
                   </div>
