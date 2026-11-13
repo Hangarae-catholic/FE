@@ -11,7 +11,7 @@ import Modal from '../components/common/Modal';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/common/TopBar';
 import BottomSheet from '../components/common/BottomSheet/BottomSheet';
-import { LOCATIONS } from '../constants/LOCATIONS';
+import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
 
 const mock = [
   {
@@ -275,7 +275,7 @@ export default function AddEventPage() {
           onClose={() => setShowBottomSheet(false)}
           searchable
           searchPlaceholder='장소를 검색해주세요'
-          options={LOCATIONS}
+          options={buildingCoordinates.map((bc) => bc.name)}
           onChange={(values: string[]) => {
             setBottomSheetSelected(values[0] ?? '');
           }}
