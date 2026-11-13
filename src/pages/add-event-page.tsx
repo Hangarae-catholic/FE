@@ -11,15 +11,19 @@ import Modal from '../components/common/Modal';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/common/TopBar';
 import BottomSheet from '../components/common/BottomSheet/BottomSheet';
-import { LOCATIONS } from '../constants/LOCATIONS';
+import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
+import { UserStore } from '../store/UserStore';
+import { STUDENT_STATUS } from '../constants/STUDENT_STATUS';
+import { Department } from '../constants/DEPARTMENT';
+import { uploadImageToS3 } from '../apis/s3';
+import type { EventRegister } from '../types/events';
+import { formatDateTimeToISO } from '../utils/formatDateTimeToISO';
+import { postEventRegister } from '../apis/events';
 
-const mock = [
-  {
-    name: '정다민',
-    grade: '4학년',
-    major: '미디어기술콘텐츠학부',
-  },
-];
+// 사용자 정보 불러오기
+const userName = UserStore.getState().user?.name;
+const userStatus = STUDENT_STATUS.find((ss) => ss.id === UserStore.getState().user?.status)?.name;
+const userDepartment = Department.find((d) => d.id === UserStore.getState().user?.departments?.[0].name)?.name;
 
 export default function AddEventPage() {
   const navigate = useNavigate();
@@ -86,10 +90,38 @@ export default function AddEventPage() {
     setEventName(value);
   };
 
-  const handleSubmit = () => {
-    // 문구 수정 또는 알림 기능 수정
-    alert('등록이 완료되었습니다. 마이페이지에서 확인 가능합니다.');
-    navigate('/home');
+  const handleSubmit = async () => {
+    try {
+      // 이미지 존재 시 이미지 업로드
+      // s3에 업로드한 이미지 url
+      const uploadedUrls: string[] = [];
+      if (selectedImages.length > 0) {
+        for (const file of selectedImages) {
+          const res = await uploadImageToS3(file);
+          if (res.httpStatus === '200 OK' && res.data) {
+            uploadedUrls.push(res.data?.url);
+          } else {
+            console.error('이미지 업로드 실패', res.message);
+          }
+        }
+      }
+      const postData: EventRegister = {
+        name: eventName,
+        responsible: eventOrgan,
+        startAt: formatDateTimeToISO(startEventDate, startTime),
+        endAt: formatDateTimeToISO(endEventDate, endTime),
+        location: `${buildingCoordinates.find((bc) => bc.name === bottomSheetSelected)?.id}`,
+        detailLocation: detailLocation,
+        information: eventContent,
+        imageUrls: uploadedUrls ?? [],
+      };
+      await postEventRegister(postData);
+      alert('행사가 등록되었습니다.');
+      navigate('/home');
+    } catch (e) {
+      console.error(e);
+      alert('행사 등록을 실패했습니다.');
+    }
   };
 
   return (
@@ -253,12 +285,12 @@ export default function AddEventPage() {
       <div className='mt-4.5'>
         <span className='font-pretendard font-medium text-base text-gray-800 leading-6'>담당자 정보</span>
         <p className='font-pretendard font-normal text-sm text-gray-700 leading-5.5'>
-          {mock[0].name}•{mock[0].grade}•{mock[0].major}
+          {userName}•{userStatus}•{userDepartment}
         </p>
       </div>
 
       {/* 완료 버튼 */}
-      <button type='button' className={`w-full mt-8.5 bg-main py-3.5 font-pretendard font-semibold text-base text-gray-50 rounded-xl disabled:bg-gray-400`} onClick={() => setIsOpenSubmitModal(true)} disabled={!eventName || !eventOrgan || !isEndDateSelected || !isStartDateSelected || !isEndTimeSelected || !isStartTimeSelected || !!bottomSheetSelected}>
+      <button type='button' className={`w-full mt-8.5 bg-main py-3.5 font-pretendard font-semibold text-base text-gray-50 rounded-xl disabled:bg-gray-400`} onClick={() => setIsOpenSubmitModal(true)} disabled={!eventName || !eventOrgan || !isEndDateSelected || !isStartDateSelected || !isEndTimeSelected || !isStartTimeSelected || !bottomSheetSelected}>
         완료
       </button>
 
@@ -271,11 +303,12 @@ export default function AddEventPage() {
       {showBottomSheet && (
         <BottomSheet
           title='행사 위치 선택'
+          initialHeight={1}
           isOpen={showBottomSheet}
           onClose={() => setShowBottomSheet(false)}
           searchable
           searchPlaceholder='장소를 검색해주세요'
-          options={LOCATIONS}
+          options={buildingCoordinates.map((bc) => bc.name)}
           onChange={(values: string[]) => {
             setBottomSheetSelected(values[0] ?? '');
           }}

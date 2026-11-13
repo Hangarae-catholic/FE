@@ -13,14 +13,15 @@ import { getTeamPosts } from '../../apis/team';
 import type { TeamPostRetrieveResponse } from '../../types/team';
 import { CATEGORIES } from '../../constants/CATEGORY';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-
-// 무한스크롤?
+import { useNavigate } from 'react-router-dom';
 
 export default function TeamMatchingPage() {
+  const navigate = useNavigate();
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
   const [selected, setSelected] = useState<string>('전체');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [submittedKeyword, setSubmittedKeyword] = useState('');
+  const [isKeywordSubmitted, setIsKeywordSubmitted] = useState(false);
 
   const options = ['최신 순', '오래된 순'];
   const [latestFirst, setLatestFirst] = useState(true);
@@ -40,6 +41,9 @@ export default function TeamMatchingPage() {
         const data = await getTeamPosts(category, keyword, latestFirst);
 
         setTeamPosts(data);
+        if (submittedKeyword) {
+          setIsKeywordSubmitted(true);
+        }
       } catch (error) {
         console.error('팀 모집글 조회 실패:', error);
       } finally {
@@ -88,13 +92,8 @@ export default function TeamMatchingPage() {
               createPortal(
                 <div className='fixed inset-x-0 top-0 z-50 mx-auto w-full max-w-120'>
                   <div className='absolute right-5 top-10 flex w-34 flex-col rounded-xl bg-[#fcfbfb] px-3'>
-                    <button type='button' className='flex items-center justify-between border-b border-gray-200 py-2'>
+                    <button type='button' className='flex items-center justify-between border-b border-gray-200 py-2' onClick={() => navigate(`/my/activity`)}>
                       <span className='font-pretendard text-sm font-normal text-gray-800'>내 게시물</span>
-                      <RightArrow className='h-2.5 w-2.5' />
-                    </button>
-
-                    <button type='button' className='flex items-center justify-between py-2'>
-                      <span className='font-pretendard text-sm font-normal text-gray-800'>최근 본</span>
                       <RightArrow className='h-2.5 w-2.5' />
                     </button>
                   </div>
@@ -133,6 +132,7 @@ export default function TeamMatchingPage() {
               onClick={() => {
                 setSearchKeyword('');
                 setSubmittedKeyword('');
+                setIsKeywordSubmitted(false);
               }}
               className='shrink-0'
               aria-label='검색어 삭제'
@@ -146,7 +146,14 @@ export default function TeamMatchingPage() {
         <CategoryGroup selected={selected} setSelected={setSelected} />
 
         {/* 정렬 드롭다운 */}
-        <div className='mb-3 flex justify-end'>
+        <div className={`mb-3 flex items-center ${isKeywordSubmitted ? 'justify-between ' : 'justify-end'}`}>
+          {isKeywordSubmitted && (
+            <p className='font-pretendard font-normal text-sm flex items-center gap-1.5 text-gray-800'>
+              '{submittedKeyword}'<span className='text-gray-700'>검색 결과</span>
+              {teamPosts?.data?.length}개
+            </p>
+          )}
+
           <Dropdown
             baseClassName='CustomDropdown'
             className='w-fit px-2 py-1 rounded-sm border border-gray-300 bg-white relative'

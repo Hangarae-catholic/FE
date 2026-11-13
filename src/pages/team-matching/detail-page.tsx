@@ -19,9 +19,10 @@ import { STUDENT_STATUS } from '../../constants/STUDENT_STATUS';
 import { formatDate } from '../../utils/FormatDate';
 import { getCharacter } from '../../constants/CHARACTER';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { UserStore } from '../../store/UserStore';
 
 // 사용자 정보 가져오기
-const user = '이소민';
+const userId = UserStore.getState().user?.userId;
 
 export default function TeamMatchDetailPage() {
   const navigate = useNavigate();
@@ -95,7 +96,8 @@ export default function TeamMatchDetailPage() {
       {isMoreModalOpen && <div className='h-full fixed inset-x-0 top-0 bottom-22 z-40 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
       {/* 상단바 */}
       <div>
-        {user === post?.data?.userName ? <TopBar title='팀 매칭 상세' rightIcon={More} rightOnClick={() => setIsMoreModalOpen((prev) => !prev)} isMoreModalOpen={isMoreModalOpen} modalBtn1='글 수정하기' modalBtn2='글 삭제하기' onClickModalBtn1={() => navigate(`/team-match/edit/${postId}`)} onClickModalBtn2={() => setIsDeleteModalOpen(true)} /> : <TopBar title='팀 매칭 상세' />}
+        {/* userId값과 비교 */}
+        {userId === post?.data?.userId ? <TopBar title='팀 매칭 상세' rightIcon={More} rightOnClick={() => setIsMoreModalOpen((prev) => !prev)} isMoreModalOpen={isMoreModalOpen} modalBtn1='글 수정하기' modalBtn2='글 삭제하기' onClickModalBtn1={() => navigate(`/team-match/edit/${postId}`)} onClickModalBtn2={() => setIsDeleteModalOpen(true)} /> : <TopBar title='팀 매칭 상세' />}
 
         {isDeleteModalOpen && <Modal title='팀 모집글을 삭제할까요?' content='삭제한 모집글은 복구할 수 없어요.' leftBtn='취소' cancel={handleCancel} rightBtn='삭제하기' rightBtnColor='RED' onClick={handleDelete} />}
       </div>
@@ -139,7 +141,14 @@ export default function TeamMatchDetailPage() {
         {/* 작성자 정보 */}
         <div>
           <div className='flex gap-2 items-center mt-4.5'>
-            <img src={getCharacter(post?.data?.character)?.image} alt={`${post?.data?.userName}의 프로필`} className='w-10.5 h-10.5 rounded-full object-fill' />
+            <img
+              src={getCharacter(post?.data?.character)?.image}
+              alt={`${post?.data?.userName}의 프로필`}
+              className='w-10.5 h-10.5 rounded-full object-fill'
+              style={{
+                backgroundColor: getCharacter(post?.data?.character)?.color,
+              }}
+            />
             <div className='flex flex-col'>
               <span className='font-pretendard font-normal text-[13px] text-gray-800'>{post?.data?.userName}</span>
               <span className='font-pretendard font-normal text-sm text-gray-600'>

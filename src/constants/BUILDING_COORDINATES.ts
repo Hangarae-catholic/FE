@@ -96,4 +96,17 @@ export const buildingCoordinates: BuildingCoordinate[] = [
     x: 22,
     y: 70,
   },
+  // 좌표 조정
+  {
+    name: '국제관',
+    id: 'INTERNATIONAL_HALL',
+    x: 13,
+    y: 28,
+  },
+  {
+    name: '스머프 동산',
+    id: 'SMURF_HILL',
+    x: 59,
+    y: 57,
+  },
 ];

@@ -17,8 +17,7 @@ import useGetTodayEventRecommend from '../hooks/Home/useGetTodayEventRecommend';
 import { endOfDay, format, isWithinInterval, startOfDay } from 'date-fns';
 import { getEventRetreive } from '../apis/events';
 import type { EventRetreiveResponse } from '../types/events';
-
-const mockInterests = ['IT•소프트웨어', 'AI•데이터', 'AI•데이터', '취업•창업•대외활동'];
+import { UserStore } from '../store/UserStore';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -157,6 +156,10 @@ export default function HomePage() {
   // 오늘 날짜 포맷팅 'm월 d일 e요일'
   const todayDate = format(new Date(), 'M월 d일 EEEE', { locale: ko });
 
+  // 사용자 정보 불러오기
+  const userNickname = UserStore.getState().user?.nickname;
+  const userInterests = UserStore.getState().user?.interests;
+
   if (eventLoading || isLoadingRecommend) {
     return <div>loading...</div>;
   }
@@ -172,7 +175,7 @@ export default function HomePage() {
         <div className='mb-3'>
           <p className='font-pretendard font-light text-2xl text-white leading-8.5 max-[425px]:text-xl'>{todayDate}</p>
           <span className='flex gap-1 items-center font-pretendard font-normal text-2xl text-white leading-8.5 max-[425px]:text-xl'>
-            <span className='font-bold'>아이브</span>님
+            <span className='font-bold'>{userNickname}</span>님
           </span>
           <p className='flex flex-col font-pretendard font-light text-2xl text-white leading-8.5 max-[425px]:text-xl'>
             캠퍼스 곳곳의 <span>행사를 만나봐요!</span>
@@ -192,7 +195,7 @@ export default function HomePage() {
         <Swiper loop={true} pagination={{ el: '.custom-pagination', type: 'bullets', clickable: true }} spaceBetween={10} autoplay={{ delay: 5000 }} modules={[Pagination, Autoplay]}>
           <>
             <SwiperSlide>
-              <ProfileCard interests={mockInterests} />
+              <ProfileCard interests={userInterests} />
             </SwiperSlide>
             {Recommend?.map((r, idx) => {
               return (

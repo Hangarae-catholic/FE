@@ -19,6 +19,7 @@ import { uploadImageToS3 } from '../../apis/s3';
 import type { TeamCreate } from '../../types/team';
 import { postTeamCreate } from '../../apis/team';
 import { CATEGORIES } from '../../constants/CATEGORY';
+import { UserStore } from '../../store/UserStore';
 
 export default function TeamCreatePage() {
   const navigate = useNavigate();
@@ -63,9 +64,9 @@ export default function TeamCreatePage() {
   };
 
   // 사용자 정보 불러오기
-  const userName = '정다민';
-  const userStatus = 'YEAR_4';
-  const userDepartment = 'MEDIA_TECHNOLOGY_CONTENTS';
+  const userName = UserStore.getState().user?.name;
+  const userStatus = STUDENT_STATUS.find((ss) => ss.id === UserStore.getState().user?.status)?.name;
+  const userDepartment = Department.find((d) => String(d.id) === String(UserStore.getState().user?.departments?.[0].name))?.name;
 
   const handleSubmit = async () => {
     try {
@@ -350,7 +351,7 @@ export default function TeamCreatePage() {
         <div>
           <span className='font-pretendard font-medium text-base text-gray-800 leading-6'>담당자 정보</span>
           <p className='font-pretendard font-normal text-sm text-gray-700 leading-5.5'>
-            {userName}•{STUDENT_STATUS.find((ss) => ss.id === userStatus)?.name}•{Department.find((d) => d.id === userDepartment)?.name}
+            {userName}•{userStatus}•{userDepartment}
           </p>
         </div>
 
