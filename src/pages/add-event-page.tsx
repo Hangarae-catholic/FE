@@ -110,7 +110,8 @@ export default function AddEventPage() {
         responsible: eventOrgan,
         startAt: formatDateTimeToISO(startEventDate, startTime),
         endAt: formatDateTimeToISO(endEventDate, endTime),
-        location: `${buildingCoordinates.find((bc) => bc.name === bottomSheetSelected)?.id} ${detailLocation}`,
+        location: `${buildingCoordinates.find((bc) => bc.name === bottomSheetSelected)?.id}`,
+        detailLocation: detailLocation,
         information: eventContent,
         imageUrls: uploadedUrls ?? [],
       };

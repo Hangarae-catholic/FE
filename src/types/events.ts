@@ -69,6 +69,7 @@ export type EventRegister = {
   startAt: string;
   endAt: string;
   location: string;
+  detailLocation: string;
   information: string;
   imageUrls: string[];
 };
