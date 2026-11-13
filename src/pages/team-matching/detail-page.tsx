@@ -96,8 +96,8 @@ export default function TeamMatchDetailPage() {
       {isMoreModalOpen && <div className='h-full fixed inset-x-0 top-0 bottom-22 z-40 bg-gray-700/23 w-full max-w-120 left-1/2 -translate-x-1/2' onClick={() => setIsMoreModalOpen(false)} aria-hidden='true' />}
       {/* 상단바 */}
       <div>
-        {/* userId */}
-        {userId === post?.data?.userName ? <TopBar title='팀 매칭 상세' rightIcon={More} rightOnClick={() => setIsMoreModalOpen((prev) => !prev)} isMoreModalOpen={isMoreModalOpen} modalBtn1='글 수정하기' modalBtn2='글 삭제하기' onClickModalBtn1={() => navigate(`/team-match/edit/${postId}`)} onClickModalBtn2={() => setIsDeleteModalOpen(true)} /> : <TopBar title='팀 매칭 상세' />}
+        {/* userId값과 비교 */}
+        {userId === post?.data?.userId ? <TopBar title='팀 매칭 상세' rightIcon={More} rightOnClick={() => setIsMoreModalOpen((prev) => !prev)} isMoreModalOpen={isMoreModalOpen} modalBtn1='글 수정하기' modalBtn2='글 삭제하기' onClickModalBtn1={() => navigate(`/team-match/edit/${postId}`)} onClickModalBtn2={() => setIsDeleteModalOpen(true)} /> : <TopBar title='팀 매칭 상세' />}
 
         {isDeleteModalOpen && <Modal title='팀 모집글을 삭제할까요?' content='삭제한 모집글은 복구할 수 없어요.' leftBtn='취소' cancel={handleCancel} rightBtn='삭제하기' rightBtnColor='RED' onClick={handleDelete} />}
       </div>

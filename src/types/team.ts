@@ -28,6 +28,7 @@ export type TeamRecruitPostDetail = {
   endAt: Date;
   maxMember: number;
   remainingMember: number;
+  userId: number;
   userName: string;
   studentStatus: string;
   department: string;
