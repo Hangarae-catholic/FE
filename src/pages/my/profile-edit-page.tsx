@@ -1,6 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { CHARACTERS, type CharacterType } from "../../constants/CHARACTER";
+import { Department } from "../../constants/DEPARTMENT";
+import { Division } from "../../constants/DIVISION";
+import { Interest } from "../../constants/INTEREST";
+import { STUDENT_STATUS } from "../../constants/STUDENT_STATUS";
+import { AuthStore } from "../../store/AuthStore";
+import { UserStore } from "../../store/UserStore";
+import { getProfile, updateProfile } from "../../apis/user";
+import type { UserData, UpdateProfileRequest } from "../../types/user";
 
 import TopBar from "../../components/common/TopBar";
 import BottomButton from "../../components/common/BottomButton";
@@ -10,33 +19,100 @@ import Modal from "../../components/common/Modal";
 import arrowDown from "../../assets/icons/arrow_down.svg";
 import deleteOrange from "../../assets/icons/delete-orange.svg";
 import check from "../../assets/icons/check.svg";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
-// 학과 데이터: 추후 API 데이터로 교체
-const departmentData: Record<string, string[]> = {
-  경영대학: ["경영학과", "회계학과"],
-  바이오헬스융합대학: ["바이오메디컬소프트웨어학과", "의생명과학과"],
-  AI전자정보융합대학: [
-    "미디어기술콘텐츠학과",
-    "컴퓨터정보공학부",
-    "인공지능학과",
+const departmentIdsByDivision: Record<string, string[]> = {
+  BUSINESS: ["BUSINESS_ADMINISTRATION", "ACCOUNTING"],
+  GLOBAL_BUSINESS_SCHOOL: [
+    "INTERNATIONAL_BUSINESS",
+    "TAX_ACCOUNTING_FINANCE",
+    "IT_FINANCE",
   ],
-  약학대학: ["약학과"],
-  인문사회계열: ["국어국문학과", "영어영문학과", "심리학과"],
-  자연공학계열: ["수학과", "화학과"],
+  BIO_HEALTH_CONVERGENCE: [
+    "BIOTECHNOLOGY",
+    "BIOMEDICAL_CHEMICAL_ENGINEERING",
+    "BIOLOGICS_ENGINEERING",
+    "AI_BIOMEDICAL_ENGINEERING",
+    "BIOMEDICAL_SCIENCE",
+    "BIOMEDICAL_SOFTWARE",
+  ],
+  AI_ELECTRONICS_INFORMATION_CONVERGENCE: [
+    "COMPUTER_INFORMATION_ENGINEERING",
+    "MEDIA_TECHNOLOGY_CONTENTS",
+    "INFORMATION_COMMUNICATION_ELECTRONICS_ENGINEERING",
+    "ARTIFICIAL_INTELLIGENCE",
+    "DATA_SCIENCE",
+  ],
+  PHARMACY: ["PHARMACY"],
+  HUMANITIES: ["KOREAN_LANGUAGE_LITERATURE", "PHILOSOPHY", "KOREAN_HISTORY"],
+  LANGUAGES: [
+    "ENGLISH_LANGUAGE_LITERATURE",
+    "CHINESE_LANGUAGE_CULTURE",
+    "JAPANESE_LANGUAGE_CULTURE",
+    "FRENCH_CULTURE",
+  ],
+  SOCIAL_SCIENCES: [
+    "SOCIAL_WELFARE",
+    "PSYCHOLOGY",
+    "SOCIOLOGY",
+    "CHILD_STUDIES",
+  ],
+  SPECIAL_EDUCATION: ["SPECIAL_EDUCATION"],
+  INTERNATIONAL_LAW_ECONOMICS: [
+    "INTERNATIONAL_STUDIES",
+    "LAW",
+    "ECONOMICS",
+    "PUBLIC_ADMINISTRATION",
+  ],
+  GLOBAL_BUSINESS: ["GLOBAL_BUSINESS"],
+  NATURAL_SCIENCES: ["CHEMISTRY", "MATHEMATICS", "PHYSICS"],
+  ENGINEERING: ["ENERGY_ENVIRONMENTAL_ENGINEERING"],
+  HUMAN_ECOLOGY: [
+    "SPATIAL_DESIGN_CONSUMER_STUDIES",
+    "CLOTHING_TEXTILES",
+    "FOOD_NUTRITION",
+  ],
+  MUSIC: ["MUSIC"],
+  APPLIED_ARTS: ["ART_MEDIA_CONVERGENCE"],
+  TEACHER_TRAINING: ["TEACHER_TRAINING"],
+  LIBERAL_STUDIES: ["LIBERAL_STUDIES"],
+  INTERDISCIPLINARY_STUDIES: ["INTERDISCIPLINARY_STUDIES"],
 };
 
-const academicStatuses = ["1학년", "2학년", "3학년", "4학년", "휴학", "졸업"];
+const colleges = Division.map((item) => item.name);
+const academicStatuses = STUDENT_STATUS.map((item) => item.name);
+const interestOptions = Interest.map((item) => item.name);
 
-const interestOptions = [
-  "경영·회계·금융",
-  "경제·무역·국제",
-  "IT·소프트웨어",
-  "AI·데이터",
-  "디자인·패션·공간",
-  "콘텐츠·미디어·예술",
-  "자격증·시험",
-  "취업·창업·대외활동",
-];
+const getDepartmentOptions = (collegeName: string): string[] => {
+  const divisionId = Division.find((item) => item.name === collegeName)?.id;
+  if (!divisionId) return [];
+  const allowedIds = new Set(departmentIdsByDivision[divisionId] ?? []);
+  return Department.filter((item) => allowedIds.has(item.id)).map(
+    (item) => item.name,
+  );
+};
+
+const nameToId = (
+  items: readonly { id: string; name: string }[],
+  name: string,
+): string => items.find((item) => item.name === name)?.id ?? "";
+const idToName = (
+  items: readonly { id: string; name: string }[],
+  id: string,
+): string => items.find((item) => item.id === id)?.name ?? id;
+const collegeForDivision = (divisionId: string): string =>
+  idToName(Division, divisionId);
+const getDepartmentId = (name: string): string => nameToId(Department, name);
+
+const characterKeyFromApi = (value: string): CharacterType => {
+  const result = (
+    Object.entries(CHARACTERS) as [
+      CharacterType,
+      (typeof CHARACTERS)[CharacterType],
+    ][]
+  ).find(([key, character]) => key === value || character.apiValue === value);
+  return result?.[0] ?? "THUMBS_UP";
+};
 
 interface ProfileForm {
   nickname: string;
@@ -45,24 +121,49 @@ interface ProfileForm {
   primaryDepartment: string;
   doubleMajorCollege: string;
   doubleMajorDepartment: string;
+  minorCollege: string;
+  minorDepartment: string;
   academicStatus: string;
   interests: string[];
 }
 
-const initialProfile: ProfileForm = {
-  nickname: "아이브",
+const emptyProfile: ProfileForm = {
+  nickname: "",
   character: "THUMBS_UP",
-  primaryCollege: "AI전자정보융합대학",
-  primaryDepartment: "미디어기술콘텐츠학과",
-  doubleMajorCollege: "AI전자정보융합대학",
-  doubleMajorDepartment: "컴퓨터정보공학부",
-  academicStatus: "휴학",
-  interests: [
-    "IT·소프트웨어",
-    "AI·데이터",
-    "자격증·시험",
-    "취업·창업·대외활동",
-  ],
+  primaryCollege: "",
+  primaryDepartment: "",
+  doubleMajorCollege: "",
+  doubleMajorDepartment: "",
+  minorCollege: "",
+  minorDepartment: "",
+  academicStatus: "",
+  interests: [],
+};
+
+const toForm = (user: UserData): ProfileForm => {
+  const primary = user.departments?.find((dept) => dept.type === "PRIMARY");
+  const minor = user.departments?.find((dept) => dept.type === "MINOR");
+  const doubleMajor = user.departments?.find(
+    (dept) => !["PRIMARY", "MINOR"].includes(dept.type),
+  );
+  return {
+    nickname: user.nickname ?? "",
+    character: characterKeyFromApi(user.character),
+    primaryCollege: primary ? collegeForDivision(primary.division) : "",
+    primaryDepartment: primary ? idToName(Department, primary.name) : "",
+    doubleMajorCollege: doubleMajor
+      ? collegeForDivision(doubleMajor.division)
+      : "",
+    doubleMajorDepartment: doubleMajor
+      ? idToName(Department, doubleMajor.name)
+      : "",
+    minorCollege: minor ? collegeForDivision(minor.division) : "",
+    minorDepartment: minor ? idToName(Department, minor.name) : "",
+    academicStatus: idToName(STUDENT_STATUS, user.status),
+    interests: (user.interests ?? []).map((item) =>
+      idToName(Interest, item.name),
+    ),
+  };
 };
 
 type SheetType =
@@ -70,6 +171,8 @@ type SheetType =
   | "primaryDepartment"
   | "doubleMajorCollege"
   | "doubleMajorDepartment"
+  | "minorCollege"
+  | "minorDepartment"
   | "academicStatus"
   | "interests"
   | null;
@@ -117,19 +220,53 @@ const SelectField = ({ value, placeholder, onClick }: SelectFieldProps) => {
 const ProfileEditPage = () => {
   const navigate = useNavigate();
 
-  const [profile, setProfile] = useState<ProfileForm>({ ...initialProfile });
-
-  const [activeSheet, setActiveSheet] = useState<SheetType>(null);
-
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-
-  const [hasDoubleMajor, setHasDoubleMajor] = useState(
-    Boolean(
-      initialProfile.doubleMajorCollege || initialProfile.doubleMajorDepartment,
-    ),
+  const accessToken = AuthStore((state) => state.accessToken);
+  const setUser = UserStore((state) => state.setUser);
+  const [profile, setProfile] = useState<ProfileForm>(emptyProfile);
+  const [originalProfile, setOriginalProfile] = useState<ProfileForm | null>(
+    null,
   );
+  const [activeSheet, setActiveSheet] = useState<SheetType>(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [hasDoubleMajor, setHasDoubleMajor] = useState(false);
+  const [hasMinor, setHasMinor] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const updateProfile = <K extends keyof ProfileForm>(
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (!accessToken) {
+        setErrorMessage("로그인 정보가 없습니다. 다시 로그인해주세요.");
+        setIsLoading(false);
+        return;
+      }
+      try {
+        const response = await getProfile(accessToken);
+        if (!response.data) throw new Error("프로필 조회 결과가 없습니다.");
+        if (cancelled) return;
+        const loaded = toForm(response.data);
+        setProfile(loaded);
+        setOriginalProfile(loaded);
+        setHasDoubleMajor(Boolean(loaded.doubleMajorDepartment));
+        setHasMinor(Boolean(loaded.minorDepartment));
+        setUser(response.data);
+      } catch (error) {
+        if (cancelled) return;
+        console.error("프로필 조회 실패:", error);
+        setErrorMessage("프로필 정보를 불러오지 못했어요. 다시 진입해주세요.");
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, setUser]);
+
+  const updateMyProfile = <K extends keyof ProfileForm>(
     key: K,
     value: ProfileForm[K],
   ) => {
@@ -139,25 +276,26 @@ const ProfileEditPage = () => {
     }));
   };
 
-  const isChanged =
-    JSON.stringify(profile) !== JSON.stringify(initialProfile) ||
-    hasDoubleMajor !==
-      Boolean(
-        initialProfile.doubleMajorCollege ||
-        initialProfile.doubleMajorDepartment,
-      );
+  const isChanged = Boolean(
+    originalProfile &&
+    (JSON.stringify(profile) !== JSON.stringify(originalProfile) ||
+      hasDoubleMajor !== Boolean(originalProfile.doubleMajorDepartment) ||
+      hasMinor !== Boolean(originalProfile.minorDepartment)),
+  );
 
   const isValid =
+    !isLoading &&
+    Boolean(originalProfile) &&
     profile.nickname.trim().length > 0 &&
     profile.primaryCollege !== "" &&
     profile.primaryDepartment !== "" &&
     profile.academicStatus !== "" &&
     profile.interests.length > 0 &&
+    profile.interests.length <= 4 &&
     (!hasDoubleMajor ||
-      (profile.doubleMajorCollege !== "" &&
-        profile.doubleMajorDepartment !== ""));
+      Boolean(profile.doubleMajorCollege && profile.doubleMajorDepartment)) &&
+    (!hasMinor || Boolean(profile.minorCollege && profile.minorDepartment));
 
-  // 뒤로가기
   const handleBack = () => {
     if (isChanged) {
       setIsCancelModalOpen(true);
@@ -167,23 +305,54 @@ const ProfileEditPage = () => {
     navigate(-1);
   };
 
-  // 저장
-  const handleSave = () => {
-    if (!isValid) return;
-
-    const updatedProfile = {
-      ...profile,
+  const handleSave = async () => {
+    if (!isValid || isSaving || !accessToken) return;
+    const primaryId = getDepartmentId(profile.primaryDepartment);
+    const doubleId = hasDoubleMajor
+      ? getDepartmentId(profile.doubleMajorDepartment)
+      : null;
+    const minorId = hasMinor ? getDepartmentId(profile.minorDepartment) : null;
+    const statusId = nameToId(STUDENT_STATUS, profile.academicStatus);
+    const interestIds = profile.interests.map((item) =>
+      nameToId(Interest, item),
+    );
+    if (
+      !primaryId ||
+      !statusId ||
+      interestIds.some((id) => !id) ||
+      (hasDoubleMajor && !doubleId) ||
+      (hasMinor && !minorId)
+    ) {
+      setErrorMessage("선택한 전공, 학적 또는 관심 분야 값을 확인해주세요.");
+      return;
+    }
+    const body: UpdateProfileRequest = {
       nickname: profile.nickname.trim(),
-      doubleMajorCollege: hasDoubleMajor ? profile.doubleMajorCollege : "",
-      doubleMajorDepartment: hasDoubleMajor
-        ? profile.doubleMajorDepartment
-        : "",
+      character: CHARACTERS[profile.character].apiValue,
+      status: statusId,
+      primaryDepartment: primaryId,
+      doubleMajorDepartment: doubleId,
+      minorDepartment: minorId,
+      interests: interestIds,
     };
-
-    // TODO: 프로필 수정 API 연동
-    console.log("수정된 프로필:", updatedProfile);
-
-    navigate("/my");
+    setIsSaving(true);
+    setErrorMessage("");
+    try {
+      const response = await updateProfile(body, accessToken);
+      if (!response.data)
+        throw new Error("프로필 수정 응답 데이터가 없습니다.");
+      setUser(response.data);
+      navigate("/my", { replace: true });
+    } catch (error) {
+      console.error("프로필 수정 실패:", error);
+      setErrorMessage(
+        axios.isAxiosError(error)
+          ? (error.response?.data?.message ?? "프로필 수정에 실패했습니다.")
+          : "프로필 수정에 실패했습니다. 다시 시도해주세요.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDeleteDoubleMajor = () => {
@@ -196,14 +365,17 @@ const ProfileEditPage = () => {
     }));
   };
 
+  const handleDeleteMinor = () => {
+    setHasMinor(false);
+    setProfile((prev) => ({ ...prev, minorCollege: "", minorDepartment: "" }));
+  };
+
   const handleRemoveInterest = (interest: string) => {
-    updateProfile(
+    updateMyProfile(
       "interests",
       profile.interests.filter((item) => item !== interest),
     );
   };
-
-  const colleges = Object.keys(departmentData);
 
   const getSheetConfig = () => {
     switch (activeSheet) {
@@ -224,10 +396,10 @@ const ProfileEditPage = () => {
       case "primaryDepartment":
         return {
           title: "제1전공 학과 선택",
-          options: departmentData[profile.primaryCollege] ?? [],
+          options: getDepartmentOptions(profile.primaryCollege),
           selected: [profile.primaryDepartment],
           onChange: (values: string[]) => {
-            updateProfile("primaryDepartment", values[0] ?? "");
+            updateMyProfile("primaryDepartment", values[0] ?? "");
           },
         };
 
@@ -248,20 +420,41 @@ const ProfileEditPage = () => {
       case "doubleMajorDepartment":
         return {
           title: "복수 전공 학과 선택",
-          options: departmentData[profile.doubleMajorCollege] ?? [],
+          options: getDepartmentOptions(profile.doubleMajorCollege),
           selected: [profile.doubleMajorDepartment],
           onChange: (values: string[]) => {
-            updateProfile("doubleMajorDepartment", values[0] ?? "");
+            updateMyProfile("doubleMajorDepartment", values[0] ?? "");
           },
         };
 
+      case "minorCollege":
+        return {
+          title: "부전공 계열 선택",
+          options: colleges,
+          selected: [profile.minorCollege],
+          onChange: (values: string[]) => {
+            setProfile((prev) => ({
+              ...prev,
+              minorCollege: values[0] ?? "",
+              minorDepartment: "",
+            }));
+          },
+        };
+      case "minorDepartment":
+        return {
+          title: "부전공 학과 선택",
+          options: getDepartmentOptions(profile.minorCollege),
+          selected: [profile.minorDepartment],
+          onChange: (values: string[]) =>
+            updateMyProfile("minorDepartment", values[0] ?? ""),
+        };
       case "academicStatus":
         return {
           title: "학적 상태 선택",
           options: academicStatuses,
           selected: [profile.academicStatus],
           onChange: (values: string[]) => {
-            updateProfile("academicStatus", values[0] ?? "");
+            updateMyProfile("academicStatus", values[0] ?? "");
           },
         };
 
@@ -271,7 +464,7 @@ const ProfileEditPage = () => {
           options: interestOptions,
           selected: profile.interests,
           onChange: (values: string[]) => {
-            updateProfile("interests", values);
+            updateMyProfile("interests", values);
           },
           multiple: true,
           maxSelections: 4,
@@ -287,6 +480,10 @@ const ProfileEditPage = () => {
 
   const sheetConfig = getSheetConfig();
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <main
       className="
@@ -298,6 +495,11 @@ const ProfileEditPage = () => {
       "
     >
       <TopBar title="프로필 설정" leftOnClick={handleBack} />
+      {errorMessage && (
+        <p role="alert" className="px-5 pt-4 text-sm text-error">
+          {errorMessage}
+        </p>
+      )}
 
       <div
         className="
@@ -325,7 +527,7 @@ const ProfileEditPage = () => {
             type="text"
             value={profile.nickname}
             maxLength={20}
-            onChange={(e) => updateProfile("nickname", e.target.value)}
+            onChange={(e) => updateMyProfile("nickname", e.target.value)}
             className="
               w-full h-[52px]
               rounded-[12px]
@@ -367,7 +569,7 @@ const ProfileEditPage = () => {
                 <button
                   key={type}
                   type="button"
-                  onClick={() => updateProfile("character", type)}
+                  onClick={() => updateMyProfile("character", type)}
                   aria-label={`${type} 캐릭터 선택`}
                   aria-pressed={isSelected}
                   className={`
@@ -503,6 +705,49 @@ const ProfileEditPage = () => {
           )}
         </section>
 
+        <section className="mt-6">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-[16px] font-medium text-[#343A40]">
+              부전공 (선택)
+            </h2>
+            {hasMinor && (
+              <button
+                type="button"
+                onClick={handleDeleteMinor}
+                className="text-[14px] text-[#6C757D] underline cursor-pointer"
+              >
+                삭제
+              </button>
+            )}
+          </div>
+          {hasMinor ? (
+            <div className="flex flex-col gap-3">
+              <SelectField
+                value={profile.minorCollege}
+                placeholder="부전공 계열 선택"
+                onClick={() => setActiveSheet("minorCollege")}
+              />
+              <SelectField
+                value={profile.minorDepartment}
+                placeholder="부전공 학과 선택"
+                onClick={() =>
+                  setActiveSheet(
+                    profile.minorCollege ? "minorDepartment" : "minorCollege",
+                  )
+                }
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setHasMinor(true)}
+              className="flex items-center justify-center gap-3 w-full h-[52px] rounded-[12px] border border-[#DEE2E6] text-[16px] text-[#6C757D] cursor-pointer"
+            >
+              <span className="text-[24px] leading-none">+</span>부전공 추가하기
+            </button>
+          )}
+        </section>
+
         <section className="mt-7">
           <h2 className="mb-3 text-[16px] font-medium text-[#343A40]">
             학적 상태
@@ -591,7 +836,11 @@ const ProfileEditPage = () => {
         </section>
       </div>
 
-      <BottomButton text="저장" onClick={handleSave} disabled={!isValid} />
+      <BottomButton
+        text="저장"
+        onClick={handleSave}
+        disabled={!isValid || isSaving || !isChanged}
+      />
 
       {sheetConfig && (
         <BottomSheet
@@ -608,6 +857,7 @@ const ProfileEditPage = () => {
           searchable={
             activeSheet === "primaryDepartment" ||
             activeSheet === "doubleMajorDepartment" ||
+            activeSheet === "minorDepartment" ||
             activeSheet === "interests"
           }
           initialHeight={0.55}

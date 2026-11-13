@@ -1,36 +1,98 @@
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCharacter } from "../../constants/CHARACTER";
 
-import thumbsupCapy from "../../assets/images/capy_thumbs_up.svg";
 import pencil from "../../assets/icons/pencil.svg";
 import NavBar from "../../components/common/NavBar";
 
-interface UserProfile {
-  nickname: string;
-  character: string;
-  department: string;
-  academicStatus: string;
-  interests: string[];
-}
+import { AuthStore } from "../../store/AuthStore";
+import { UserStore } from "../../store/UserStore";
+import { getProfile } from "../../apis/user";
 
-const mockUser: UserProfile = {
-  nickname: "아이브",
-  character: thumbsupCapy,
-  department: "미디어기술콘텐츠학부",
-  academicStatus: "4학년",
-  interests: [
-    "IT·소프트웨어",
-    "AI·데이터",
-    "자격증·시험",
-    "취업·창업·대외활동",
-  ],
+import { Department } from "../../constants/DEPARTMENT";
+import { Interest } from "../../constants/INTEREST";
+import { STUDENT_STATUS } from "../../constants/STUDENT_STATUS";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+
+const getDepartmentName = (id: string) => {
+  return Department.find((item) => item.id === id)?.name ?? id;
+};
+
+const getInterestName = (id: string) => {
+  return Interest.find((item) => item.id === id)?.name ?? id;
+};
+
+const getStatusName = (id: string) => {
+  return STUDENT_STATUS.find((item) => item.id === id)?.name ?? id;
 };
 
 const MyPage = () => {
   const navigate = useNavigate();
 
-  const user = mockUser;
-  const character = getCharacter(user.character);
+  const accessToken = AuthStore((state) => state.accessToken);
+  const user = UserStore((state) => state.user);
+  const setUser = UserStore((state) => state.setUser);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchProfile = useCallback(async () => {
+    if (!accessToken) {
+      setIsLoading(false);
+      setError(true);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(false);
+
+    try {
+      const response = await getProfile(accessToken);
+
+      console.log("백엔드 캐릭터:", user?.character);
+      console.log("매핑된 캐릭터:", character);
+
+      if (!response.data) {
+        throw new Error("프로필 정보가 없습니다.");
+      }
+
+      setUser(response.data);
+    } catch (err) {
+      console.error("프로필 조회 실패:", err);
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accessToken, setUser]);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      await fetchProfile();
+    };
+
+    void loadProfile();
+  }, [fetchProfile]);
+
+  const character = user ? getCharacter(user.character) : null;
+
+  const primaryDepartment = user?.departments.find(
+    (department) => department.type === "PRIMARY",
+  );
+
+  const nickname = user?.nickname || "-";
+
+  const departmentName = primaryDepartment
+    ? getDepartmentName(primaryDepartment.name)
+    : "-";
+
+  const academicStatus = user?.status ? getStatusName(user.status) : "-";
+
+  const interests =
+    user?.interests.map((interest) => getInterestName(interest.name)) ?? [];
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <main
@@ -49,6 +111,21 @@ const MyPage = () => {
       >
         마이페이지
       </h1>
+      {error && (
+        <div className="mt-5 text-center">
+          <p className="text-[14px] text-gray-600">
+            프로필 정보를 불러오지 못했어요.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => void fetchProfile()}
+            className="mt-2 text-[14px] font-semibold text-main underline"
+          >
+            다시 시도하기
+          </button>
+        </div>
+      )}
 
       <section
         className="
@@ -69,21 +146,22 @@ const MyPage = () => {
           >
             <div
               className="
-                flex items-center justify-center
-                w-full h-full
-                rounded-full
-                bg-[#FFA556]
-                overflow-hidden
-              "
+    flex items-center justify-center
+    w-full h-full
+    rounded-full
+    overflow-hidden
+  "
+              style={{ backgroundColor: character?.color ?? "#E9ECEF" }}
             >
-              <img
-                src={character.image}
-                alt="프로필 캐릭터"
-                className="
-                  w-[70%] h-[70%]
-                  object-contain
-                "
-              />
+              {character ? (
+                <img
+                  src={character.image}
+                  alt="프로필 캐릭터"
+                  className="w-[70%] h-[70%] object-contain"
+                />
+              ) : (
+                <span className="text-[24px] text-gray-600">-</span>
+              )}
             </div>
           </div>
 
@@ -92,7 +170,7 @@ const MyPage = () => {
             onClick={() => navigate("/my/edit")}
             aria-label="프로필 수정"
             className="
-              absolute bottom-0 right-0
+              absolute bottom-1 right-1
               flex items-center justify-center
               w-[36px] h-[36px]
               rounded-full
@@ -114,7 +192,7 @@ const MyPage = () => {
             text-[#202124]
           "
         >
-          {user.nickname}
+          {nickname}
         </h2>
         <p
           className="
@@ -124,7 +202,7 @@ const MyPage = () => {
             text-[#6C757D]
           "
         >
-          {user.department} · {user.academicStatus}
+          {departmentName} · {academicStatus}
         </p>
       </section>
 
@@ -183,7 +261,7 @@ const MyPage = () => {
         </h2>
 
         <div className="grid grid-cols-2 gap-4">
-          {user.interests.map((interest) => (
+          {(interests.length > 0 ? interests : ["-"]).map((interest) => (
             <div
               key={interest}
               className="

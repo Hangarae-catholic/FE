@@ -8,6 +8,7 @@ import TopBar from "../../components/common/TopBar";
 import visibleIcon from "../../assets/icons/icon_visible.svg";
 import invisibleIcon from "../../assets/icons/icon_invisible.svg";
 import { checkProfile } from "../../apis/user";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -22,13 +23,12 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (isLoading) return;
+    if (isLoading) return <LoadingSpinner />;
 
     setIsLoading(true);
     setLoginError(false);
 
     try {
-      // 1. 로그인 API 호출
       const response = await login({
         loginId: loginId.trim(),
         password,
@@ -44,10 +44,8 @@ const LoginPage = () => {
         throw new Error("로그인 토큰이 없습니다.");
       }
 
-      // 2. 로그인 토큰 저장
       setAuth({ accessToken, refreshToken });
 
-      // 3. 프로필 생성 여부 확인
       const profileResponse = await checkProfile(accessToken);
 
       if (profileResponse.data === true) {

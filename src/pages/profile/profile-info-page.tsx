@@ -1,5 +1,7 @@
 import { useState } from "react";
+import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { UserStore } from "../../store/UserStore";
 
 import TopBar from "../../components/common/TopBar";
 import BottomButton from "../../components/common/BottomButton";
@@ -11,6 +13,9 @@ import { Department } from "../../constants/DEPARTMENT";
 import { Division } from "../../constants/DIVISION";
 import { Interest } from "../../constants/INTEREST";
 import { STUDENT_STATUS } from "../../constants/STUDENT_STATUS";
+import { AuthStore } from "../../store/AuthStore";
+import { createProfile } from "../../apis/user";
+import type { CreateProfileRequest } from "../../types/user";
 
 type SheetType =
   | "primaryCollege"
@@ -147,6 +152,10 @@ const SelectField = ({
 const ProfileInfoPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const accessToken = AuthStore((state) => state.accessToken);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const setUser = UserStore((state) => state.setUser);
 
   const [primaryCollege, setPrimaryCollege] = useState("");
   const [primaryDepartment, setPrimaryDepartment] = useState("");
@@ -183,22 +192,90 @@ const ProfileInfoPage = () => {
     setMinorDepartment("");
   };
 
-  const handleNext = () => {
-    if (!isValid) return;
+  const handleNext = async () => {
+    if (!isValid || isSubmitting) return;
 
-    navigate("/profile/complete", {
-      state: {
-        ...location.state,
-        primaryCollege,
-        primaryDepartment,
-        secondaryCollege: hasSecondMajor ? secondaryCollege : null,
-        secondaryDepartment: hasSecondMajor ? secondaryDepartment : null,
-        minorCollege: hasMinor ? minorCollege : null,
-        minorDepartment: hasMinor ? minorDepartment : null,
-        academicStatus,
-        interests,
-      },
-    });
+    const setup = location.state as {
+      nickname?: string;
+      character?: string;
+    } | null;
+    const nickname = setup?.nickname?.trim();
+    const character = setup?.character;
+
+    if (!nickname || !character) {
+      setSubmitError("닉네임과 캐릭터를 먼저 설정해주세요.");
+      return;
+    }
+    if (!accessToken) {
+      setSubmitError("로그인 정보가 없습니다. 다시 로그인해주세요.");
+      return;
+    }
+
+    const primary = Department.find(
+      (item) => item.name === primaryDepartment,
+    )?.id;
+    const doubleMajor = hasSecondMajor
+      ? Department.find((item) => item.name === secondaryDepartment)?.id
+      : null;
+    const minor = hasMinor
+      ? Department.find((item) => item.name === minorDepartment)?.id
+      : null;
+    const status = STUDENT_STATUS.find(
+      (item) => item.name === academicStatus,
+    )?.id;
+    const selectedInterests = interests.map(
+      (name) => Interest.find((item) => item.name === name)?.id,
+    );
+
+    if (
+      !primary ||
+      !status ||
+      (hasSecondMajor && !doubleMajor) ||
+      (hasMinor && !minor) ||
+      selectedInterests.some((id) => !id)
+    ) {
+      setSubmitError("선택한 프로필 정보를 확인해주세요.");
+      return;
+    }
+
+    const body: CreateProfileRequest = {
+      nickname,
+      character,
+      status,
+      primaryDepartment: primary,
+      doubleMajorDepartment: doubleMajor ?? null,
+      minorDepartment: minor ?? null,
+      interests: selectedInterests as string[],
+    };
+
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const response = await createProfile(body, accessToken);
+
+      if (!response.data) {
+        throw new Error("프로필 생성 응답 데이터가 없습니다.");
+      }
+      setUser(response.data);
+
+      navigate("/profile/complete", { replace: true });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log("location.state:", location.state);
+        console.log("API 요청 body:", body);
+        console.error(
+          "프로필 생성 실패:",
+          error.response?.status,
+          error.response?.data,
+        );
+      } else {
+        console.error("프로필 생성 실패:", error);
+      }
+      setSubmitError("프로필을 저장하지 못했어요. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getSheetConfig = () => {
@@ -580,7 +657,16 @@ const ProfileInfoPage = () => {
         </section>
       </div>
 
-      <BottomButton text="다음" onClick={handleNext} disabled={!isValid} />
+      {submitError && (
+        <p role="alert" className="px-5 pb-2 text-[14px] text-error">
+          {submitError}
+        </p>
+      )}
+      <BottomButton
+        text={isSubmitting ? "저장중" : "다음"}
+        onClick={handleNext}
+        disabled={!isValid || isSubmitting}
+      />
 
       {sheetConfig && (
         <BottomSheet
