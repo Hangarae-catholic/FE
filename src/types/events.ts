@@ -66,8 +66,8 @@ export type EventDetailResponse = CommonResponse<EventDetail>;
 export type EventRegister = {
   name: string;
   responsible: string;
-  startAt: Date;
-  endAt: Date;
+  startAt: string;
+  endAt: string;
   location: string;
   information: string;
   imageUrls: string[];
