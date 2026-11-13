@@ -21,6 +21,7 @@ export default function TeamMatchingPage() {
   const [selected, setSelected] = useState<string>('전체');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [submittedKeyword, setSubmittedKeyword] = useState('');
+  const [isKeywordSubmitted, setIsKeywordSubmitted] = useState(false);
 
   const options = ['최신 순', '오래된 순'];
   const [latestFirst, setLatestFirst] = useState(true);
@@ -40,6 +41,9 @@ export default function TeamMatchingPage() {
         const data = await getTeamPosts(category, keyword, latestFirst);
 
         setTeamPosts(data);
+        if (submittedKeyword) {
+          setIsKeywordSubmitted(true);
+        }
       } catch (error) {
         console.error('팀 모집글 조회 실패:', error);
       } finally {
@@ -133,6 +137,7 @@ export default function TeamMatchingPage() {
               onClick={() => {
                 setSearchKeyword('');
                 setSubmittedKeyword('');
+                setIsKeywordSubmitted(false);
               }}
               className='shrink-0'
               aria-label='검색어 삭제'
@@ -146,7 +151,14 @@ export default function TeamMatchingPage() {
         <CategoryGroup selected={selected} setSelected={setSelected} />
 
         {/* 정렬 드롭다운 */}
-        <div className='mb-3 flex justify-end'>
+        <div className={`mb-3 flex items-center ${isKeywordSubmitted ? 'justify-between ' : 'justify-end'}`}>
+          {isKeywordSubmitted && (
+            <p className='font-pretendard font-normal text-sm flex items-center gap-1.5 text-gray-800'>
+              '{submittedKeyword}'<span className='text-gray-700'>검색 결과</span>
+              {teamPosts?.data?.length}개
+            </p>
+          )}
+
           <Dropdown
             baseClassName='CustomDropdown'
             className='w-fit px-2 py-1 rounded-sm border border-gray-300 bg-white relative'
