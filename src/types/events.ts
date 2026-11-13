@@ -61,3 +61,15 @@ export type EventDetail = {
 };
 
 export type EventDetailResponse = CommonResponse<EventDetail>;
+
+// 행사 등록
+export type EventRegister = {
+  name: string;
+  responsible: string;
+  startAt: Date;
+  endAt: Date;
+  location: string;
+  information: string;
+  imageUrls: string[];
+};
+export type EventRegisterRequest = CommonResponse<number>;
