@@ -13,24 +13,11 @@ import { formatDate } from '../utils/FormatDate';
 import { buildingCoordinates } from '../constants/BUILDING_COORDINATES';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
-// const mock = [
-//   {
-//     image: [ExEventDetail, ExEventDetail, ExEventDetail],
-//     title: '컴퓨터정보공학부 학술제',
-//     time: '26.11.24(화) 14시',
-//     location: '김수환관(K) 컨퍼런스홀',
-//     organ: '컴퓨터정보공학부',
-//     content: `안녕하세요! 컴퓨터정보공학부 학생회 연아입니다!\n이번 2026 학술제는 COMA, UMC, 멋쟁이사자처럼과 함꼐 진행합니다!  많은 관심 부탁드립니다!<br /><br />학술제 일정은 다음과 같습니다.\n12:00 - 14:00 본선 진출 팀 부스 세팅\n14:00 - 18:00 팀별 성과와 소개 발표\n18:30 시상자 발표 및 폐회<br /><br />자세한 내용 확인: https://csie.catholic.ac.kr/csie/community/notice.do `,
-//   },
-// ];
-
 export default function EventDetailPage() {
-  const { id: noticeId } = useParams();
+  const { postId } = useParams();
   const [currentSlide, setCurrentSlide] = useState(1);
   const [eventDetail, setEventDetail] = useState<EventDetailResponse>();
   const [eventDetailLoading, setEventDetailLoading] = useState(false);
-
-  console.log(noticeId);
 
   useEffect(() => {
     const fetchEventDetail = async (noticeId: number) => {
@@ -47,8 +34,8 @@ export default function EventDetailPage() {
       }
     };
 
-    fetchEventDetail(Number(noticeId));
-  }, [noticeId]);
+    fetchEventDetail(Number(postId));
+  }, [postId]);
 
   // 로딩스피너
   if (eventDetailLoading) {

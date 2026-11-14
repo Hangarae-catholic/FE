@@ -233,29 +233,31 @@ export default function EventsPage() {
                 swiperRef.current = swiper;
               }}
             >
-              {selectedBuildingEvents.map((event) => (
-                <SwiperSlide key={event.noticeId}>
-                  <EventCard
-                    id={event.noticeId}
-                    title={event.name}
-                    recommend={eventsLikes?.data?.likeCount}
-                    unrecommend={eventsLikes?.data?.dislikeCount}
-                    image={event.imageUrls}
-                    location={buildingCoordinates.find((bc) => bc.id === event.location)?.name}
-                    startDate={event.startAt}
-                    endDate={event.endAt}
-                    content={event.summary}
-                    setCurrentSlide={setCurrentSlide}
-                    currentSlide={currentSlide}
-                    eventsNum={selectedBuildingEvents.length}
-                    onSlideChange={(index) => swiperRef.current?.slideTo(index)}
-                    userReaction={eventsLikes?.data?.userReaction ?? null}
-                    onReact={(reaction) => handleEventReaction(event.noticeId, reaction)}
-                    onClose={setShowEventCard}
-                    isLoading={eventLikesLoading}
-                  />
-                </SwiperSlide>
-              ))}
+              {selectedBuildingEvents.map((event) => {
+                return (
+                  <SwiperSlide key={event.noticeId}>
+                    <EventCard
+                      id={event.noticeId}
+                      title={event.name}
+                      recommend={eventsLikes?.data?.likeCount}
+                      unrecommend={eventsLikes?.data?.dislikeCount}
+                      image={event.imageUrls}
+                      location={buildingCoordinates.find((bc) => bc.id === event.location)?.name}
+                      startDate={event.startAt}
+                      endDate={event.endAt}
+                      content={event.summary}
+                      setCurrentSlide={setCurrentSlide}
+                      currentSlide={currentSlide}
+                      eventsNum={selectedBuildingEvents.length}
+                      onSlideChange={(index) => swiperRef.current?.slideTo(index)}
+                      userReaction={eventsLikes?.data?.userReaction ?? null}
+                      onReact={(reaction) => handleEventReaction(event.noticeId, reaction)}
+                      onClose={setShowEventCard}
+                      isLoading={eventLikesLoading}
+                    />
+                  </SwiperSlide>
+                );
+              })}
             </Swiper>
           ) : selectedBuildingEvents.length === 1 ? (
             <EventCard
