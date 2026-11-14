@@ -224,11 +224,7 @@ const CalendarDetailPage = () => {
         bg-bg font-pretendard
       "
     >
-      <TopBar
-        title={event.name}
-        rightIcon={CalendarPlus}
-        rightOnClick={handleDownload}
-      />
+      <TopBar rightIcon={CalendarPlus} rightOnClick={handleDownload} />
 
       <div
         className="
@@ -237,12 +233,10 @@ const CalendarDetailPage = () => {
           [&::-webkit-scrollbar]:hidden
         "
       >
-        {/* 행사 제목 */}
         <h2 className="mb-7 text-[18px] font-semibold leading-[1.4] text-[#343A40]">
           {event.name}
         </h2>
 
-        {/* 행사 정보 */}
         <div className="flex flex-col gap-6">
           {infoItems.map((item) => {
             const Icon = item.icon;
@@ -294,7 +288,6 @@ const CalendarDetailPage = () => {
 
         <div className="my-7 h-px w-full bg-[#DEE2E6]" />
 
-        {/* 세부 내용 */}
         <section>
           <h3 className="mb-3 text-[14px] font-medium text-[#343A40]">
             세부 내용
