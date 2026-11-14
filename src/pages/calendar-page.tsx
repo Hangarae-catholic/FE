@@ -772,7 +772,7 @@ const CalendarPage = () => {
                       type="button"
                       onClick={() => {
                         if (event.type === "NOTICE" && event.noticeId != null) {
-                          navigate(`/event-detail/${event.noticeId}`);
+                          navigate(`/calendar/${event.noticeId}`);
                         }
                       }}
                       className="
