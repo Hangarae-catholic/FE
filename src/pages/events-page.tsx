@@ -132,7 +132,7 @@ export default function EventsPage() {
   };
 
   // 목록 날짜 필터링
-  const filteredListEvents = Events?.data?.filter((event) => isEventInDateRange(event.startAt, event.endAt, selectedListDate[0], switchOn ? selectedListDate[1] : selectedListDate[0])) ?? [];
+  const filteredListEvents = approvedEvents.filter((event) => isEventInDateRange(event.startAt, event.endAt, selectedListDate[0], switchOn ? selectedListDate[1] : selectedListDate[0])) ?? [];
 
   const fetchEventLikes = async (noticeId: number) => {
     try {
