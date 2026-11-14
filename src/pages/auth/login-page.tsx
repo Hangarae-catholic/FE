@@ -9,6 +9,7 @@ import visibleIcon from "../../assets/icons/icon_visible.svg";
 import invisibleIcon from "../../assets/icons/icon_invisible.svg";
 import { checkProfile } from "../../apis/user";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { UserStore } from "../../store/UserStore";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -46,9 +47,14 @@ const LoginPage = () => {
 
       setAuth({ accessToken, refreshToken });
 
-      const profileResponse = await checkProfile(accessToken);
+      const profileResponse = await checkProfile();
 
       if (profileResponse.data === true) {
+        const user = await UserStore.getState().fetchUser();
+
+        if (!user) {
+          throw new Error("사용자 정보를 불러오지 못했습니다.");
+        }
         navigate("/home", { replace: true });
       } else if (profileResponse.data === false) {
         navigate("/profile/setup", { replace: true });

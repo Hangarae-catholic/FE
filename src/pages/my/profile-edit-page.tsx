@@ -243,7 +243,7 @@ const ProfileEditPage = () => {
         return;
       }
       try {
-        const response = await getProfile(accessToken);
+        const response = await getProfile();
         if (!response.data) throw new Error("프로필 조회 결과가 없습니다.");
         if (cancelled) return;
         const loaded = toForm(response.data);
@@ -338,7 +338,7 @@ const ProfileEditPage = () => {
     setIsSaving(true);
     setErrorMessage("");
     try {
-      const response = await updateProfile(body, accessToken);
+      const response = await updateProfile(body);
       if (!response.data)
         throw new Error("프로필 수정 응답 데이터가 없습니다.");
       setUser(response.data);

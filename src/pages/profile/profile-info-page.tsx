@@ -252,7 +252,7 @@ const ProfileInfoPage = () => {
     setSubmitError("");
 
     try {
-      const response = await createProfile(body, accessToken);
+      const response = await createProfile(body);
 
       if (!response.data) {
         throw new Error("프로필 생성 응답 데이터가 없습니다.");
