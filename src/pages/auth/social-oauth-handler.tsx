@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthStore } from "../../store/AuthStore";
 import { getOAuthTicket } from "../../apis/auth";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { UserStore } from "../../store/UserStore";
 
 const SocialOAuthHandler = () => {
   const navigate = useNavigate();
@@ -62,6 +63,13 @@ const SocialOAuthHandler = () => {
             }
 
             setAuth(data.tokens);
+
+            const user = await UserStore.getState().fetchUser();
+
+            if (!user) {
+              throw new Error("사용자 정보를 불러오지 못했습니다.");
+            }
+
             navigate("/home", { replace: true });
             return;
           }

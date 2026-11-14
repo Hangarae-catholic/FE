@@ -47,7 +47,7 @@ const MyPage = () => {
     setError(false);
 
     try {
-      const response = await getProfile(accessToken);
+      const response = await getProfile();
 
       console.log("백엔드 캐릭터:", user?.character);
       console.log("매핑된 캐릭터:", character);

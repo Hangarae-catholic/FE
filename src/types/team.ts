@@ -1,4 +1,4 @@
-import type { CommonResponse } from './common';
+import type { CommonResponse } from "./common";
 
 // 팀매칭 목록 조회
 export type TeamRecruitPost = {
@@ -11,8 +11,8 @@ export type TeamRecruitPost = {
   userName: string;
   studentStatus: string;
   department: string;
-  category: 'COURSE' | 'CONTEST_COMPETITION' | 'STUDY' | 'OTHER';
-  teamStatus: 'RECRUITING' | 'CLOSED';
+  category: "COURSE" | "CONTEST_COMPETITION" | "STUDY" | "OTHER";
+  teamStatus: "RECRUITING" | "CLOSED";
   detail: string;
   imageUrl: string;
   createdAt: Date;
@@ -34,7 +34,7 @@ export type TeamRecruitPostDetail = {
   department: string;
   character: string;
   category: string;
-  teamStatus: 'RECRUITING' | 'CLOSED';
+  teamStatus: "RECRUITING" | "CLOSED";
   detail: string;
   contacts: {
     type: string;
