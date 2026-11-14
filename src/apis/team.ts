@@ -1,0 +1,96 @@
+import type {
+  TeamCreate,
+  TeamCreateRequest,
+  TeamDeleteResponse,
+  TeamEdit,
+  TeamEditRequest,
+  TeamPostCloseResponse,
+} from "./../types/team";
+// import axios from 'axios';
+import type {
+  TeamPostDetailResponse,
+  TeamPostRetrieveResponse,
+} from "../types/team";
+import { api } from "./axios";
+
+// 임시 키값을 활용한 axios
+// export const api = axios.create({
+//   baseURL: import.meta.env.VITE_API_URL,
+//   headers: {
+//     'Content-Type': 'application/json',
+//     Authorization: import.meta.env.VITE_AUTH_KEY,
+//   },
+// });
+
+// 팀매칭 목록 조회
+export const getTeamPosts = async (
+  category?: string,
+  keyword?: string,
+  latestFirst?: boolean,
+): Promise<TeamPostRetrieveResponse> => {
+  const { data } = await api.get(`/api/teams`, {
+    params: {
+      category,
+      keyword,
+      latestFirst,
+    },
+  });
+
+  return data;
+};
+
+// 팀매칭 상세 조회
+export const getTeamPostDetail = async (
+  teamId: number,
+): Promise<TeamPostDetailResponse> => {
+  const { data } = await api.get(`/api/teams/${teamId}`);
+
+  return data;
+};
+
+// 팀 생성 등록
+export const postTeamCreate = async (
+  TeamCreate: TeamCreate,
+): Promise<TeamCreateRequest> => {
+  const { data } = await api.post(`/api/teams`, {
+    ...TeamCreate,
+  });
+
+  return data;
+};
+
+// 팀매칭 수정
+export const putTeamPost = async (
+  teamId: number,
+  TeamEdit: TeamEdit,
+): Promise<TeamEditRequest> => {
+  const { data } = await api.put(`/api/teams/${teamId}`, {
+    ...TeamEdit,
+  });
+
+  return data;
+};
+
+// 팀매칭 삭제
+export const deleteTeamPost = async (
+  teamId: number,
+): Promise<TeamDeleteResponse> => {
+  const { data } = await api.delete(`/api/teams/${teamId}`);
+
+  return data;
+};
+
+// 팀매칭 수동 마감
+export const patchTeamClose = async (
+  teamId: number,
+): Promise<TeamPostCloseResponse> => {
+  const { data } = await api.patch(`/api/teams/${teamId}/close`);
+
+  return data;
+};
+
+// 내가 작성한 팀매칭 목록 조회
+export const getMyTeamPosts = async (): Promise<TeamPostRetrieveResponse> => {
+  const { data } = await api.get<TeamPostRetrieveResponse>("/api/teams/my");
+  return data;
+};
