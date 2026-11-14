@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { getEventDetail } from "../apis/events";
+import { getEventCalendarFile, getEventDetail } from "../apis/events";
 import type { EventDetail } from "../types/events";
 
 import { buildingCoordinates } from "../constants/BUILDING_COORDINATES";
@@ -59,69 +59,6 @@ const getDepartmentName = (department: string) => {
   return Department.find((item) => item.id === department)?.name ?? department;
 };
 
-// ICS 텍스트 처리
-const escapeIcsText = (value: string) => {
-  return value
-    .replace(/\\/g, "\\\\")
-    .replace(/\r?\n/g, "\\n")
-    .replace(/,/g, "\\,")
-    .replace(/;/g, "\\;");
-};
-
-// ICS 날짜 변환
-const toIcsUtc = (dateTime: string | Date) => {
-  const date = new Date(dateTime);
-
-  if (Number.isNaN(date.getTime())) {
-    throw new Error("잘못된 날짜입니다.");
-  }
-
-  return date
-    .toISOString()
-    .replace(/[-:]/g, "")
-    .replace(/\.\d{3}/, "");
-};
-
-// 캘린더 일정 다운로드
-const downloadIcs = (event: EventDetail) => {
-  const location = getLocationName(event.location);
-
-  const ics = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//HANGARAE//Calendar//KO",
-    "CALSCALE:GREGORIAN",
-    "BEGIN:VEVENT",
-    `UID:notice-${event.noticeId}@hangarae`,
-    `DTSTAMP:${toIcsUtc(new Date())}`,
-    `DTSTART:${toIcsUtc(event.startAt)}`,
-    `DTEND:${toIcsUtc(event.endAt)}`,
-    `SUMMARY:${escapeIcsText(event.name)}`,
-    `LOCATION:${escapeIcsText(location)}`,
-    `DESCRIPTION:${escapeIcsText(event.information ?? "")}`,
-    ...(event.url ? [`URL:${event.url}`] : []),
-    "END:VEVENT",
-    "END:VCALENDAR",
-    "",
-  ].join("\r\n");
-
-  const blob = new Blob([ics], {
-    type: "text/calendar;charset=utf-8",
-  });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = `hangarae-event-${event.noticeId}.ics`;
-
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-};
-
 const CalendarDetailPage = () => {
   const navigate = useNavigate();
   const { noticeId, postId } = useParams();
@@ -130,6 +67,7 @@ const CalendarDetailPage = () => {
 
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
@@ -189,14 +127,33 @@ const CalendarDetailPage = () => {
   }, [showToast]);
 
   // 일정 다운로드
-  const handleDownload = () => {
-    if (!event) return;
+  const handleDownload = async () => {
+    if (!event || isDownloading) return;
+
+    setIsDownloading(true);
 
     try {
-      downloadIcs(event);
+      const blob = await getEventCalendarFile(event.noticeId);
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `hangarae-event-${event.noticeId}.ics`;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+
       setShowToast(true);
     } catch (error) {
       console.error("일정 파일 다운로드 실패:", error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
