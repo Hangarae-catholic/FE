@@ -1,12 +1,18 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import BottomSheet from "../components/common/BottomSheet/BottomSheet";
 import NavBar from "../components/common/NavBar";
 
+import type { AcademicSchedule, CalendarEvent } from "../types/calendar";
+import { getAcademicCalendar, getCalendar } from "../apis/calendar";
+
+import { Division } from "../constants/DIVISION";
+
 import RightArrow from "../assets/icons/arrow_right.svg?react";
 import Filter from "../assets/icons/filter.svg?react";
 import FilterOrange from "../assets/icons/filter-orange.svg?react";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 
 // 필터 유형
 const calendarTypes = [
@@ -18,91 +24,88 @@ const calendarTypes = [
   "공모전",
 ] as const;
 
+const categoryMap: Record<string, string> = {
+  일반: "GENERAL",
+  "학과·학사": "DEPARTMENT_ACADEMIC",
+  장학: "SCHOLARSHIP",
+  취창업: "EMPLOYMENT_STARTUP",
+  공모전: "CONTEST",
+};
+
 type CalendarType = (typeof calendarTypes)[number];
 
 const majorOptions = [
   "경영대학",
-  "바이오헬스융합대학",
-  "AI전자정보융합대학",
-  "약학대학",
-  "인문사회계열",
-  "자연공학계열",
-  "예체능계열",
+  "글로벌경영학부",
+  "바이오헬스융합",
+  "AI전자정보융합",
+  "약학",
+  "인문계열",
+  "어문계열",
+  "사회과학계열",
+  "특수교육",
+  "국제, 법정경계열",
+  "글로벌경영학",
+  "자연과학계열",
+  "공학계열",
+  "생활과학계열",
+  "음악",
+  "응용예술",
+  "융합전공",
   "교직과정",
   "자유전공",
-  "학부대학",
 ];
 
 const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
 
-interface CalendarEvent {
-  postId: number;
+interface CalendarEvents {
+  id: string;
+  noticeId?: number;
+
   name: string;
   startAt: string;
   endAt: string;
+
   category: string;
   division: string | null;
+
+  type: "ACADEMIC" | "NOTICE";
 }
 
-// TODO: 실제 캘린더 일정 조회 API로 교체
-const mockEvents: CalendarEvent[] = [
-  {
-    postId: 1,
-    name: "컴퓨터정보공학부 학술제",
-    startAt: "2026-11-13T14:00:00",
-    endAt: "2026-11-13T18:00:00",
-    category: "DEPARTMENT_ACADEMIC",
-    division: "AI전자정보융합대학",
-  },
-  {
-    postId: 2,
-    name: "정보통신전자공학부 학술제",
-    startAt: "2026-11-13T13:00:00",
-    endAt: "2026-11-13T17:00:00",
-    category: "DEPARTMENT_ACADEMIC",
-    division: "AI전자정보융합대학",
-  },
-  {
-    postId: 3,
-    name: "2학기 수강신청",
-    startAt: "2026-11-02T09:00:00",
-    endAt: "2026-11-04T18:00:00",
-    category: "DEPARTMENT_ACADEMIC",
+const convertAcademicEvents = (
+  schedules: AcademicSchedule[],
+): CalendarEvents[] => {
+  return schedules.map((schedule, index) => ({
+    id: `academic-${schedule.startDate}-${index}`,
+
+    name: schedule.name,
+
+    startAt: `${schedule.startDate}T00:00:00`,
+    endAt: `${schedule.endDate}T23:59:59`,
+
+    category: "ACADEMIC",
     division: null,
-  },
-  {
-    postId: 4,
-    name: "컴퓨터정보공학부 학술제",
-    startAt: "2026-11-24T14:00:00",
-    endAt: "2026-11-26T18:00:00",
-    category: "DEPARTMENT_ACADEMIC",
-    division: "AI전자정보융합대학",
-  },
-  {
-    postId: 5,
-    name: "정보통신전자공학부 학술제",
-    startAt: "2026-11-24T13:00:00",
-    endAt: "2026-11-25T17:00:00",
-    category: "DEPARTMENT_ACADEMIC",
-    division: "AI전자정보융합대학",
-  },
-  {
-    postId: 6,
-    name: "개인 일정",
-    startAt: "2026-11-26T10:00:00",
-    endAt: "2026-11-26T12:00:00",
-    category: "GENERAL",
-    division: null,
-  },
-  {
-    postId: 7,
-    name: "미디어콘텐츠학과 학술제",
-    startAt: "2026-11-24T10:00:00",
-    endAt: "2026-11-28T12:00:00",
-    category: "GENERAL",
-    division: null,
-  },
-];
+
+    type: "ACADEMIC",
+  }));
+};
+
+const convertCalendarEvents = (events: CalendarEvent[]): CalendarEvents[] => {
+  return events.map((event) => ({
+    id: `notice-${event.noticeId}`,
+    noticeId: event.noticeId,
+
+    name: event.name,
+
+    startAt: event.startAt,
+    endAt: event.endAt,
+
+    category: event.category,
+    division: event.division,
+
+    type: "NOTICE",
+  }));
+};
 
 const formatDateKey = (date: Date) => {
   const year = date.getFullYear();
@@ -142,27 +145,19 @@ const getDatePart = (dateTime: string) => {
   return dateTime.slice(0, 10);
 };
 
-const isEventOnDate = (event: CalendarEvent, dateKey: string) => {
+const isEventOnDate = (event: CalendarEvents, dateKey: string) => {
   const startDate = getDatePart(event.startAt);
   const endDate = getDatePart(event.endAt);
 
   return startDate <= dateKey && dateKey <= endDate;
 };
 
-const categoryLabels: Record<string, CalendarType> = {
-  GENERAL: "일반",
-  DEPARTMENT_ACADEMIC: "학과·학사",
-  SCHOLARSHIP: "장학",
-  EMPLOYMENT_STARTUP: "취창업",
-  CONTEST: "공모전",
-};
-
-const getEventColor = (category: string) => {
-  return category === "GENERAL" ? "green" : "orange";
+const getEventColor = (event: CalendarEvents) => {
+  return event.type === "ACADEMIC" ? "green" : "orange";
 };
 
 interface WeekBar {
-  event: CalendarEvent;
+  event: CalendarEvents;
   startColumn: number;
   endColumn: number;
   lane: number;
@@ -170,7 +165,10 @@ interface WeekBar {
   continuesToNext: boolean;
 }
 
-const getWeekBars = (weekDates: Date[], events: CalendarEvent[]): WeekBar[] => {
+const getWeekBars = (
+  weekDates: Date[],
+  events: CalendarEvents[],
+): WeekBar[] => {
   const weekStart = formatDateKey(weekDates[0]);
   const weekEnd = formatDateKey(weekDates[6]);
 
@@ -246,6 +244,31 @@ const getWeekBars = (weekDates: Date[], events: CalendarEvent[]): WeekBar[] => {
 const CalendarPage = () => {
   const navigate = useNavigate();
 
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+  const lastSwipeTime = useRef(0);
+  const swipeAmount = useRef(0);
+
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const suppressClick = useRef(false);
+
+  // 기본 학사일정
+  const [academicEvents, setAcademicEvents] = useState<CalendarEvents[]>([]);
+
+  // 필터로 조회한 교내 행사
+  const [noticeEvents, setNoticeEvents] = useState<CalendarEvents[]>([]);
+
+  // 로딩 상태
+  const [isAcademicLoading, setIsAcademicLoading] = useState(false);
+  const [isNoticeLoading, setIsNoticeLoading] = useState(false);
+
+  // 에러 상태
+  const [academicError, setAcademicError] = useState<string | null>(null);
+
+  const isCalendarLoading = isAcademicLoading || isNoticeLoading;
+
   const [currentMonth, setCurrentMonth] = useState(
     () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
@@ -259,9 +282,6 @@ const CalendarPage = () => {
 
   const [draftType, setDraftType] = useState<CalendarType>("전체");
   const [draftCollege, setDraftCollege] = useState("전체");
-
-  const touchStartX = useRef<number | null>(null);
-  const suppressClick = useRef(false);
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -279,18 +299,7 @@ const CalendarPage = () => {
     calendarDays.slice(index * 7, index * 7 + 7),
   );
 
-  const filteredEvents = mockEvents.filter((event) => {
-    const matchesType =
-      calendarType === "전체" ||
-      categoryLabels[event.category] === calendarType;
-
-    const matchesCollege =
-      calendarCollege === "전체" ||
-      event.division === null ||
-      event.division === calendarCollege;
-
-    return matchesType && matchesCollege;
-  });
+  const filteredEvents: CalendarEvents[] = [...academicEvents, ...noticeEvents];
 
   const selectedEvents = selectedDate
     ? filteredEvents
@@ -308,39 +317,8 @@ const CalendarPage = () => {
     setSelectedDate(null);
   };
 
-  // 스와이프 시작
-  const handleTouchStart = (event: React.TouchEvent) => {
-    touchStartX.current = event.changedTouches[0].clientX;
-  };
-
-  // 스와이프 종료
-  const handleTouchEnd = (event: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-
-    const endX = event.changedTouches[0].clientX;
-    const distance = endX - touchStartX.current;
-
-    if (Math.abs(distance) > 60) {
-      suppressClick.current = true;
-
-      if (distance < 0) {
-        changeMonth(1);
-      } else {
-        changeMonth(-1);
-      }
-
-      window.setTimeout(() => {
-        suppressClick.current = false;
-      }, 0);
-    }
-
-    touchStartX.current = null;
-  };
-
   // 날짜 선택
   const handleSelectDate = (date: Date) => {
-    if (suppressClick.current) return;
-
     const clickedYear = date.getFullYear();
     const clickedMonth = date.getMonth();
 
@@ -366,6 +344,190 @@ const CalendarPage = () => {
     setCalendarCollege(draftCollege);
     setIsFilterOpen(false);
   };
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = event.changedTouches[0].clientX;
+    touchStartY.current = event.changedTouches[0].clientY;
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartX.current === null || touchStartY.current === null) {
+      return;
+    }
+
+    const distanceX = event.changedTouches[0].clientX - touchStartX.current;
+
+    const distanceY = event.changedTouches[0].clientY - touchStartY.current;
+
+    // 세로 스크롤보다 가로 스와이프가 확실히 클 때만 처리
+    if (Math.abs(distanceX) > 60 && Math.abs(distanceX) > Math.abs(distanceY)) {
+      suppressClick.current = true;
+
+      // 왼쪽 → 다음 달 / 오른쪽 → 이전 달
+      changeMonth(distanceX < 0 ? 1 : -1);
+
+      window.setTimeout(() => {
+        suppressClick.current = false;
+      }, 100);
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchAcademicEvents = async () => {
+      if (year !== 2026) {
+        setAcademicEvents([]);
+        return;
+      }
+
+      setIsAcademicLoading(true);
+      setAcademicError(null);
+
+      try {
+        const response = await getAcademicCalendar({
+          year,
+          month: month + 1,
+        });
+
+        if (cancelled) return;
+
+        setAcademicEvents(convertAcademicEvents(response.data ?? []));
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error("학사일정 조회 실패:", error);
+
+        setAcademicEvents([]);
+        setAcademicError("학사일정을 불러오지 못했어요.");
+      } finally {
+        if (!cancelled) {
+          setIsAcademicLoading(false);
+        }
+      }
+    };
+
+    void fetchAcademicEvents();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [year, month]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchCalendarEvents = async () => {
+      // 필터가 모두 '전체'면 교내 행사 조회하지 않음
+      if (calendarType === "전체" && calendarCollege === "전체") {
+        setNoticeEvents([]);
+        setIsNoticeLoading(false);
+        return;
+      }
+
+      const category = categoryMap[calendarType];
+
+      const division = Division.find(
+        (item) => item.name === calendarCollege,
+      )?.id;
+
+      console.log("선택한 계열:", calendarCollege);
+      console.log("전체 계열 상수:", Division);
+      console.log("변환된 계열 ID:", division);
+
+      setIsNoticeLoading(true);
+
+      try {
+        const request = {
+          year,
+          month: month + 1,
+          divisions: division ? [division] : [],
+          categories: category ? [category] : [],
+        };
+
+        // API 요청 데이터 확인
+        console.log("📤 캘린더 필터 요청:", request);
+
+        const response = await getCalendar(request);
+
+        if (cancelled) return;
+
+        // API 응답 데이터 확인
+        console.log("📥 캘린더 필터 응답:", response.data);
+
+        setNoticeEvents(convertCalendarEvents(response.data ?? []));
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error("교내 행사 조회 실패:", error);
+
+        setNoticeEvents([]);
+      } finally {
+        if (!cancelled) {
+          setIsNoticeLoading(false);
+        }
+      }
+    };
+
+    void fetchCalendarEvents();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [year, month, calendarType, calendarCollege]);
+
+  useEffect(() => {
+    const element = calendarRef.current;
+
+    if (!element) return;
+
+    const handleTrackpadSwipe = (event: WheelEvent) => {
+      // 가로 스와이프만 처리
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) {
+        return;
+      }
+
+      // 브라우저 기본 가로 스크롤 방지
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+
+      swipeAmount.current += event.deltaX;
+
+      const now = Date.now();
+
+      // 연속 월 이동 방지
+      if (now - lastSwipeTime.current < 700) {
+        return;
+      }
+
+      // 일정 거리 이상 스와이프했을 때 이동
+      if (Math.abs(swipeAmount.current) < 40) {
+        return;
+      }
+
+      lastSwipeTime.current = now;
+
+      if (swipeAmount.current > 0) {
+        changeMonth(1);
+      } else {
+        changeMonth(-1);
+      }
+
+      swipeAmount.current = 0;
+    };
+
+    element.addEventListener("wheel", handleTrackpadSwipe, {
+      passive: false,
+    });
+
+    return () => {
+      element.removeEventListener("wheel", handleTrackpadSwipe);
+    };
+  }, []);
 
   return (
     <main
@@ -456,8 +618,31 @@ const CalendarPage = () => {
           ))}
         </div>
 
+        {isCalendarLoading && (
+          <div
+            role="status"
+            className="
+      flex items-center justify-center
+      py-10
+    "
+          >
+            <LoadingSpinner />
+          </div>
+        )}
+
+        {academicError && (
+          <p role="alert" className="mt-3 text-center text-[14px] text-error">
+            {academicError}
+          </p>
+        )}
+
         <div
-          className="bg-white touch-pan-y"
+          ref={calendarRef}
+          className="
+    bg-white
+    overscroll-x-none
+    touch-pan-y
+  "
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -517,27 +702,28 @@ const CalendarPage = () => {
                   })}
                 </div>
 
-                <div className="pointer-events-none absolute inset-0 mx-2">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
                   {weekBars.map((bar) => {
-                    const color = getEventColor(bar.event.category);
+                    const color = getEventColor(bar.event);
 
                     return (
                       <div
-                        key={bar.event.postId}
+                        key={bar.event.id}
                         className={`
-                  absolute h-[18px]
-                  overflow-hidden
-                  px-1 text-[10px]
-                  leading-[18px]
-                  whitespace-nowrap text-white
-                  ${color === "green" ? "bg-[#22B85A]" : "bg-main"}
-                  ${
-                    bar.continuesFromPrevious
-                      ? "rounded-l-none"
-                      : "rounded-l-[3px]"
-                  }
-                  ${bar.continuesToNext ? "rounded-r-none" : "rounded-r-[3px]"}
-                `}
+    absolute
+    h-[18px]
+    min-w-0
+    overflow-hidden
+    px-1
+    text-[10px]
+    leading-[18px]
+    whitespace-nowrap
+    text-white
+    box-border
+    ${color === "green" ? "bg-[#22B85A]" : "bg-main"}
+    ${bar.continuesFromPrevious ? "rounded-l-none" : "rounded-l-[3px]"}
+    ${bar.continuesToNext ? "rounded-r-none" : "rounded-r-[3px]"}
+  `}
                         style={{
                           left: `${(bar.startColumn / 7) * 100}%`,
                           width: `${
@@ -546,7 +732,9 @@ const CalendarPage = () => {
                           top: `${30 + bar.lane * 22}px`,
                         }}
                       >
-                        <span className="block truncate">{bar.event.name}</span>
+                        <span className="block w-full truncate">
+                          {bar.event.name}
+                        </span>
                       </div>
                     );
                   })}
@@ -576,13 +764,17 @@ const CalendarPage = () => {
                   const isStartingDay = selectedDate === startDate;
                   const isEndingDay = selectedDate === endDate;
 
-                  const color = getEventColor(event.category);
+                  const color = getEventColor(event);
 
                   return (
                     <button
-                      key={event.postId}
+                      key={event.id}
                       type="button"
-                      onClick={() => navigate(`/calendar/${event.postId}`)}
+                      onClick={() => {
+                        if (event.type === "NOTICE" && event.noticeId != null) {
+                          navigate(`/event-detail/${event.noticeId}`);
+                        }
+                      }}
                       className="
                 flex w-full items-center
                 gap-4 rounded-[12px]
