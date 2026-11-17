@@ -73,3 +73,15 @@ export const getMyEvent = async (): Promise<EventRecommendResponse> => {
   const { data } = await api.get<EventRecommendResponse>("/api/notices/my");
   return data;
 };
+
+// 행사 캘린더 파일 다운로드
+export const getEventCalendarFile = async (noticeId: number): Promise<Blob> => {
+  const response = await api.get<Blob>(
+    `/api/notices/${noticeId}/calendar-file`,
+    {
+      responseType: "blob",
+    },
+  );
+
+  return response.data;
+};
