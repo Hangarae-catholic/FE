@@ -69,7 +69,7 @@ export default function EventCard({ id, recommend, unrecommend, image, location,
       <div className='w-full px-5 py-4 flex flex-col gap-2 rounded-[20px] bg-[#FEFEFE]'>
         <div className='flex flex-col gap-3'>
           <div className='flex items-center justify-between'>
-            <span className='font-pretendard font-normal text-[13px] text-orange-600'>콘서트홀</span>
+            <span className='font-pretendard font-normal text-[13px] text-orange-600'>{location}</span>
             <button type='button' className='flex items-center justify-end' onClick={() => onClose?.(false)}>
               <X className='w-6 h-6 text-gray-700' />
             </button>
