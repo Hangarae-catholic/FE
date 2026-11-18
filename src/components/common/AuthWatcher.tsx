@@ -10,7 +10,11 @@ const PUBLIC_PATHS = [
   "/tou",
   "/find-id",
   "/find-password",
+  "/welcome",
   "/profile/setup",
+  "/profile/info",
+  "/profile/complete",
+  "/auth/oauth/result",
 ];
 
 const AuthWatcher = () => {
