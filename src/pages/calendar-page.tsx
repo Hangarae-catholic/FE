@@ -34,6 +34,46 @@ const categoryMap: Record<string, string> = {
 
 type CalendarType = (typeof calendarTypes)[number];
 
+const CALENDAR_STORAGE_KEY = "hangarae-calendar-state";
+
+interface SavedCalendarState {
+  year: number;
+  month: number;
+  selectedDate: string | null;
+  calendarType: CalendarType;
+  calendarCollege: string;
+}
+
+const getSavedCalendarState = (): SavedCalendarState | null => {
+  try {
+    const saved = sessionStorage.getItem(CALENDAR_STORAGE_KEY);
+
+    if (!saved) return null;
+
+    const parsed: SavedCalendarState = JSON.parse(saved);
+
+    // 저장된 값이 올바른지 확인
+    if (
+      !Number.isInteger(parsed.year) ||
+      !Number.isInteger(parsed.month) ||
+      parsed.month < 0 ||
+      parsed.month > 11 ||
+      !calendarTypes.includes(parsed.calendarType) ||
+      !(
+        parsed.calendarCollege === "전체" ||
+        majorOptions.includes(parsed.calendarCollege)
+      )
+    ) {
+      return null;
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error("캘린더 상태 불러오기 실패:", error);
+    return null;
+  }
+};
+
 const majorOptions = [
   "경영대학",
   "글로벌경영학부",
@@ -140,7 +180,6 @@ const formatShortDate = (dateTime: string) => {
   return `${day}일(${weekdays[date.getDay()]})`;
 };
 
-// 날짜 부분만 추출 (YYYY-MM-DD)
 const getDatePart = (dateTime: string) => {
   return dateTime.slice(0, 10);
 };
@@ -190,7 +229,6 @@ const getWeekBars = (
     const start = getDatePart(event.startAt);
     const end = getDatePart(event.endAt);
 
-    // 해당 주에서 시작하는 칸
     const startColumn = weekDates.findIndex(
       (date) => formatDateKey(date) >= start,
     );
@@ -254,34 +292,67 @@ const CalendarPage = () => {
 
   const suppressClick = useRef(false);
 
-  // 기본 학사일정
   const [academicEvents, setAcademicEvents] = useState<CalendarEvents[]>([]);
 
-  // 필터로 조회한 교내 행사
   const [noticeEvents, setNoticeEvents] = useState<CalendarEvents[]>([]);
 
-  // 로딩 상태
   const [isAcademicLoading, setIsAcademicLoading] = useState(false);
   const [isNoticeLoading, setIsNoticeLoading] = useState(false);
 
-  // 에러 상태
   const [academicError, setAcademicError] = useState<string | null>(null);
 
   const isCalendarLoading = isAcademicLoading || isNoticeLoading;
 
-  const [currentMonth, setCurrentMonth] = useState(
-    () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-  );
+  const [savedState] = useState(() => getSavedCalendarState());
 
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    if (savedState) {
+      return new Date(savedState.year, savedState.month, 1);
+    }
+
+    return new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  });
+
+  const [selectedDate, setSelectedDate] = useState<string | null>(
+    savedState?.selectedDate ?? null,
+  );
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const [calendarType, setCalendarType] = useState<CalendarType>("전체");
-  const [calendarCollege, setCalendarCollege] = useState("전체");
+  const [calendarType, setCalendarType] = useState<CalendarType>(
+    savedState?.calendarType ?? "전체",
+  );
 
-  const [draftType, setDraftType] = useState<CalendarType>("전체");
-  const [draftCollege, setDraftCollege] = useState("전체");
+  const [calendarCollege, setCalendarCollege] = useState(
+    savedState?.calendarCollege ?? "전체",
+  );
+
+  const [draftType, setDraftType] = useState<CalendarType>(
+    savedState?.calendarType ?? "전체",
+  );
+
+  const [draftCollege, setDraftCollege] = useState(
+    savedState?.calendarCollege ?? "전체",
+  );
+
+  useEffect(() => {
+    const calendarState: SavedCalendarState = {
+      year: currentMonth.getFullYear(),
+      month: currentMonth.getMonth(),
+      selectedDate,
+      calendarType,
+      calendarCollege,
+    };
+
+    try {
+      sessionStorage.setItem(
+        CALENDAR_STORAGE_KEY,
+        JSON.stringify(calendarState),
+      );
+    } catch (error) {
+      console.error("캘린더 상태 저장 실패:", error);
+    }
+  }, [currentMonth, selectedDate, calendarType, calendarCollege]);
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -317,7 +388,6 @@ const CalendarPage = () => {
     setSelectedDate(null);
   };
 
-  // 날짜 선택
   const handleSelectDate = (date: Date) => {
     const clickedYear = date.getFullYear();
     const clickedMonth = date.getMonth();
@@ -331,14 +401,12 @@ const CalendarPage = () => {
     setSelectedDate((prev) => (prev === key ? null : key));
   };
 
-  // 필터 열기
   const openFilter = () => {
     setDraftType(calendarType);
     setDraftCollege(calendarCollege);
     setIsFilterOpen(true);
   };
 
-  // 필터 적용
   const applyFilter = () => {
     setCalendarType(draftType);
     setCalendarCollege(draftCollege);
@@ -359,11 +427,9 @@ const CalendarPage = () => {
 
     const distanceY = event.changedTouches[0].clientY - touchStartY.current;
 
-    // 세로 스크롤보다 가로 스와이프가 확실히 클 때만 처리
     if (Math.abs(distanceX) > 60 && Math.abs(distanceX) > Math.abs(distanceY)) {
       suppressClick.current = true;
 
-      // 왼쪽 → 다음 달 / 오른쪽 → 이전 달
       changeMonth(distanceX < 0 ? 1 : -1);
 
       window.setTimeout(() => {
