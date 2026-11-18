@@ -5,6 +5,7 @@ import axios from "axios";
 import Button from "../../components/common/Button";
 import TopBar from "../../components/common/TopBar";
 import { sendEmailCode, signUp, verifyEmailCode } from "../../apis/auth";
+import { AuthStore } from "../../store/AuthStore";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -173,8 +174,13 @@ const SignupPage = () => {
     try {
       const response = await signUp(body);
 
-      console.log("회원가입 성공 응답:", response);
-      navigate("/welcome", { replace: true });
+      if (!response.data?.accessToken || !response.data?.refreshToken) {
+        throw new Error("회원가입 후 인증 토큰이 없습니다.");
+      }
+
+      AuthStore.getState().setAuth(response.data);
+
+      navigate("/welcome");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("HTTP 상태:", error.response?.status);
