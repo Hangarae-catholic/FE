@@ -29,7 +29,7 @@ const categoryMap: Record<string, string> = {
   "학과·학사": "DEPARTMENT_ACADEMIC",
   장학: "SCHOLARSHIP",
   취창업: "EMPLOYMENT_STARTUP",
-  공모전: "CONTEST",
+  공모전: "CONTEST_COMPETITION",
 };
 
 type CalendarType = (typeof calendarTypes)[number];
