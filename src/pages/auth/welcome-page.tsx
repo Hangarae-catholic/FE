@@ -2,11 +2,20 @@ import { useNavigate } from "react-router-dom";
 
 import Button from "../../components/common/Button";
 import welcomeCapy from "../../assets/images/capy_welcome.svg";
+import { AuthStore } from "../../store/AuthStore";
 
 const WelcomePage = () => {
   const navigate = useNavigate();
 
   const handleStart = () => {
+    const { accessToken, refreshToken, isAuthenticated } = AuthStore.getState();
+
+    console.log("회원가입 직후 인증 상태:", {
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken,
+      isAuthenticated,
+    });
+
     navigate("/profile/setup", { replace: true });
   };
 
