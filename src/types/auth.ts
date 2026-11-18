@@ -35,7 +35,7 @@ export type SignUpRequest = {
   confirmPassword: string;
 };
 
-export type SignUpResponse = CommonResponse<string>;
+export type SignUpResponse = CommonResponse<LoginData>;
 
 // 이메일 인증
 export type EmailPurpose = "JOIN" | "FIND_ID" | "RESET_PASSWORD";
