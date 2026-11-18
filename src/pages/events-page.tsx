@@ -44,7 +44,7 @@ export default function EventsPage() {
   const [Events, setEvents] = useState<EventRetreiveResponse>();
   const [eventLoading, setEventLoading] = useState(true);
 
-  const [eventsLikes, setEventLikes] = useState<EventLikeResponse>();
+  const [eventsLikes, setEventLikes] = useState<Record<number, EventLikeResponse>>({});
   const [eventLikesLoading, setEventLikesLoading] = useState(false);
 
   useEffect(() => {
@@ -134,13 +134,48 @@ export default function EventsPage() {
   // 목록 날짜 필터링
   const filteredListEvents = approvedEvents.filter((event) => isEventInDateRange(event.startAt, event.endAt, selectedListDate[0], switchOn ? selectedListDate[1] : selectedListDate[0])) ?? [];
 
+  const filteredEventIds = filteredListEvents.map((event) => event.noticeId).join(',');
+
+  useEffect(() => {
+    if (isMap || !filteredEventIds) return;
+
+    const fetchAllEventLikes = async () => {
+      try {
+        setEventLikesLoading(true);
+
+        const noticeIds = filteredEventIds.split(',').map(Number);
+
+        const results = await Promise.all(noticeIds.map((noticeId) => getEventLikes(noticeId)));
+
+        setEventLikes((prev) => {
+          const updated = { ...prev };
+
+          noticeIds.forEach((noticeId, index) => {
+            updated[noticeId] = results[index];
+          });
+
+          return updated;
+        });
+      } catch (error) {
+        console.error('행사 목록 추천/비추천 조회 실패:', error);
+      } finally {
+        setEventLikesLoading(false);
+      }
+    };
+
+    fetchAllEventLikes();
+  }, [isMap, filteredEventIds]);
+
   const fetchEventLikes = async (noticeId: number) => {
     try {
       setEventLikesLoading(true);
 
       const data = await getEventLikes(noticeId);
 
-      setEventLikes(data);
+      setEventLikes((prev) => ({
+        ...prev,
+        [noticeId]: data,
+      }));
     } catch (error) {
       console.error('행사 추천수 조회 실패:', error);
     } finally {
@@ -152,14 +187,14 @@ export default function EventsPage() {
     try {
       setEventLikesLoading(true);
 
-      // 1. 추천 / 비추천 등록
       await postEventLikes(noticeId, type);
 
-      // 2. 등록 성공 후 최신 추천 정보 조회
       const data = await getEventLikes(noticeId);
 
-      // 3. 최신 정보 반영
-      setEventLikes(data);
+      setEventLikes((prev) => ({
+        ...prev,
+        [noticeId]: data,
+      }));
     } catch (error) {
       console.error('행사 추천/비추천 등록 실패:', error);
     } finally {
@@ -199,11 +234,10 @@ export default function EventsPage() {
               setSelectedBuilding(buildingName);
               setCurrentSlide(1);
               setShowEventCard(true);
-
               if (selectedEvents.length > 0) {
                 fetchEventLikes(selectedEvents[0].noticeId);
               } else {
-                setEventLikes(undefined);
+                setEventLikes({});
               }
             }}
             events={filteredEvents}
@@ -239,8 +273,8 @@ export default function EventsPage() {
                     <EventCard
                       id={event.noticeId}
                       title={event.name}
-                      recommend={eventsLikes?.data?.likeCount}
-                      unrecommend={eventsLikes?.data?.dislikeCount}
+                      recommend={eventsLikes[event.noticeId]?.data?.likeCount}
+                      unrecommend={eventsLikes[event.noticeId]?.data?.dislikeCount}
                       image={event.imageUrls}
                       location={buildingCoordinates.find((bc) => bc.id === event.location)?.name}
                       startDate={event.startAt}
@@ -250,7 +284,7 @@ export default function EventsPage() {
                       currentSlide={currentSlide}
                       eventsNum={selectedBuildingEvents.length}
                       onSlideChange={(index) => swiperRef.current?.slideTo(index)}
-                      userReaction={eventsLikes?.data?.userReaction ?? null}
+                      userReaction={eventsLikes[event.noticeId]?.data?.userReaction ?? null}
                       onReact={(reaction) => handleEventReaction(event.noticeId, reaction)}
                       onClose={setShowEventCard}
                       isLoading={eventLikesLoading}
@@ -263,14 +297,14 @@ export default function EventsPage() {
             <EventCard
               id={selectedBuildingEvents[0].noticeId}
               title={selectedBuildingEvents[0].name}
-              recommend={eventsLikes?.data?.likeCount}
-              unrecommend={eventsLikes?.data?.dislikeCount}
+              recommend={eventsLikes[selectedBuildingEvents[0].noticeId]?.data?.likeCount}
+              unrecommend={eventsLikes[selectedBuildingEvents[0].noticeId]?.data?.dislikeCount}
               image={selectedBuildingEvents[0].imageUrls}
               location={buildingCoordinates.find((bc) => bc.id === selectedBuildingEvents[0].location)?.name}
               startDate={selectedBuildingEvents[0].startAt}
               endDate={selectedBuildingEvents[0].endAt}
               content={selectedBuildingEvents[0].summary}
-              userReaction={eventsLikes?.data?.userReaction ?? null}
+              userReaction={eventsLikes[selectedBuildingEvents[0].noticeId]?.data?.userReaction ?? null}
               onReact={(reaction) => handleEventReaction(selectedBuildingEvents[0].noticeId, reaction)}
               onClose={setShowEventCard}
               isLoading={eventLikesLoading}
@@ -308,7 +342,7 @@ export default function EventsPage() {
       {filteredListEvents.length > 0 ? (
         filteredListEvents.map((event) => (
           <div key={event.noticeId} className='mt-6 flex flex-col gap-4'>
-            <EventListCard id={event.noticeId} image={event.imageUrls} title={event.name} location={buildingCoordinates.find((bc) => bc.id === event.location)?.name} startDate={event.startAt} endDate={event.endAt} likeCount={eventsLikes?.data?.likeCount} dislikeCount={eventsLikes?.data?.dislikeCount} />
+            <EventListCard id={event.noticeId} image={event.imageUrls} title={event.name} location={buildingCoordinates.find((bc) => bc.id === event.location)?.name} startDate={event.startAt} endDate={event.endAt} likeCount={eventsLikes[event.noticeId]?.data?.likeCount} dislikeCount={eventsLikes[event.noticeId]?.data?.dislikeCount} />
           </div>
         ))
       ) : (
