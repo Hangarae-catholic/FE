@@ -52,7 +52,7 @@ export default function EventDetailPage() {
           <Swiper loop={true} spaceBetween={10} slidesPerView={1} className='w-full' onSlideChange={(swiper) => setCurrentSlide(swiper.realIndex + 1)}>
             {eventDetail?.data?.imageUrls.map((img, idx) => (
               <SwiperSlide key={idx}>
-                <img src={img} alt={`${eventDetail?.data?.name} 모집글의 이미지 ${idx + 1}`} className='w-full h-37.5 object-fill rounded-t-xl' />
+                <img src={img} alt={`${eventDetail?.data?.name} 모집글의 이미지 ${idx + 1}`} className='w-full h-37.5 object-contain rounded-t-xl' />
               </SwiperSlide>
             ))}
           </Swiper>
