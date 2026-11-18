@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { LoginData } from "../types/auth";
+import { UserStore } from "./UserStore";
 
 type AuthState = {
   accessToken: string | null;
@@ -25,15 +26,21 @@ export const AuthStore = create<AuthState>()(
           isAuthenticated: true,
         }),
 
-      clearAuth: () =>
+      clearAuth: () => {
         set({
           accessToken: null,
           refreshToken: null,
           isAuthenticated: false,
-        }),
+        });
+
+        UserStore.getState().clearUser();
+      },
     }),
     {
       name: "hangarae-auth",
+
+      storage: createJSONStorage(() => sessionStorage),
+
       partialize: (state) => ({
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
