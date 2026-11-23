@@ -134,7 +134,7 @@ export default function TeamMatchPostEditPage() {
         remainingMember: Number(recruitNumber - memberCount),
         category: CATEGORIES.find((c) => c.type === category)?.id,
         detail: recruitContent,
-        contacts: [...(kakaoUrl ? [{ type: 'KAKAO_OPEN_CHAT', url: kakaoUrl }] : []), ...(instagramUrl ? [{ type: 'INSTAGRAM', url: instagramUrl }] : []), ...(mailUrl ? [{ type: 'ETC', url: mailUrl }] : [])],
+        contacts: [...(kakaoUrl ? [{ type: 'KAKAO_OPEN_CHAT', url: kakaoUrl }] : []), ...(instagramUrl ? [{ type: 'INSTAGRAM', url: `https://www.instagram.com/${instagramUrl}` }] : []), ...(mailUrl ? [{ type: 'ETC', url: mailUrl }] : [])],
         imageUrls: uploadedUrls ?? [],
       };
 
